@@ -9,6 +9,12 @@
       "badge": "Grid"
     },
     {
+      "id": "tree-grid",
+      "label": "트리·그리드",
+      "icon": "⊞",
+      "badge": "New"
+    },
+    {
       "id": "order-form",
       "label": "주문 입력",
       "icon": "✎"

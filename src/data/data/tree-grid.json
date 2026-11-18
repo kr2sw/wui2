@@ -1,0 +1,163 @@
+{
+  "values": {
+    "workboard": {
+      "tree": [
+        "dev-web",
+        "design-ui"
+      ],
+      "grid": []
+    }
+  },
+  "grids": {
+    "tasks": [
+      {
+        "task": "디자인 시스템 토큰 정리",
+        "owner": "김민준",
+        "dept": "dev-web",
+        "due": "2026-11-20",
+        "priority": "high",
+        "progress": 80,
+        "done": false,
+        "note": "공통 컬러/간격 반영"
+      },
+      {
+        "task": "대시보드 차트 접근성 점검",
+        "owner": "이서연",
+        "dept": "dev-web",
+        "due": "2026-11-22",
+        "priority": "normal",
+        "progress": 45,
+        "done": false,
+        "note": "ARIA 라벨 보강"
+      },
+      {
+        "task": "모바일 헤더 반응형 개선",
+        "owner": "박도윤",
+        "dept": "dev-mobile",
+        "due": "2026-11-23",
+        "priority": "high",
+        "progress": 30,
+        "done": false,
+        "note": ""
+      },
+      {
+        "task": "푸시 알림 설정 화면 QA",
+        "owner": "정하준",
+        "dept": "dev-qa",
+        "due": "2026-11-21",
+        "priority": "normal",
+        "progress": 60,
+        "done": false,
+        "note": "회귀 테스트 포함"
+      },
+      {
+        "task": "컴포넌트 스펙 문서화",
+        "owner": "최지우",
+        "dept": "design-ui",
+        "due": "2026-11-24",
+        "priority": "normal",
+        "progress": 50,
+        "done": false,
+        "note": "Figma 링크 정리"
+      },
+      {
+        "task": "브랜드 아이콘 세트 업데이트",
+        "owner": "강수아",
+        "dept": "design-brand",
+        "due": "2026-11-26",
+        "priority": "low",
+        "progress": 20,
+        "done": false,
+        "note": ""
+      },
+      {
+        "task": "파트너 제안서 템플릿 작성",
+        "owner": "윤지호",
+        "dept": "biz-sales",
+        "due": "2026-11-25",
+        "priority": "high",
+        "progress": 10,
+        "done": false,
+        "note": "신규 거래처용"
+      },
+      {
+        "task": "고객 문의 FAQ 정비",
+        "owner": "임하은",
+        "dept": "biz-cs",
+        "due": "2026-11-19",
+        "priority": "normal",
+        "progress": 100,
+        "done": true,
+        "note": "배포 완료"
+      }
+    ]
+  },
+  "trees": {
+    "departments": [
+      {
+        "id": "company",
+        "label": "WUI 주식회사",
+        "icon": "🏢",
+        "expanded": true,
+        "children": [
+          {
+            "id": "dev",
+            "label": "개발본부",
+            "icon": "⌨️",
+            "children": [
+              {
+                "id": "dev-web",
+                "label": "웹플랫폼팀",
+                "icon": "🌐"
+              },
+              {
+                "id": "dev-mobile",
+                "label": "모바일팀",
+                "icon": "📱"
+              },
+              {
+                "id": "dev-qa",
+                "label": "품질관리팀",
+                "icon": "🧪"
+              }
+            ]
+          },
+          {
+            "id": "design",
+            "label": "디자인센터",
+            "icon": "🎨",
+            "children": [
+              {
+                "id": "design-ui",
+                "label": "UI팀",
+                "icon": "✏️"
+              },
+              {
+                "id": "design-brand",
+                "label": "브랜드팀",
+                "icon": "🖌️"
+              }
+            ]
+          },
+          {
+            "id": "business",
+            "label": "사업본부",
+            "icon": "📈",
+            "children": [
+              {
+                "id": "biz-sales",
+                "label": "영업1팀",
+                "icon": "🤝"
+              },
+              {
+                "id": "biz-cs",
+                "label": "고객지원팀",
+                "icon": "🎧"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

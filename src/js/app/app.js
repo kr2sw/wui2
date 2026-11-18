@@ -47,6 +47,7 @@ export function createApp(mount, options = {}) {
     logs: [],
     loadingMenu: false,
     menuError: null,
+    sidebarCollapsed: false,
   };
 
   /* ------------------------------ 마크업 ------------------------------ */
@@ -56,6 +57,11 @@ export function createApp(mount, options = {}) {
   const menuNav = h('nav.wui-app-menu', { 'aria-label': '메뉴' });
   const sideFoot = h('div.wui-app-sidefoot');
   const overlayEl = h('div.wui-app-overlay', { hidden: true });
+  const sideToggleBtn = h('button.wui-app-sidebartoggle', {
+    type: 'button',
+    title: '메뉴 접기',
+    'aria-label': '메뉴 접기',
+  }, '«');
 
   const mainEl = h('div.wui-app-main');
   const topEl = h('header.wui-app-top');
@@ -89,12 +95,26 @@ export function createApp(mount, options = {}) {
   }
 
   /* ------------------------------ 브랜드/스킨 ------------------------------ */
+  function isMobileSidebar() {
+    return window.matchMedia('(max-width: 980px)').matches;
+  }
+
+  function setMenuCollapsed(collapsed) {
+    state.sidebarCollapsed = Boolean(collapsed);
+    rootEl.classList.toggle('is-menu-collapsed', state.sidebarCollapsed);
+    const label = state.sidebarCollapsed ? '메뉴 펼치기' : '메뉴 접기';
+    sideToggleBtn.title = label;
+    sideToggleBtn.setAttribute('aria-label', label);
+    sideToggleBtn.textContent = state.sidebarCollapsed ? '»' : '«';
+  }
+
   function renderBrand() {
     brandEl.innerHTML = '';
     brandEl.appendChild(h('div.wui-app-logo', {}, opts.logo || 'W'));
     brandEl.appendChild(h('div.wui-app-brandtext', {},
       h('div.wui-app-brandtitle', {}, opts.title || 'WUI'),
       h('div.wui-app-brandsub', {}, opts.subtitle || '')));
+    brandEl.appendChild(sideToggleBtn);
   }
 
   let skinPicker = null;
@@ -200,6 +220,7 @@ export function createApp(mount, options = {}) {
         const open = state.open.has(item.id);
         const btn = h('button.wui-app-menubtn', {
           type: 'button',
+          title: item.label,
           class: [
             hasChildren ? 'is-group' : 'is-leaf',
             active ? 'is-active' : '',
@@ -215,6 +236,12 @@ export function createApp(mount, options = {}) {
         if (hasChildren) btn.appendChild(h('span.wui-app-menuchev', {}, open ? '▾' : '▸'));
         btn.addEventListener('click', () => {
           if (hasChildren) {
+            if (state.sidebarCollapsed && !isMobileSidebar()) {
+              setMenuCollapsed(false);
+              if (!state.open.has(item.id)) state.open.add(item.id);
+              renderMenu();
+              return;
+            }
             if (state.open.has(item.id)) state.open.delete(item.id);
             else state.open.add(item.id);
             renderMenu();
@@ -637,6 +664,7 @@ export function createApp(mount, options = {}) {
       h('div', {}, h('span.wui-badge', {}, 'Skin'), h('div.wui-small', {}, '테마 · 모양 · 밀도')))));
   viewEl.appendChild(welcomeEl);
 
+  sideToggleBtn.addEventListener('click', () => setMenuCollapsed(!state.sidebarCollapsed));
   menuBtn.addEventListener('click', () => setSidebar(!rootEl.classList.contains('is-sidebar-open')));
   overlayEl.addEventListener('click', () => setSidebar(false));
   refreshBtn.addEventListener('click', () => {
@@ -696,9 +724,12 @@ export function createApp(mount, options = {}) {
     closeTab,
     toggleLog,
     toast,
+    setMenuCollapsed,
+    toggleMenu: () => setMenuCollapsed(!state.sidebarCollapsed),
     getState: () => ({
       menu: state.menu, items: state.items, tabs: state.tabs.map((t) => ({ id: t.id, label: t.label, loaded: t.loaded })),
       activeId: state.activeId, logs: state.logs.slice(), loading: state.loadingMenu, error: state.menuError,
+      sidebarCollapsed: state.sidebarCollapsed,
     }),
     on: (type, fn) => emitter.on(type, fn),
     off: (type, fn) => emitter.off(type, fn),

@@ -77,7 +77,8 @@ function demoCard(title, description, ...children) {
 let appApi = null;
 function initApp(host) {
   if (appApi) return;
-  appApi = createApp(host, {
+  const mount = host.querySelector('#app-host') || host;
+  appApi = createApp(mount, {
     menuUrl: '/api/menu',
     layerUrl: '/api/layers/{layer}',
     dataUrl: '/api/data/{data}',
@@ -306,7 +307,54 @@ function initTree(host) {
 }
 
 /* ------------------------------------------------------------------ *
- * 5. JSON 화면 배치
+ * 5. 트리 · 그리드 (레이어 JSON 예제)
+ * ------------------------------------------------------------------ */
+function initTreeGrid(host) {
+  if (host.dataset.ready) return;
+  host.dataset.ready = '1';
+  const mount = h('div#tree-grid-mount');
+  const actions = h('div.demo-toolbar');
+  const out = makeOutput(host, { height: 180 });
+  const layer = layers['tree-grid'];
+  const data = dataMap['tree-grid'] || { values: {}, trees: {}, grids: {} };
+
+  const form = createLayout(mount, layer, {
+    values: data.values || {},
+    data,
+    onChange: ({ name, value }) => out.log('change', { name, value }),
+    onSubmit: (payload) => out.log('submit', payload.values),
+    onAction: (payload) => {
+      if (payload.action === 'json') {
+        WUI.util.download('tree-grid-values.json', JSON.stringify(payload.values, null, 2));
+        out.log('action:json', payload.values);
+      } else {
+        out.log(`action:${payload.action}`, payload.values);
+      }
+    },
+  });
+
+  actions.append(
+    demoButton('값 수집', () => out.log('getValues()', form.getValues())),
+    demoButton('검증', () => out.log('validate()', form.validate())),
+    demoButton('그리드 변경 내역', () => {
+      const board = form.getControl('workboard');
+      const grid = board && (board.grid || board);
+      out.log('getChanges', grid && isFn(grid.getChanges) ? grid.getChanges() : []);
+    }),
+    demoButton('데이터 재적용', () => {
+      form.applyData(dataMap['tree-grid'] || {});
+      out.log('applyData', '완료');
+    }),
+  );
+
+  host.appendChild(actions);
+  host.appendChild(mount);
+  host.appendChild(h('h3.demo-subtitle', {}, '이벤트 / API 결과'));
+  host.appendChild(out.el);
+}
+
+/* ------------------------------------------------------------------ *
+ * 6. JSON 화면 배치
  * ------------------------------------------------------------------ */
 const LAYOUT_SCHEMA = {
   title: '프로젝트 등록',
@@ -431,7 +479,7 @@ function initLayout(host) {
 }
 
 /* ------------------------------------------------------------------ *
- * 6. 스킨
+ * 7. 스킨
  * ------------------------------------------------------------------ */
 function initSkin(host) {
   if (host.dataset.ready) return;
@@ -545,6 +593,7 @@ const VIEWS = {
   editor: initEditor,
   grid: initGrid,
   tree: initTree,
+  'tree-grid': initTreeGrid,
   layout: initLayout,
   skin: initSkin,
 };

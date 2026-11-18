@@ -100,6 +100,7 @@ export const menu = {
   subtitle: '바닐라 JS 웹 UI 키트',
   items: [
     { id: 'dashboard', label: '대시보드', icon: '▦', badge: 'Grid' },
+    { id: 'tree-grid', label: '트리·그리드', icon: '⊞', badge: 'New' },
     { id: 'order-form', label: '주문 입력', icon: '✎' },
     { id: 'approval', label: '결재 문서', icon: '◫', badge: 'Editor' },
     { id: 'org', label: '조직도', icon: '⌘', data: false, badge: 'Tree' },
@@ -319,6 +320,111 @@ const themeButtons = [
   ['orange', '오렌지'], ['red', '레드'], ['slate', '슬레이트'], ['dark', '다크'], ['midnight', '미드나잇'],
 ];
 
+const treeGridLayer = {
+  title: '조직·업무 트리 그리드',
+  description: '좌측 조직 트리와 우측 편집형 그리드를 한 화면에 배치한 예제입니다. 그리드의 수정/추가 상태(statusColumn)와 트리 체크 값을 함께 수집합니다.',
+  actions: [
+    { label: '값 JSON', action: 'json', variant: 'ghost' },
+    { label: '초기화', action: 'reset' },
+    { label: '저장', action: 'submit', variant: 'primary' },
+  ],
+  groups: [
+    {
+      id: 'intro',
+      items: [
+        {
+          type: 'html',
+          span: 12,
+          html: `
+            <div class="wui-kpis">
+              <div class="wui-kpi"><span class="wui-kpi-label">담당 조직</span><strong>3개 팀</strong><span class="wui-kpi-diff is-up">트리 체크 연동</span></div>
+              <div class="wui-kpi"><span class="wui-kpi-label">진행 업무</span><strong>8건</strong><span class="wui-kpi-diff">그리드 편집</span></div>
+              <div class="wui-kpi"><span class="wui-kpi-label">수정 표시</span><strong>ON</strong><span class="wui-kpi-diff is-up">추가/수정 배지</span></div>
+              <div class="wui-kpi"><span class="wui-kpi-label">저장 형식</span><strong>JSON</strong><span class="wui-kpi-diff">{ tree, grid }</span></div>
+            </div>`,
+        },
+      ],
+    },
+    {
+      id: 'board',
+      title: '업무 배정 보드',
+      description: '왼쪽에서 조직을 선택(체크)하고, 오른쪽 그리드에서 업무를 편집하세요. 행을 수정하거나 추가하면 상태 열에 표시됩니다.',
+      aside: '레이어: /api/layers/tree-grid · 데이터: /api/data/tree-grid',
+      items: [
+        {
+          type: 'tree-grid',
+          name: 'workboard',
+          span: 12,
+          treeKey: 'departments',
+          gridKey: 'tasks',
+          treeWidth: 300,
+          height: 360,
+          gridTitle: '업무 목록',
+          filterRow: true,
+          statusColumn: true,
+          search: true,
+          columns: [
+            { key: 'task', title: '업무명', type: 'text', width: 220, required: true, frozen: 'left' },
+            { key: 'owner', title: '담당자', type: 'text', width: 110 },
+            { key: 'dept', title: '조직', type: 'select', width: 120, options: [
+              { value: 'dev-web', label: '웹플랫폼팀' },
+              { value: 'dev-mobile', label: '모바일팀' },
+              { value: 'dev-qa', label: '품질관리팀' },
+              { value: 'design-ui', label: 'UI팀' },
+              { value: 'design-brand', label: '브랜드팀' },
+              { value: 'biz-sales', label: '영업1팀' },
+              { value: 'biz-cs', label: '고객지원팀' },
+            ] },
+            { key: 'due', title: '마감일', type: 'date', width: 120 },
+            { key: 'priority', title: '우선순위', type: 'select', width: 100, options: [
+              { value: 'high', label: '높음' },
+              { value: 'normal', label: '보통' },
+              { value: 'low', label: '낮음' },
+            ] },
+            { key: 'progress', title: '진행률', type: 'slider', width: 160, min: 0, max: 100 },
+            { key: 'done', title: '완료', type: 'checkbox', width: 70 },
+            { key: 'note', title: '비고', type: 'text', width: 220 },
+          ],
+        },
+      ],
+    },
+    {
+      id: 'guide',
+      title: '화면 구성 안내',
+      items: [
+        {
+          type: 'html',
+          span: 6,
+          html: `<div class="wui-note">
+            <strong>레이어 JSON 구성 (type: "tree-grid")</strong>
+            <p>트리와 그리드를 하나의 컨트롤로 배치합니다. 데이터는 <code>data.trees[treeKey]</code>, <code>data.grids[gridKey]</code>에서 로드합니다.</p>
+            <pre class="wui-pre">{
+  "type": "tree-grid",
+  "name": "workboard",
+  "treeKey": "departments",
+  "gridKey": "tasks",
+  "statusColumn": true,
+  "columns": [ ... ]
+}</pre>
+          </div>`,
+        },
+        {
+          type: 'html',
+          span: 6,
+          html: `<div class="wui-note">
+            <strong>수집 값 / 수정 여부</strong>
+            <p>폼 값은 <code>{ tree: [체크된 노드 id], grid: [행 데이터] }</code> 형태로 수집됩니다. <code>statusColumn: true</code>이면 행 편집 시 <em>수정</em>, 추가 시 <em>추가</em> 상태가 표시되고 저장 후 기준 스냅샷이 갱신됩니다.</p>
+            <pre class="wui-pre">"workboard": {
+  "tree": ["dev-web", "design-ui"],
+  "grid": [{ "task": "...", "owner": "..." }]
+}</pre>
+          </div>`,
+        },
+      ],
+    },
+  ],
+};
+
 const settingsSkinLayer = {
   title: '스킨 갤러리',
   description: '색상 테마 · 모양(모서리/테두리) · 밀도를 즉시 바꿉니다. 선택값은 localStorage 에 저장됩니다.',
@@ -374,6 +480,7 @@ export const layers = {
   'order-form': orderFormLayer,
   approval: approvalLayer,
   org: orgLayer,
+  'tree-grid': treeGridLayer,
   'settings-general': settingsGeneralLayer,
   'settings-skin': settingsSkinLayer,
 };
@@ -438,6 +545,27 @@ export const dataMap = {
       retention: '90일',
       memo: '매주 월요일 오전에 점검합니다.',
     },
+  },
+  'tree-grid': {
+    values: {
+      workboard: {
+        tree: ['dev-web', 'design-ui'],
+        grid: [],
+      },
+    },
+    grids: {
+      tasks: [
+        { task: '디자인 시스템 토큰 정리', owner: '김민준', dept: 'dev-web', due: '2026-11-20', priority: 'high', progress: 80, done: false, note: '공통 컬러/간격 반영' },
+        { task: '대시보드 차트 접근성 점검', owner: '이서연', dept: 'dev-web', due: '2026-11-22', priority: 'normal', progress: 45, done: false, note: 'ARIA 라벨 보강' },
+        { task: '모바일 헤더 반응형 개선', owner: '박도윤', dept: 'dev-mobile', due: '2026-11-23', priority: 'high', progress: 30, done: false, note: '' },
+        { task: '푸시 알림 설정 화면 QA', owner: '정하준', dept: 'dev-qa', due: '2026-11-21', priority: 'normal', progress: 60, done: false, note: '회귀 테스트 포함' },
+        { task: '컴포넌트 스펙 문서화', owner: '최지우', dept: 'design-ui', due: '2026-11-24', priority: 'normal', progress: 50, done: false, note: 'Figma 링크 정리' },
+        { task: '브랜드 아이콘 세트 업데이트', owner: '강수아', dept: 'design-brand', due: '2026-11-26', priority: 'low', progress: 20, done: false, note: '' },
+        { task: '파트너 제안서 템플릿 작성', owner: '윤지호', dept: 'biz-sales', due: '2026-11-25', priority: 'high', progress: 10, done: false, note: '신규 거래처용' },
+        { task: '고객 문의 FAQ 정비', owner: '임하은', dept: 'biz-cs', due: '2026-11-19', priority: 'normal', progress: 100, done: true, note: '배포 완료' },
+      ],
+    },
+    trees: { departments: DEPARTMENT_TREE },
   },
   'settings-skin': { values: {} },
 };

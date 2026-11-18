@@ -30,6 +30,7 @@
         <button class="demo-navbtn" type="button" role="tab" data-view="editor">에디터</button>
         <button class="demo-navbtn" type="button" role="tab" data-view="grid">그리드</button>
         <button class="demo-navbtn" type="button" role="tab" data-view="tree">트리</button>
+        <button class="demo-navbtn" type="button" role="tab" data-view="tree-grid">트리·그리드</button>
         <button class="demo-navbtn" type="button" role="tab" data-view="layout">레이아웃</button>
         <button class="demo-navbtn" type="button" role="tab" data-view="skin">스킨</button>
       </nav>
@@ -83,7 +84,19 @@
         </div>
       </section>
 
-      <!-- 5. JSON 화면 배치 -->
+      <!-- 5. 트리 · 그리드 -->
+      <section class="demo-view" data-view="tree-grid" aria-label="트리 그리드 데모">
+        <div class="demo-pagehead">
+          <div>
+            <p class="demo-eyebrow">WUI layout · type: "tree-grid"</p>
+            <h1>트리 · 그리드</h1>
+            <p>좌측 조직 트리와 우측 편집형 그리드를 레이어 JSON으로 한 화면에 배치합니다. 그리드 상태 열(<code>statusColumn</code>)로 수정/추가 여부를 표시하고, 값은 <code>{ tree, grid }</code>로 수집됩니다.</p>
+          </div>
+          <code class="wui-code">createLayout('#host', layer, { data })</code>
+        </div>
+      </section>
+
+      <!-- 6. JSON 화면 배치 -->
       <section class="demo-view" data-view="layout" aria-label="레이아웃 데모">
         <div class="demo-pagehead">
           <div>
@@ -95,7 +108,7 @@
         </div>
       </section>
 
-      <!-- 6. 스킨 -->
+      <!-- 7. 스킨 -->
       <section class="demo-view" data-view="skin" aria-label="스킨 데모">
         <div class="demo-pagehead">
           <div>
