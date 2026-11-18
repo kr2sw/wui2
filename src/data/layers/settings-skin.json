@@ -1,0 +1,187 @@
+{
+  "title": "스킨 갤러리",
+  "description": "색상 테마 · 모양(모서리/테두리) · 밀도를 즉시 바꿉니다. 선택값은 localStorage 에 저장됩니다.",
+  "groups": [
+    {
+      "id": "colors",
+      "title": "색상 테마",
+      "items": [
+        {
+          "type": "button",
+          "name": "theme-blue",
+          "span": 2,
+          "text": "블루",
+          "action": "theme",
+          "theme": "blue",
+          "variant": "primary"
+        },
+        {
+          "type": "button",
+          "name": "theme-indigo",
+          "span": 2,
+          "text": "인디고",
+          "action": "theme",
+          "theme": "indigo"
+        },
+        {
+          "type": "button",
+          "name": "theme-green",
+          "span": 2,
+          "text": "그린",
+          "action": "theme",
+          "theme": "green"
+        },
+        {
+          "type": "button",
+          "name": "theme-teal",
+          "span": 2,
+          "text": "틸",
+          "action": "theme",
+          "theme": "teal"
+        },
+        {
+          "type": "button",
+          "name": "theme-purple",
+          "span": 2,
+          "text": "퍼플",
+          "action": "theme",
+          "theme": "purple"
+        },
+        {
+          "type": "button",
+          "name": "theme-orange",
+          "span": 2,
+          "text": "오렌지",
+          "action": "theme",
+          "theme": "orange"
+        },
+        {
+          "type": "button",
+          "name": "theme-red",
+          "span": 2,
+          "text": "레드",
+          "action": "theme",
+          "theme": "red"
+        },
+        {
+          "type": "button",
+          "name": "theme-slate",
+          "span": 2,
+          "text": "슬레이트",
+          "action": "theme",
+          "theme": "slate"
+        },
+        {
+          "type": "button",
+          "name": "theme-dark",
+          "span": 2,
+          "text": "다크",
+          "action": "theme",
+          "theme": "dark"
+        },
+        {
+          "type": "button",
+          "name": "theme-midnight",
+          "span": 2,
+          "text": "미드나잇",
+          "action": "theme",
+          "theme": "midnight"
+        }
+      ]
+    },
+    {
+      "id": "shapes",
+      "title": "모양",
+      "items": [
+        {
+          "type": "button",
+          "name": "shape-sharp",
+          "span": 2,
+          "text": "각진",
+          "action": "shape",
+          "shape": "sharp"
+        },
+        {
+          "type": "button",
+          "name": "shape-soft",
+          "span": 2,
+          "text": "부드럽게",
+          "action": "shape",
+          "shape": "soft"
+        },
+        {
+          "type": "button",
+          "name": "shape-round",
+          "span": 2,
+          "text": "둥글게",
+          "action": "shape",
+          "shape": "round"
+        },
+        {
+          "type": "button",
+          "name": "shape-pill",
+          "span": 2,
+          "text": "캡슐",
+          "action": "shape",
+          "shape": "pill"
+        },
+        {
+          "type": "button",
+          "name": "border-toggle",
+          "span": 2,
+          "text": "테두리 토글",
+          "action": "borders"
+        },
+        {
+          "type": "button",
+          "name": "skin-reset",
+          "span": 2,
+          "text": "기본값",
+          "action": "skin-reset",
+          "variant": "ghost"
+        }
+      ]
+    },
+    {
+      "id": "density",
+      "title": "밀도",
+      "items": [
+        {
+          "type": "button",
+          "name": "density-compact",
+          "span": 2,
+          "text": "좁게",
+          "action": "density",
+          "density": "compact"
+        },
+        {
+          "type": "button",
+          "name": "density-normal",
+          "span": 2,
+          "text": "보통",
+          "action": "density",
+          "density": "normal"
+        },
+        {
+          "type": "button",
+          "name": "density-comfortable",
+          "span": 2,
+          "text": "넓게",
+          "action": "density",
+          "density": "comfortable"
+        }
+      ]
+    },
+    {
+      "id": "summary",
+      "title": "현재 스킨",
+      "items": [
+        {
+          "type": "html",
+          "span": 12,
+          "html": "<div class=\"wui-note\">\n            <p>버튼 액션은 <code>handleAction</code> 에서 <code>theme</code>, <code>shape</code>, <code>density</code>, <code>borders</code>, <code>skin-reset</code> 로 처리됩니다.</p>\n            <pre class=\"wui-pre\">WUI.skin.setTheme('green');\nWUI.skin.setShape({ radius: 10, borders: false });\nWUI.skin.setDensity('compact');</pre>\n          </div>"
+        }
+      ]
+    }
+  ]
+}

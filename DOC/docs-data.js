@@ -1,0 +1,1090 @@
+/*!
+ * WUI 문서 데이터 - tools/build-docs.mjs 가 자동 생성합니다.
+ * 직접 수정하지 말고 DOC/*.md 수정 후 npm run build:docs 를 실행하세요.
+ */
+window.WUI_DOCS = {
+  "schema": 1,
+  "generator": "tools/build-docs.mjs",
+  "docs": [
+    {
+      "id": "01-overview",
+      "file": "01-overview.md",
+      "order": 1,
+      "title": "01. 개요",
+      "summary": "WUI 는 특정 프레임워크나 빌드 도구 없이 동작하는 바닐라 자바스크립트 UI 키트입니다. 업무 화면에서 반복적으로 필요한 문서 편집, 대량 데이터 편집, 계층 데이터 탐색, JSON 기반 화면 구성, 메뉴 기반 앱 셸, 스킨 전환을 각각 독립 모듈로 제공하고, 하나의 전역 객체 WUI 로 묶습니다.",
+      "headings": [
+        {
+          "id": "1-목표",
+          "text": "1. 목표",
+          "level": 2
+        },
+        {
+          "id": "2-설계-원칙",
+          "text": "2. 설계 원칙",
+          "level": 2
+        },
+        {
+          "id": "3-기능-범위",
+          "text": "3. 기능 범위",
+          "level": 2
+        },
+        {
+          "id": "31-웹-에디터",
+          "text": "3.1 웹 에디터",
+          "level": 3
+        },
+        {
+          "id": "32-편집형-그리드",
+          "text": "3.2 편집형 그리드",
+          "level": 3
+        },
+        {
+          "id": "33-트리",
+          "text": "3.3 트리",
+          "level": 3
+        },
+        {
+          "id": "34-json-화면-배치",
+          "text": "3.4 JSON 화면 배치",
+          "level": 3
+        },
+        {
+          "id": "35-메뉴레이어데이터-앱",
+          "text": "3.5 메뉴·레이어·데이터 앱",
+          "level": 3
+        },
+        {
+          "id": "36-스킨",
+          "text": "3.6 스킨",
+          "level": 3
+        },
+        {
+          "id": "4-브라우저-요구-사항",
+          "text": "4. 브라우저 요구 사항",
+          "level": 2
+        },
+        {
+          "id": "5-가장-작은-예제",
+          "text": "5. 가장 작은 예제",
+          "level": 2
+        },
+        {
+          "id": "6-문서-읽는-순서",
+          "text": "6. 문서 읽는 순서",
+          "level": 2
+        }
+      ],
+      "markdown": "# 01. 개요\n\nWUI 는 특정 프레임워크나 빌드 도구 없이 동작하는 바닐라 자바스크립트 UI 키트입니다. 업무 화면에서 반복적으로 필요한 **문서 편집**, **대량 데이터 편집**, **계층 데이터 탐색**, **JSON 기반 화면 구성**, **메뉴 기반 앱 셸**, **스킨 전환**을 각각 독립 모듈로 제공하고, 하나의 전역 객체 `WUI` 로 묶습니다.\n\n## 1. 목표\n\n1. **의존성 없는 실행** — 번들러, 트랜스파일러, UI 라이브러리 없이 최신 브라우저에서 바로 실행합니다.\n2. **함수형 사용** — 모든 기능은 `create*` 팩토리로 생성하고, 반환된 API 객체로 제어합니다.\n3. **JSON 주도 화면** — 메뉴, 레이어, 데이터, 트리, 폼 배치를 JSON 으로 정의합니다.\n4. **업무 화면 수준의 기능** — 고정 열, 가상 스크롤, 검증, 변경 추적, 지연 로딩, 오류 복구를 포함합니다.\n5. **한 곳에서 확장** — 컨트롤 레지스트리, 테마 등록, URL 템플릿, 이벤트 훅으로 기능을 확장합니다.\n6. **문서와 데모의 일치** — 문서의 예제와 API 설명은 실제 구현을 기준으로 작성합니다.\n\n## 2. 설계 원칙\n\n| 원칙 | 구현 |\n| --- | --- |\n| 작은 코어 | `core/util.js`, `core/emitter.js`, `core/ajax.js`, `core/skin.js` 만 공통 기반으로 사용 |\n| 팩토리 패턴 | `createEditor`, `createGrid`, `createTree`, `createLayout`, `createApp` |\n| API 객체 | 각 팩토리는 `el`, 상태 getter, 명령 메서드, `on/off`, `destroy` 를 반환 |\n| 선언적 UI | 레이아웃은 JSON 스키마, 앱은 메뉴 JSON, 데이터는 데이터 JSON |\n| 이벤트 기반 | 모든 컴포넌트가 자체 `Emitter` 를 가지며 옵션 콜백과 이벤트를 함께 제공 |\n| CSS 토큰 | 색상·간격·모서리·그림자를 CSS 변수로 두고 `data-wui-theme/shape/density` 로 전환 |\n| 점진적 향상 | 서버가 없으면 mock 응답으로 폴백하여 데모와 문서가 항상 동작 |\n| 명시적 정리 | `destroy()` 가 DOM, 이벤트, 타이머, 리스너를 정리 |\n\n## 3. 기능 범위\n\n### 3.1 웹 에디터\n\n- `contenteditable` 기반 리치 텍스트 편집\n- 실행 취소/다시 실행, 굵게/기울임/밑줄/취소선\n- 문단 스타일, 글자 크기, 글자색, 형광펜\n- 정렬, 글머리/번호 목록, 들여쓰기\n- 링크, 구분선, 인용, 코드 블록, 서식 지우기\n- 표 삽입과 행/열 추가·삭제, 표 삭제\n- 이미지 파일 선택, 붙여넣기, 드래그 앤 드롭\n- HTML 소스 모드, 전체화면, 자동저장, HTML 정화\n\n### 3.2 편집형 그리드\n\n- sticky 헤더, 좌/우 고정 열\n- absolute 행 배치 기반 가상 스크롤\n- 다중 정렬, 전체 검색, 열별 필터 행\n- 12종 셀 타입과 사용자 정의 셀\n- 행 추가/삭제, 범위/토글 선택, 전체 선택\n- 규칙 기반 검증, 오류 셀 표시, 첫 오류로 이동\n- 변경 내역 스냅샷, CSV 내보내기, 열 너비 저장\n- AJAX 데이터 적재와 로딩/오류 상태\n\n### 3.3 트리\n\n- 트라이스테이트 체크박스와 부모/자식 cascade\n- 검색, 일치 항목 하이라이트, 경로 자동 펼침\n- 키보드 탐색(방향키, Home/End, Space, Enter)\n- 노드 추가/수정/삭제, 전체 펼침/접힘\n- 지연 로딩(`lazy.load`)과 로딩 표시\n- 사용자 정의 노드 렌더\n\n### 3.4 JSON 화면 배치\n\n- 12컬럼 CSS Grid 기반 flow 배치\n- `mode: \"absolute\"` 와 `pos {x,y,w,h}` 좌표 배치\n- 그룹/섹션, 상단·하단 액션\n- 31종 기본 컨트롤, 중첩 에디터/그리드/트리\n- `visibleWhen`, `disabledWhen` 조건\n- `required`, `pattern`, `min/max`, `rules` 검증\n- `bind` 기반 데이터 바인딩과 값 수집/설정\n- `registerControl` 사용자 컨트롤 확장\n\n### 3.5 메뉴·레이어·데이터 앱\n\n- 메뉴 JSON 로드와 계층 메뉴 렌더\n- 메뉴 클릭 시 레이어 JSON + 데이터 JSON AJAX 로드\n- 탭 열기/닫기/전환, 해시 라우팅\n- 로딩/오류/재시도, AJAX 로그 패널\n- 폼 제출, 액션 처리, JSON 다운로드\n- 스킨 패널과 테마/모양/밀도 전환\n\n### 3.6 스킨\n\n- 10가지 색상 테마(라이트 8, 다크 2)\n- 4가지 모양 프리셋과 모서리/테두리/그림자 조정\n- 3단계 밀도\n- localStorage 저장과 복원\n- 사용자 테마·모양 등록\n\n## 4. 브라우저 요구 사항\n\n| 항목 | 요구 |\n| --- | --- |\n| ES 모듈 | `<script type=\"module\">` 지원 브라우저 |\n| CSS | CSS 변수, Grid, sticky, `:is()` 수준의 최신 CSS |\n| API | `fetch`, `AbortController`, `URLSearchParams`, `structuredClone` 대신 자체 clone |\n| 저장소 | localStorage 사용 가능(없으면 메모리 폴백) |\n\n개발·검증 환경은 Microsoft Edge 157 헤드리스(Chromium)입니다. Node.js 는 서버와 데이터/문서 생성, 정적 검사에만 사용합니다.\n\n## 5. 가장 작은 예제\n\n```html\n<!DOCTYPE html>\n<html lang=\"ko\">\n<head>\n  <meta charset=\"utf-8\">\n  <link rel=\"stylesheet\" href=\"./src/css/tokens.css\">\n  <link rel=\"stylesheet\" href=\"./src/css/base.css\">\n  <link rel=\"stylesheet\" href=\"./src/css/tree.css\">\n</head>\n<body>\n  <div id=\"tree\"></div>\n  <script type=\"module\">\n    import WUI from './src/js/webui.js';\n\n    WUI.createTree('#tree', {\n      data: [\n        { id: 'root', label: '본사', children: [\n          { id: 'dev', label: '개발팀' },\n          { id: 'design', label: '디자인팀' },\n        ]},\n      ],\n      checkable: true,\n      cascade: true,\n      onCheck: ({ checkedNodes }) => console.log(checkedNodes),\n    });\n  </script>\n</body>\n</html>\n```\n\n## 6. 문서 읽는 순서\n\n- 처음 사용: [02. 데모 가이드](02-demo-guide.md) → [03. 아키텍처](03-architecture.md)\n- 컴포넌트 사용: [04. 에디터](04-editor.md), [05. 그리드](05-grid.md), [06. 트리](06-tree.md)\n- 화면 구성: [07. JSON 화면 배치](07-layout-json.md), [08. 메뉴·레이어·AJAX](08-menu-layer-ajax.md)\n- 디자인: [09. 스킨](09-skin.md)\n- 전체 API: [10. API 레퍼런스](10-api-reference.md)\n- 구현 이력: [11. 진행 기록](11-progress.md)\n"
+    },
+    {
+      "id": "02-demo-guide",
+      "file": "02-demo-guide.md",
+      "order": 2,
+      "title": "02. 데모 가이드",
+      "summary": "데모는 하나의 HTML 안에서 6개 뷰를 전환하는 구조입니다. 상단 내비게이션 또는 해시(#app, #editor, #grid, #tree, #layout, #skin)로 이동합니다.",
+      "headings": [
+        {
+          "id": "1-실행-방법",
+          "text": "1. 실행 방법",
+          "level": 2
+        },
+        {
+          "id": "11-서버로-실행-권장",
+          "text": "1.1 서버로 실행 (권장)",
+          "level": 3
+        },
+        {
+          "id": "12-파일로-직접-열기",
+          "text": "1.2 파일로 직접 열기",
+          "level": 3
+        },
+        {
+          "id": "2-6개-데모-뷰",
+          "text": "2. 6개 데모 뷰",
+          "level": 2
+        },
+        {
+          "id": "21-통합-앱-app",
+          "text": "2.1 통합 앱 (#app)",
+          "level": 3
+        },
+        {
+          "id": "22-에디터-editor",
+          "text": "2.2 에디터 (#editor)",
+          "level": 3
+        },
+        {
+          "id": "23-그리드-grid",
+          "text": "2.3 그리드 (#grid)",
+          "level": 3
+        },
+        {
+          "id": "24-트리-tree",
+          "text": "2.4 트리 (#tree)",
+          "level": 3
+        },
+        {
+          "id": "25-레이아웃-layout",
+          "text": "2.5 레이아웃 (#layout)",
+          "level": 3
+        },
+        {
+          "id": "26-스킨-skin",
+          "text": "2.6 스킨 (#skin)",
+          "level": 3
+        },
+        {
+          "id": "3-데이터-수정과-재생성",
+          "text": "3. 데이터 수정과 재생성",
+          "level": 2
+        },
+        {
+          "id": "4-문서-뷰어",
+          "text": "4. 문서 뷰어",
+          "level": 2
+        },
+        {
+          "id": "5-점검-명령",
+          "text": "5. 점검 명령",
+          "level": 2
+        },
+        {
+          "id": "6-문제-해결",
+          "text": "6. 문제 해결",
+          "level": 2
+        }
+      ],
+      "markdown": "# 02. 데모 가이드\n\n데모는 하나의 HTML 안에서 6개 뷰를 전환하는 구조입니다. 상단 내비게이션 또는 해시(`#app`, `#editor`, `#grid`, `#tree`, `#layout`, `#skin`)로 이동합니다.\n\n## 1. 실행 방법\n\n### 1.1 서버로 실행 (권장)\n\n```bash\nnpm start\n```\n\n- 데모: `http://localhost:4173/`\n- 문서: `http://localhost:4173/DOC/`\n- 포트 변경: `PORT=8080 npm start`\n- API 지연: `API_DELAY=800 npm start` (기본 220ms)\n- 바인딩 호스트: `HOST=127.0.0.1 npm start`\n\n서버는 정적 파일과 다음 API 를 함께 제공합니다.\n\n| 메서드 | 경로 | 응답 |\n| --- | --- | --- |\n| GET | `/api/menu` | 메뉴 JSON |\n| GET | `/api/layers/:id` | 레이어 JSON |\n| GET | `/api/data/:id` | 데이터 JSON |\n| GET | `/api/tree` | 트리 JSON |\n| POST | `/api/submit` | 저장 모의 응답 |\n| POST | `/api/action/:name` | 액션 모의 응답 |\n\n### 1.2 파일로 직접 열기\n\n`index.html` 을 더블클릭해 `file://` 로 열어도 됩니다. ES 모듈은 `file://` 에서 동작하지만 `fetch('/api/...')` 는 실패합니다. 이때 `demo.js` 가 등록한 mock 이 **자동 폴백**으로 사용됩니다.\n\n상단의 `MOCK↺ fallback` 배지는 mock 폴백이 준비되어 있음을 나타냅니다. 실제 요청이 성공하면 서버 응답을, 실패하면 mock 응답을 사용합니다.\n\n## 2. 6개 데모 뷰\n\n### 2.1 통합 앱 (`#app`)\n\n메뉴 JSON → 레이어 JSON → 데이터 JSON 순서로 AJAX 로드하는 전체 앱입니다.\n\n- 메뉴: 대시보드, 주문 입력, 결재 문서, 조직도, 설정(일반/스킨)\n- 탭: 메뉴를 열면 탭이 생기고 닫을 수 있습니다.\n- 새로고침: 현재 탭의 레이어와 데이터를 다시 읽습니다.\n- 로그: AJAX 요청 이력(상태, 소요 시간, mock 여부)을 확인합니다.\n- 스킨 패널: 왼쪽 사이드바 하단에서 테마/모양/밀도를 바꿉니다.\n\n확인할 화면:\n\n| 메뉴 | 확인 내용 |\n| --- | --- |\n| 대시보드 | HTML KPI, JSON 임베드 그리드(고정 열/필터/가상 스크롤), 조직도 트리 |\n| 주문 입력 | 12컬럼 폼, 조건부 필드(긴급 사유), 필수/패턴/이메일 검증, JSON/초기화/저장 액션 |\n| 결재 문서 | 에디터 임베드, 읽기 전용 필드, 결재선 트리, 제출 |\n| 조직도 | `data: false` 메뉴로 데이터 요청 생략, 트리 레이어만 로드 |\n| 일반 설정 | 스위치/선택/숫자 등 컨트롤 조합과 저장 |\n| 스킨 갤러리 | 버튼 액션으로 테마/모양/밀도/테두리 변경 |\n\n### 2.2 에디터 (`#editor`)\n\n- 서식, 문단, 글자 크기, 색상, 정렬, 목록, 링크\n- 표 삽입 후 셀 내부에서 표 도구 표시\n- 이미지 파일 선택, 붙여넣기, 드래그 앤 드롭\n- HTML 소스 보기, 전체화면, 수동 저장, 자동저장\n- API 버튼: HTML/텍스트/데이터 조회, 이미지 삽입, 읽기 전용 전환\n\n### 2.3 그리드 (`#grid`)\n\n- 500행 가상 스크롤 데이터\n- `+ 1,000행`, 정렬, 열 고정/해제, 검증, 변경 내역, CSV, 특정 행 이동\n- 셀 편집 시 `change` 이벤트 로그\n- 행 선택 시 선택 개수 로그\n\n### 2.4 트리 (`#tree`)\n\n- 조직도 트리, 트라이스테이트 체크\n- 검색과 하이라이트\n- 전체 펼침/접힘, 체크 초기화, 체크 목록 로그\n- 노드 선택과 키보드 탐색\n\n### 2.5 레이아웃 (`#layout`)\n\n- flow 배치와 absolute 배치 예제\n- 조건부 표시, 검증, 값 수집, 제출\n- 에디터/그리드/트리 임베드\n- 사용자 정의 컨트롤\n\n### 2.6 스킨 (`#skin`)\n\n- 10개 테마 스와치\n- 4개 모양 프리셋, 모서리 슬라이더, 테두리 토글\n- 3개 밀도\n- 현재 스킨 상태 로그, 초기화\n\n## 3. 데이터 수정과 재생성\n\n데모 데이터의 단일 소스는 `src/data/seed.js` 입니다. `menu.json`, `layers/*.json`, `data/*.json`, `tree.json` 은 생성 파일입니다.\n\n```bash\n# seed.js 수정 후\nnpm run build:data\n```\n\n서버가 실행 중이어도 JSON 파일을 매 요청마다 읽으므로 새로고침하면 반영됩니다. 파일을 직접 수정했다면 다음 `build:data` 실행 때 덮어써집니다.\n\n## 4. 문서 뷰어\n\n`DOC/index.html` 은 `DOC/docs-data.js` 를 일반 스크립트로 읽어 Markdown 을 렌더링합니다. 외부 CDN 이 없고 `file://` 에서도 동작합니다.\n\n```bash\nnpm run build:docs\n```\n\n`DOC/*.md` 를 추가/수정한 뒤 위 명령을 실행해야 뷰어 목록과 본문이 갱신됩니다.\n\n뷰어 기능:\n\n- 파일명 기반 id(`#10-api-reference`) 해시 라우팅과 헤딩 anchor\n- 제목/본문 검색, 코드 블록 복사, 이전/다음 문서 이동\n- 라이트/다크 테마 전환과 localStorage 저장\n- 모바일 오프캔버스 목록\n- Markdown 링크(`02-demo-guide.md`)를 뷰어 경로로 자동 변환\n\n## 5. 점검 명령\n\n```bash\nnpm run check\n```\n\n검사 항목:\n\n1. 11개 ES 모듈 import 성공\n2. `webui.js` 전역 내보내기와 버전 일치\n3. 컨트롤 20종 이상, 테마 10종\n4. seed.js 메뉴/레이어/데이터 정합성\n5. 생성된 JSON 파싱\n6. DOC Markdown 과 `docs-data.json` 동기화\n\n브라우저 실제 실행 점검은 Edge CDP 스크립트로 수행했습니다.\n\n```bash\nnode tools/browser-check.mjs\n```\n\n이 스크립트는 Edge 를 헤드리스로 띄워 앱 메뉴/탭/그리드/트리/AJAX, 주문 폼 검증, 에디터, 조직도, 스킨, 5개 데모 뷰, 모바일 사이드바를 확인하고 콘솔 오류를 수집합니다. 로딩 오버레이처럼 `hidden` 속성으로 숨긴 요소가 화면에 남지 않는지도 함께 검사합니다. 환경에 Edge 경로가 다르면 스크립트 상단의 경로를 조정해야 합니다.\n\n## 6. 문제 해결\n\n| 증상 | 원인/해결 |\n| --- | --- |\n| 화면이 비어 있음 | `file://` 로 열었고 mock 도 없는 경우. `npm start` 사용 또는 `demo.js` mock 확인 |\n| 데이터가 예전 값 | `src/data/seed.js` 만 수정한 경우. `npm run build:data` 실행 |\n| API 404 | 레이어/데이터 id 와 `menu.json` 의 id 일치 여부 확인 |\n| 포트 충돌 | `PORT=8081 npm start` |\n| 문서 목록이 비어 있음 | `npm run build:docs` 미실행. `DOC/docs-data.js` 생성 여부 확인 |\n| 스킨이 일부만 적용됨 | `skin.init({ target })` 또는 `createApp` 사용 여부 확인. `data-wui-*` 속성이 대상 요소에 있어야 함 |\n| 한글 JSON 깨짐 | 파일을 UTF-8 로 저장. 서버는 `charset=utf-8` 로 응답 |\n"
+    },
+    {
+      "id": "03-architecture",
+      "file": "03-architecture.md",
+      "order": 3,
+      "title": "03. 아키텍처",
+      "summary": "WUI 는 \"작은 코어 + 독립 컴포넌트 + 통합 엔트리\" 구조입니다. 각 컴포넌트는 서로를 직접 알지 않고, 코어 유틸/이벤트/통신 위에서 동작합니다.",
+      "headings": [
+        {
+          "id": "1-모듈-구조",
+          "text": "1. 모듈 구조",
+          "level": 2
+        },
+        {
+          "id": "의존-방향",
+          "text": "의존 방향",
+          "level": 3
+        },
+        {
+          "id": "2-진입점",
+          "text": "2. 진입점",
+          "level": 2
+        },
+        {
+          "id": "3-팩토리-생명주기",
+          "text": "3. 팩토리 생명주기",
+          "level": 2
+        },
+        {
+          "id": "생성-시점",
+          "text": "생성 시점",
+          "level": 3
+        },
+        {
+          "id": "파괴-시점",
+          "text": "파괴 시점",
+          "level": 3
+        },
+        {
+          "id": "4-데이터-흐름",
+          "text": "4. 데이터 흐름",
+          "level": 2
+        },
+        {
+          "id": "41-데모-데이터-파이프라인",
+          "text": "4.1 데모 데이터 파이프라인",
+          "level": 3
+        },
+        {
+          "id": "42-앱-화면-로드",
+          "text": "4.2 앱 화면 로드",
+          "level": 3
+        },
+        {
+          "id": "43-레이아웃-값-흐름",
+          "text": "4.3 레이아웃 값 흐름",
+          "level": 3
+        },
+        {
+          "id": "5-주요-설계-패턴",
+          "text": "5. 주요 설계 패턴",
+          "level": 2
+        },
+        {
+          "id": "51-옵션-병합과-정규화",
+          "text": "5.1 옵션 병합과 정규화",
+          "level": 3
+        },
+        {
+          "id": "52-이벤트-콜백",
+          "text": "5.2 이벤트 + 콜백",
+          "level": 3
+        },
+        {
+          "id": "53-레지스트리",
+          "text": "5.3 레지스트리",
+          "level": 3
+        },
+        {
+          "id": "54-위임-이벤트",
+          "text": "5.4 위임 이벤트",
+          "level": 3
+        },
+        {
+          "id": "55-스냅샷과-변경-감지",
+          "text": "5.5 스냅샷과 변경 감지",
+          "level": 3
+        },
+        {
+          "id": "6-css-구조",
+          "text": "6. CSS 구조",
+          "level": 2
+        },
+        {
+          "id": "7-확장-지점",
+          "text": "7. 확장 지점",
+          "level": 2
+        },
+        {
+          "id": "8-접근성과-안전성",
+          "text": "8. 접근성과 안전성",
+          "level": 2
+        }
+      ],
+      "markdown": "# 03. 아키텍처\n\nWUI 는 \"작은 코어 + 독립 컴포넌트 + 통합 엔트리\" 구조입니다. 각 컴포넌트는 서로를 직접 알지 않고, 코어 유틸/이벤트/통신 위에서 동작합니다.\n\n## 1. 모듈 구조\n\n```text\nsrc/js/\n├─ core/\n│  ├─ util.js       DOM 헬퍼, clone, 경로 접근, 검증, CSV, 저장소, 다운로드\n│  ├─ emitter.js    on/off/once/emit/destroy\n│  ├─ ajax.js       fetch 래퍼, 타임아웃, 로그, mock 폴백\n│  └─ skin.js       테마/모양/밀도, CSS 변수 적용, 피커\n├─ editor/\n│  └─ editor.js     createEditor, sanitizeHtml\n├─ grid/\n│  └─ grid.js       createGrid\n├─ tree/\n│  └─ tree.js       createTree\n├─ layout/\n│  ├─ layout.js     createLayout\n│  └─ controls.js   controlRegistry, 31개 기본 컨트롤\n├─ app/\n│  └─ app.js        createApp\n├─ webui.js         통합 엔트리 (전역 WUI + named export)\n└─ demo.js          데모 초기화, mock 등록, 뷰 라우팅\n```\n\n### 의존 방향\n\n```text\nutil / emitter\n   ↑        ↑\n ajax     skin\n   ↑        ↑\n app ──→ layout ──→ controls ──→ editor / grid / tree\n          │\n grid ────┴──→ core (util, emitter, ajax)\n tree ────────→ core (util, emitter)\n editor ──────→ core (util, emitter)\n```\n\n- `core` 는 다른 컴포넌트를 import 하지 않습니다.\n- `editor`, `grid`, `tree` 는 서로 독립적입니다.\n- `controls` 가 세 컴포넌트를 레이아웃 컨트롤로 감쌉니다.\n- `app` 이 `layout` 과 `ajax`, `skin` 을 조합합니다.\n- `webui.js` 만 전체를 조합해 외부에 노출합니다.\n\n## 2. 진입점\n\n```js\nimport WUI from './src/js/webui.js';\n\nWUI.VERSION;              // '1.0.0'\nWUI.createGrid(...);\nWUI.ajax.get(...);\nWUI.skin.setTheme(...);\n```\n\n`webui.js` 는 다음을 제공합니다.\n\n- 기본 내보내기: 전역 `WUI` 와 동일한 객체\n- named export: `createEditor`, `createGrid`, `createTree`, `createLayout`, `createApp`, `ajax`, `skin`, `util`, `Emitter`, `registerControl` 등\n- 브라우저에서는 `window.WUI` 자동 할당\n\n전역 객체는 다음 그룹으로 구성됩니다.\n\n| 그룹 | 키 |\n| --- | --- |\n| 메타 | `VERSION`, `util` |\n| DOM 헬퍼 | `h`, `$`, `$$`, `on` |\n| 이벤트 | `Emitter` |\n| 통신 | `ajax`, `AjaxError` |\n| 스킨 | `skin` |\n| 컴포넌트 | `createEditor`, `editor`, `sanitizeHtml`, `createGrid`, `grid`, `createTree`, `tree`, `createLayout`, `layout`, `createApp`, `app` |\n| 레이아웃 확장 | `registerControl`, `getControlFactory`, `listControls`, `controlRegistry` |\n\n## 3. 팩토리 생명주기\n\n모든 팩토리는 같은 패턴을 따릅니다.\n\n```js\nconst instance = WUI.createX(mount, options);\n// mount: CSS 선택자 또는 Element\n// options: 기본값과 병합\n\ninstance.el;       // 루트 요소\ninstance.on(...);  // 이벤트\ninstance.off(...);\ninstance.destroy();\n```\n\n### 생성 시점\n\n| 컴포넌트 | 초기화 순서 |\n| --- | --- |\n| 에디터 | 옵션 병합 → 마크업 생성 → textarea 숨김 처리 → 자동저장 복원 → 초기 HTML 적용 → 툴바 생성 |\n| 그리드 | 옵션 병합 → 마크업 → 컬럼 정규화/헤더 → 데이터 정규화 → 뷰 계산 → 행 렌더 → `ready` |\n| 트리 | 옵션 병합 → 마크업 → 데이터 정규화(byId, expanded, checked) → 렌더 → `ready` |\n| 레이아웃 | 옵션 병합 → 스키마 정규화 → 각 아이템 컨트롤 생성 → 조건 평가 → `ready` |\n| 앱 | 옵션 병합 → 셸 마크업 → 스킨 대상 등록 → 메뉴 AJAX → 메뉴 렌더 → 첫 리프 메뉴 열기 |\n\n### 파괴 시점\n\n- `destroy()` 는 DOM 제거, Emitter 정리, 타이머/RAF 취소, 전역 리스너 해제를 수행합니다.\n- 앱은 열린 탭의 레이아웃, 스킨 피커, `skin` 대상, `hashchange` 리스너를 정리합니다.\n- 에디터는 `selectionchange`, 전체화면 클래스, 디바운스 타이머를 정리합니다.\n\n## 4. 데이터 흐름\n\n### 4.1 데모 데이터 파이프라인\n\n```text\nsrc/data/seed.js\n   │  tools/build-data.mjs\n   ├─→ src/data/menu.json\n   ├─→ src/data/layers/*.json\n   ├─→ src/data/data/*.json\n   └─→ src/data/tree.json\n          │\n          ├─ serve.mjs  (/api/*)\n          └─ demo.js    (ajax.mock)\n```\n\n- `seed.js` 가 유일한 원본입니다.\n- 서버는 JSON 파일을 매 요청마다 읽습니다.\n- `file://` 에서는 `demo.js` 의 mock 이 같은 seed 객체를 반환합니다.\n- 따라서 서버 데모와 파일 데모의 데이터가 동일합니다.\n\n### 4.2 앱 화면 로드\n\n```text\ncreateApp\n  → ajax.get(menuUrl)\n  → 메뉴 정규화(state.map, children)\n  → 첫 리프 메뉴 openMenu\n  → ensureTab → activateTab → loadTab\n      → ajax.get(layerUrl resolved)\n      → ajax.get(dataUrl resolved)  (menu.data !== false)\n      → createLayout(layer, { values: data.values, data })\n      → renderPane\n```\n\nURL 템플릿은 메뉴 객체로 치환됩니다.\n\n```js\nlayerUrl: '/api/layers/{layer}'   // { id, layer, data, menu }\ndataUrl:  '/api/data/{data}'\n```\n\n함수를 사용할 수도 있습니다.\n\n```js\ndataUrl: (menu) => `/api/data/${menu.id}?v=2`\n```\n\n### 4.3 레이아웃 값 흐름\n\n```text\nschema.values / data.bind / item.value\n        ↓ 초기값\ncontrol.getValue()\n        ↓ input/change\nhandleControlChange\n  → st.values 갱신\n  → bind 대상에 setPath\n  → visibleWhen/disabledWhen 재평가\n  → change 이벤트 + onChange 콜백\n        ↓ submit\nvalidate() → getValues() → onSubmit\n```\n\n## 5. 주요 설계 패턴\n\n### 5.1 옵션 병합과 정규화\n\n각 컴포넌트는 `DEFAULTS` 또는 `DEFAULT_OPTIONS` 를 갖고, 사용자 옵션을 얕게 병합합니다. 중첩 옵션(에디터의 `image`, `table`)은 별도로 병합합니다. 그리드 컬럼은 `normalizeColumn` 에서 타입별 기본 너비, 정렬, 편집 가능 여부, 규칙을 채웁니다.\n\n### 5.2 이벤트 + 콜백\n\n동일한 사건을 두 방식으로 전달합니다.\n\n```js\nconst grid = createGrid('#g', {\n  onChange: (payload) => console.log('callback', payload),\n});\n\ngrid.on('change', (payload) => console.log('event', payload));\n```\n\n콜백은 옵션으로 간편하게, 이벤트는 다중 구독과 해제를 위해 사용합니다.\n\n### 5.3 레지스트리\n\n레이아웃 컨트롤은 `Map` 기반 레지스트리에 등록됩니다.\n\n```js\nregisterControl('rating', (ctx) => {\n  const el = document.createElement('div');\n  // ...\n  return { el, getValue, setValue, focus, setDisabled, destroy };\n});\n```\n\n`createLayout` 은 `getControlFactory(type)` 으로 팩토리를 찾고, 없으면 `custom`(render가 있을 때) 또는 `text` 로 폴백합니다.\n\n### 5.4 위임 이벤트\n\n그리드는 행/셀을 매번 이벤트 바인딩하지 않고 `rowsEl` 에 `input`, `change`, `blur`, `keydown`, `click` 을 위임합니다. 가상 스크롤로 DOM 이 재생성되어도 리스너가 유지됩니다.\n\n### 5.5 스냅샷과 변경 감지\n\n그리드는 행마다 `_rid`(non-enumerable)를 부여하고, 초기/저장 시 JSON 스냅샷을 저장합니다. `getChanges()` 는 현재 행과 스냅샷을 비교합니다. `getData()` 는 `_rid` 를 제거한 복사본을 반환합니다.\n\n## 6. CSS 구조\n\n```text\ntokens.css    디자인 토큰(색/간격/모서리/그림자/다크 테마 값)\nbase.css      리셋, 타이포, 버튼/입력/배지/알림/유틸리티\neditor.css    에디터\ngrid.css      그리드\ntree.css      트리\nlayout.css    레이아웃/필드/폼\napp.css       앱 셸(사이드바/탑바/탭/로그/토스트/스킨 패널)\ndemo.css      데모 페이지 전용\n```\n\n로드 순서는 토큰 → 베이스 → 컴포넌트 → 레이아웃/앱 → 데모입니다. 스킨은 `tokens.css` 변수를 런타임에 덮어쓰고, 모양/밀도는 `data-wui-shape`, `data-wui-density` 선택자와 인라인 변수로 적용합니다.\n\n## 7. 확장 지점\n\n| 확장 | 방법 |\n| --- | --- |\n| 새 폼 컨트롤 | `WUI.registerControl(type, factory, { label })` |\n| 새 테마 | `WUI.skin.registerTheme(name, { label, color, dark, vars })` |\n| 새 모양 | `WUI.skin.registerShape(name, { label, vars })` |\n| 그리드 셀 | `type: 'custom'` + `render(ctx)` |\n| 트리 노드 | `renderNode({ node, level, tree })` |\n| 데이터 소스 | `ajax.configure({ baseUrl })`, `grid.load(url)` |\n| 앱 URL | `layerUrl`, `dataUrl`, `menuUrl`, `submitUrl` 함수/템플릿 |\n| 액션 | 레이아웃 `action` + `app.on('action')` 또는 `def.url` |\n\n## 8. 접근성과 안전성\n\n- 그리드 `role=\"grid\"`, 셀 `role=\"gridcell\"`, 트리 `role=\"tree\"`, 행 `role=\"treeitem\"`.\n- 에디터 툴바는 `role=\"toolbar\"`, 버튼에 `aria-label`/`title`.\n- 검증 오류는 `role=\"alert\"`, 입력에 `aria-invalid`.\n- 에디터는 허용 태그/속성 목록으로 HTML 을 정화하고 `javascript:` URL, `on*` 속성, 위험한 style 을 제거합니다.\n- 문서 뷰어는 Markdown 을 렌더링할 때 HTML 을 이스케이프하고 URL 스킴을 제한합니다.\n"
+    },
+    {
+      "id": "04-editor",
+      "file": "04-editor.md",
+      "order": 4,
+      "title": "04. 웹 에디터",
+      "summary": "createEditor 는 contenteditable 기반의 리치 텍스트 에디터입니다. 서식, 표, 이미지 첨부, HTML 소스 보기, 전체화면, 자동저장을 지원하며 입력 HTML 은 기본적으로 정화됩니다.",
+      "headings": [
+        {
+          "id": "1-기본-사용",
+          "text": "1. 기본 사용",
+          "level": 2
+        },
+        {
+          "id": "2-옵션",
+          "text": "2. 옵션",
+          "level": 2
+        },
+        {
+          "id": "툴바-구성",
+          "text": "툴바 구성",
+          "level": 3
+        },
+        {
+          "id": "3-api",
+          "text": "3. API",
+          "level": 2
+        },
+        {
+          "id": "사용-예",
+          "text": "사용 예",
+          "level": 3
+        },
+        {
+          "id": "4-이벤트",
+          "text": "4. 이벤트",
+          "level": 2
+        },
+        {
+          "id": "5-이미지-처리",
+          "text": "5. 이미지 처리",
+          "level": 2
+        },
+        {
+          "id": "6-html-정화",
+          "text": "6. HTML 정화",
+          "level": 2
+        },
+        {
+          "id": "7-접근성과-키보드",
+          "text": "7. 접근성과 키보드",
+          "level": 2
+        },
+        {
+          "id": "8-제한-사항",
+          "text": "8. 제한 사항",
+          "level": 2
+        }
+      ],
+      "markdown": "# 04. 웹 에디터\n\n`createEditor` 는 `contenteditable` 기반의 리치 텍스트 에디터입니다. 서식, 표, 이미지 첨부, HTML 소스 보기, 전체화면, 자동저장을 지원하며 입력 HTML 은 기본적으로 정화됩니다.\n\n## 1. 기본 사용\n\n```html\n<link rel=\"stylesheet\" href=\"../src/css/tokens.css\">\n<link rel=\"stylesheet\" href=\"../src/css/base.css\">\n<link rel=\"stylesheet\" href=\"../src/css/editor.css\">\n\n<div id=\"editor\"></div>\n\n<script type=\"module\">\n  import WUI from '../src/js/webui.js';\n\n  const editor = WUI.createEditor('#editor', {\n    value: '<h1>제목</h1><p>본문입니다.</p>',\n    height: 360,\n    toolbar: 'full',\n    onChange: ({ html, text }) => console.log(text.length),\n    onSave: ({ html }) => console.log('saved', html),\n  });\n</script>\n```\n\n`textarea` 를 마운트 대상으로 사용하면 원본 textarea 는 숨겨지고 폼 전송 값을 유지합니다.\n\n```html\n<textarea id=\"content\" name=\"content\">초기 HTML</textarea>\n<script type=\"module\">\n  WUI.createEditor('#content', { toolbar: 'basic' });\n</script>\n```\n\n## 2. 옵션\n\n| 옵션 | 기본값 | 설명 |\n| --- | --- | --- |\n| `value` | `''` | 초기 HTML |\n| `placeholder` | 안내 문구 | 빈 편집 영역에 표시 |\n| `height` | `320` | 편집 영역 높이(px 또는 CSS 값) |\n| `minHeight` | `180` | 최소 높이(px) |\n| `toolbar` | `'full'` | `'full'`, `'basic'`, `false` |\n| `stickyToolbar` | `true` | 스크롤 시 툴바 고정 |\n| `readOnly` | `false` | 읽기 전용 시작 |\n| `autofocus` | `false` | 시작 시 포커스 |\n| `autosave` | `false` | localStorage 자동저장 |\n| `autosaveKey` | 자동 생성 | 자동저장 키 |\n| `autosaveDelay` | `700` | 자동저장 디바운스(ms) |\n| `image.accept` | `'image/*'` | 이미지 파일 입력 accept |\n| `image.maxSize` | `5MB` | 최대 이미지 크기 |\n| `image.uploader` | `null` | `async (file) => url` 업로더 |\n| `table.maxRows` | `20` | 표 최대 행 |\n| `table.maxCols` | `10` | 표 최대 열 |\n| `table.defaultRows` | `3` | 기본 행 |\n| `table.defaultCols` | `3` | 기본 열 |\n| `sanitize` | `true` | 입출력 HTML 정화 |\n| `showStatus` | `true` | 하단 글자 수/상태 표시 |\n| `onChange` | `null` | 변경 콜백 |\n| `onSave` | `null` | 저장 콜백 |\n| `onImage` | `null` | 이미지 삽입 콜백 |\n\n### 툴바 구성\n\n- `full`: 실행 취소/다시 실행, 문단, 글자 크기, 굵게/기울임/밑줄/취소선, 글자색/형광펜, 정렬, 목록/들여쓰기, 링크/이미지/표/구분선, 인용/코드/서식 지우기, HTML 소스, 전체화면, 표 도구\n- `basic`: 동일한 편집 도구에서 HTML 소스 버튼만 제외\n- `false`: 툴바 숨김\n\n표 도구는 커서가 표 셀 안에 있을 때만 나타나며 행 추가/삭제, 열 추가/삭제, 표 삭제를 제공합니다.\n\n## 3. API\n\n```js\nconst editor = WUI.createEditor('#editor', options);\n```\n\n| 멤버 | 설명 |\n| --- | --- |\n| `el` | 루트 요소 |\n| `toolbar` | 툴바 요소 |\n| `area` | 편집 영역 요소 |\n| `id` | 인스턴스 id |\n| `getHTML({ raw })` | HTML 반환. 기본은 정화, `raw: true` 는 원본 |\n| `setHTML(html, { silent })` | HTML 설정. 기본 `silent: true` |\n| `getText()` | 텍스트 반환 |\n| `setText(text)` | 텍스트 설정(HTML 이스케이프) |\n| `getData()` | `{ html, text, empty, chars }` |\n| `getValue()` / `setValue()` | `getHTML` / `setHTML` 별칭 |\n| `focus()` | 편집 영역 포커스 |\n| `exec(command, value)` | `document.execCommand` 실행 |\n| `insertHTML(html)` | HTML 삽입(정화 옵션 적용) |\n| `insertText(text)` | 텍스트 삽입 |\n| `insertImage(src, { alt, width })` | URL 이미지 삽입 |\n| `insertImageFile(file)` | 파일 검증 후 업로더/data URL 로 삽입 |\n| `insertTable(rows, cols, header)` | 표 삽입 |\n| `setFontSize(px)` | 선택 영역 글자 크기 |\n| `save()` | 저장 이벤트 + 자동저장 갱신 |\n| `clear()` | 내용 비우기 |\n| `setReadOnly(flag)` | 읽기 전용 전환 |\n| `setSourceMode(flag)` | HTML 소스 모드 전환 |\n| `toggleFullscreen(force)` | 전체화면 전환 |\n| `isDirty()` | 마지막 저장 이후 변경 여부 |\n| `getSelectedText()` | 선택 텍스트 |\n| `on(type, fn)` / `off(type, fn)` | 이벤트 구독/해제 |\n| `destroy()` | 정리 |\n\n### 사용 예\n\n```js\nconst editor = WUI.createEditor('#editor', { autosave: true });\n\neditor.setHTML('<p>안녕하세요</p>');\neditor.insertImage('/assets/logo.png', { alt: '로고', width: 240 });\neditor.insertTable(4, 3, true);\n\neditor.on('change', ({ html, text, empty, chars }) => {\n  document.querySelector('#preview').innerHTML = html;\n  document.querySelector('#count').textContent = `${chars}자`;\n});\n\neditor.setReadOnly(true);\nconsole.log(editor.isDirty());\n```\n\n## 4. 이벤트\n\n| 이벤트 | 페이로드 | 시점 |\n| --- | --- | --- |\n| `ready` | `api` | 생성 완료 |\n| `change` | `{ html, text, empty, chars }` | 입력 디바운스 후 |\n| `save` | `{ html, text, empty, chars }` | `save()` 호출 |\n| `clear` | 없음 | `clear()` 호출 |\n| `readonly` | `boolean` | 읽기 전용 전환 |\n| `image` | `{ file, src }` | 이미지 삽입 |\n| `focus` | 없음 | 편집 영역 포커스 |\n| `blur` | 없음 | 편집 영역 블러 |\n\n```js\neditor.on('image', ({ file, src }) => {\n  console.log(file.name, src);\n});\n```\n\n## 5. 이미지 처리\n\n우선순위:\n\n1. `options.image.uploader(file)` 가 있으면 그 결과 URL 사용\n2. 없으면 `FileReader` 로 data URL 생성\n\n`insertImageFile(file)` 은 다음을 검사합니다.\n\n- `file.type` 이 `image/` 로 시작해야 함\n- `image.maxSize` 초과 시 거부\n- 실패 시 상태 표시줄에 오류 메시지\n\n붙여넣기와 드래그 앤 드롭도 같은 경로를 사용합니다. 서버 업로드는 포함되어 있지 않으므로 실제 서비스에서는 `uploader` 를 제공하세요.\n\n```js\nconst editor = WUI.createEditor('#editor', {\n  image: {\n    maxSize: 10 * 1024 * 1024,\n    uploader: async (file) => {\n      const body = new FormData();\n      body.append('file', file);\n      const res = await fetch('/upload', { method: 'POST', body });\n      const json = await res.json();\n      return json.url;\n    },\n  },\n});\n```\n\n## 6. HTML 정화\n\n`sanitizeHtml(html)` 은 `template` 요소로 파싱한 뒤 다음 규칙을 적용합니다.\n\n- 허용 태그만 유지: 문단/제목/목록/표/이미지/링크/인용/코드/서식 태그 등\n- 위험 태그 제거: `script`, `style`, `iframe`, `object`, `embed`, `form`, `input` 등\n- `on*` 이벤트 속성, `srcdoc`, `formaction` 제거\n- `javascript:`, `vbscript:`, `data:text/html` URL 제거\n- `style` 의 `expression`, `javascript:`, `url(...)` 제거\n- 허용 목록에 없는 속성 제거(`data-*` 허용)\n- `src` 없는 이미지 제거\n\n```js\nimport { sanitizeHtml } from './src/js/webui.js';\n\nconst safe = sanitizeHtml('<p onclick=\"alert(1)\">본문</p><script>alert(2)</script>');\n// '<p>본문</p>'\n```\n\n정화를 끄려면 `sanitize: false` 를 사용하지만, 신뢰할 수 없는 HTML 에는 권장하지 않습니다.\n\n## 7. 접근성과 키보드\n\n- 툴바 버튼은 `aria-label`/`title` 을 가집니다.\n- `Ctrl+B`, `Ctrl+I`, `Ctrl+U`, `Ctrl+Z`, `Ctrl+Shift+Z`, `Ctrl+K` 등 브라우저 기본 편집 단축키를 사용합니다.\n- `.wui-editor-btn` 은 `mousedown` 기본 동작을 막아 선택 영역을 유지합니다.\n- 전체화면은 `Esc` 로 종료할 수 있습니다.\n- 읽기 전용일 때 `contenteditable=\"false\"` 와 툴바 `pointer-events: none` 을 적용합니다.\n\n## 8. 제한 사항\n\n- `document.execCommand` 기반이므로 브라우저별 서식 결과가 조금 다를 수 있습니다.\n- 표 셀 병합/분할, 이미지 리사이즈 핸들은 제공하지 않습니다.\n- 서버 업로드, 협업 편집, 변경 이력 관리는 범위에 포함되지 않습니다.\n- 자동저장은 localStorage 단일 키에 HTML 문자열만 저장합니다.\n"
+    },
+    {
+      "id": "05-grid",
+      "file": "05-grid.md",
+      "order": 5,
+      "title": "05. 그리드",
+      "summary": "createGrid 는 대량 데이터를 편집하기 위한 그리드입니다. 헤더 sticky, 좌/우 고정 열, 절대 위치 행 배치 기반 가상 스크롤, 정렬/검색/필터, 12종 셀 타입, 검증, 변경 추적, CSV 내보내기를 제공합니다.",
+      "headings": [
+        {
+          "id": "1-기본-사용",
+          "text": "1. 기본 사용",
+          "level": 2
+        },
+        {
+          "id": "2-옵션",
+          "text": "2. 옵션",
+          "level": 2
+        },
+        {
+          "id": "3-컬럼-정의",
+          "text": "3. 컬럼 정의",
+          "level": 2
+        },
+        {
+          "id": "고정-열",
+          "text": "고정 열",
+          "level": 3
+        },
+        {
+          "id": "4-셀-타입-12종",
+          "text": "4. 셀 타입 (12종)",
+          "level": 2
+        },
+        {
+          "id": "사용자-정의-셀",
+          "text": "사용자 정의 셀",
+          "level": 3
+        },
+        {
+          "id": "5-검증",
+          "text": "5. 검증",
+          "level": 2
+        },
+        {
+          "id": "6-api",
+          "text": "6. API",
+          "level": 2
+        },
+        {
+          "id": "데이터컬럼",
+          "text": "데이터/컬럼",
+          "level": 3
+        },
+        {
+          "id": "정렬필터선택",
+          "text": "정렬/필터/선택",
+          "level": 3
+        },
+        {
+          "id": "검증저장내보내기",
+          "text": "검증/저장/내보내기",
+          "level": 3
+        },
+        {
+          "id": "getter",
+          "text": "getter",
+          "level": 3
+        },
+        {
+          "id": "ajax-로드-예",
+          "text": "AJAX 로드 예",
+          "level": 3
+        },
+        {
+          "id": "7-이벤트",
+          "text": "7. 이벤트",
+          "level": 2
+        },
+        {
+          "id": "8-가상-스크롤과-고정",
+          "text": "8. 가상 스크롤과 고정",
+          "level": 2
+        },
+        {
+          "id": "9-상태와-스냅샷",
+          "text": "9. 상태와 스냅샷",
+          "level": 2
+        },
+        {
+          "id": "10-스타일과-확장",
+          "text": "10. 스타일과 확장",
+          "level": 2
+        },
+        {
+          "id": "11-제한-사항",
+          "text": "11. 제한 사항",
+          "level": 2
+        }
+      ],
+      "markdown": "# 05. 그리드\n\n`createGrid` 는 대량 데이터를 편집하기 위한 그리드입니다. 헤더 sticky, 좌/우 고정 열, 절대 위치 행 배치 기반 가상 스크롤, 정렬/검색/필터, 12종 셀 타입, 검증, 변경 추적, CSV 내보내기를 제공합니다.\n\n## 1. 기본 사용\n\n```html\n<link rel=\"stylesheet\" href=\"../src/css/tokens.css\">\n<link rel=\"stylesheet\" href=\"../src/css/base.css\">\n<link rel=\"stylesheet\" href=\"../src/css/grid.css\">\n\n<div id=\"grid\"></div>\n\n<script type=\"module\">\n  import WUI from '../src/js/webui.js';\n\n  const grid = WUI.createGrid('#grid', {\n    title: '주문 목록',\n    height: 420,\n    filterRow: true,\n    columns: [\n      { key: 'orderNo', title: '주문번호', type: 'text', width: 140, frozen: 'left', required: true },\n      { key: 'customer', title: '고객명', type: 'text', width: 100 },\n      { key: 'qty', title: '수량', type: 'number', width: 80, min: 1, max: 99 },\n      { key: 'orderedAt', title: '주문일', type: 'date', width: 130 },\n      { key: 'status', title: '상태', type: 'badge', width: 90, editable: false, frozen: 'right',\n        options: [\n          { value: 'ready', label: '준비' },\n          { value: 'done', label: '완료' },\n        ] },\n    ],\n    data: [\n      { orderNo: 'ORD-001', customer: '김하늘', qty: 2, orderedAt: '2026-11-01', status: 'ready' },\n    ],\n    onChange: ({ row, key, value }) => console.log(key, value, row),\n  });\n</script>\n```\n\n## 2. 옵션\n\n| 옵션 | 기본값 | 설명 |\n| --- | --- | --- |\n| `id` | 자동 | 인스턴스 id. 너비 저장 키 등에 사용 |\n| `title` | `''` | 그리드 제목/aria-label |\n| `description` | `''` | 툴바 아래 설명 |\n| `columns` | `[]` | 컬럼 정의 |\n| `data` | `[]` | 초기 행 배열 |\n| `height` | `420` | 뷰포트 높이 |\n| `maxHeight` | `560` | 최대 높이 |\n| `minHeight` | `160` | 최소 높이 |\n| `rowHeight` | CSS 변수/36 | 행 높이 |\n| `headerHeight` | CSS 변수/38 | 헤더 높이 |\n| `virtual` | `true` | 가상 스크롤 |\n| `overscan` | `6` | 화면 밖 여유 행 |\n| `selectable` | `true` | 행 선택 |\n| `checkboxColumn` | `true` | 선택 체크박스 열 |\n| `indexColumn` | `true` | 번호 열 |\n| `stickyHeader` | `true` | 헤더 고정 |\n| `zebra` | `true` | 줄무늬 |\n| `resizable` | `true` | 열 너비 조절 |\n| `sortable` | `true` | 정렬 |\n| `multiSort` | `true` | Shift 기반 다중 정렬 |\n| `search` | `true` | 전체 검색 |\n| `filterRow` | `false` | 열별 필터 입력 행 |\n| `toolbar` | `true` | 상단 도구 모음 |\n| `footer` | `true` | 하단 집계 |\n| `showCount` | `true` | 건수 표시 |\n| `emptyText` | `데이터가 없습니다.` | 빈 상태 문구 |\n| `rowClass` | `null` | `(row) => string` 행 클래스 |\n| `persistWidths` | `false` | 열 너비 localStorage 저장 |\n| `autoLoad` | `false` | 생성 시 `dataUrl` 로드 |\n| `dataUrl` | `null` | 자동 로드 URL |\n| `onChange` | `null` | 셀 변경 콜백 |\n| `onSave` | `null` | 저장 콜백 |\n| `onRowAdd` | `null` | 행 추가 콜백 |\n| `onSelect` | `null` | 선택 변경 콜백 |\n| `onSort` | `null` | 정렬 변경 콜백 |\n\n## 3. 컬럼 정의\n\n```js\n{\n  key: 'amount',            // 데이터 키 (필수)\n  title: '금액',             // 헤더 텍스트\n  type: 'number',           // 셀 타입\n  width: 120,               // 초기 너비\n  minWidth: 70,             // 최소 너비 (기본 min(70, width))\n  align: 'right',           // left | center | right\n  editable: true,           // 편집 가능 여부\n  sortable: true,\n  filterable: true,\n  frozen: 'left',           // 'left' | 'right' | null\n  placeholder: '0',\n  default: 0,               // 새 행 기본값\n  decimals: 0,              // number 표시 소수 자릿수\n  unit: '원',               // slider 표시 단위\n  min: 0, max: 1000000, step: 1000,   // number/slider\n  options: [...],           // select/radio/badge\n  rules: [...],             // 검증 규칙\n  required: true,           // required 규칙 단축\n  requiredMessage: '필수입니다.',\n  format: (value, row, col) => string,  // 표시값 변환\n  sortValue: (value, row) => any,        // 정렬 키 변환\n  render: (ctx) => Node|string,          // type: 'custom'\n}\n```\n\n`options` 는 배열, `{ value: label }` 객체, `(row) => 배열` 함수를 모두 허용합니다. 각 옵션은 `value`, `label`, `disabled` 를 가질 수 있습니다.\n\n### 고정 열\n\n- `frozen: 'left'` 는 왼쪽, `frozen: 'right'` 는 오른쪽에 고정됩니다.\n- 컬럼 배열 순서와 무관하게 표시 시 좌/중앙/우 순서로 재배치됩니다.\n- 런타임 변경은 `grid.setFrozen(key, 'left' | 'right' | null)` 입니다.\n- 선택/번호 열은 항상 왼쪽 고정입니다.\n\n## 4. 셀 타입 (12종)\n\n| 타입 | 편집 UI | 값 형식 | 비고 |\n| --- | --- | --- | --- |\n| `text` | `<input type=\"text\">` | string | 기본 |\n| `textarea` | `<textarea>` | string | 1행 높이, Enter 로 다음 행 이동 |\n| `number` | `<input inputmode=\"decimal\">` | number \\| null | 숫자 파싱, `decimals` 표시 |\n| `date` | `<input type=\"date\">` | `YYYY-MM-DD` | |\n| `time` | `<input type=\"time\">` | `HH:mm` | |\n| `datetime` | `<input type=\"datetime-local\">` | `YYYY-MM-DDTHH:mm` | |\n| `select` | `<select>` | 옵션 value | `placeholder`/`emptyLabel` |\n| `radio` | 라디오 그룹 | 옵션 value | 셀 안에 라디오 표시 |\n| `checkbox` | 체크박스 | boolean | 기본값 `false` |\n| `slider` | `<input type=\"range\">` | number | `min/max/step/unit` |\n| `badge` | 읽기 전용 배지 | string | `editable: false` 와 함께 사용 |\n| `custom` | 사용자 렌더 | 자유 | `render(ctx)` |\n\n`badge` 는 `editable: false` 일 때 `wui-badge` 로 표시됩니다. 편집 가능하게 두면 기본 텍스트 입력으로 동작합니다.\n\n### 사용자 정의 셀\n\n```js\n{\n  key: 'score',\n  title: '평점',\n  type: 'custom',\n  width: 140,\n  render: ({ value, row, commit, setError }) => {\n    const wrap = document.createElement('div');\n    wrap.className = 'score-stars';\n    for (let i = 1; i <= 5; i += 1) {\n      const b = document.createElement('button');\n      b.type = 'button';\n      b.textContent = i <= value ? '★' : '☆';\n      b.addEventListener('click', () => commit(i));\n      wrap.appendChild(b);\n    }\n    if (value < 1) setError('1점 이상 선택하세요.');\n    return wrap;\n  },\n}\n```\n\n`ctx` 필드: `value`, `row`, `column`, `cell`, `grid`, `commit(next, { silent })`, `setError(message)`.\n\n## 5. 검증\n\n공통 검증 엔진(`validateValue`)을 사용합니다.\n\n```js\n{ key: 'email', title: '이메일', rules: ['email'] }\n\n{ key: 'phone', title: '연락처', rules: [\n  { type: 'pattern', value: '^01[0-9]-?\\\\d{3,4}-?\\\\d{4}$', message: '휴대폰 번호 형식이 아닙니다.' },\n] }\n\n{ key: 'name', title: '이름', rules: [\n  'required',\n  { type: 'minLength', value: 2 },\n  { type: 'maxLength', value: 20 },\n] }\n```\n\n지원 규칙:\n\n| 규칙 | 옵션 | 설명 |\n| --- | --- | --- |\n| `required` | – | 빈 값 불가 |\n| `min` / `max` | `value` 또는 `min`/`max` | 숫자 범위 |\n| `minLength` / `maxLength` | `value` 또는 `length` | 문자열 길이 |\n| `pattern` | `value`(RegExp/문자열) | 정규식 |\n| `email` | – | 이메일 형식 |\n| `number` | – | 숫자 여부 |\n| `custom` | `validate`/`fn` | 사용자 함수. `false` 또는 메시지 문자열 반환 |\n| 함수 | – | `(value, row, ctx) => false|string` |\n\n```js\n{\n  type: 'custom',\n  validate: (value, row) => value > row.min ? true : '최소값보다 커야 합니다.',\n  message: '값을 확인하세요.',\n}\n```\n\n- `validate()` 는 전체 행을 검사하고 `{ rid, key, message, row }[]` 를 반환합니다.\n- 오류 셀에는 `is-invalid` 클래스와 `title` 이 적용됩니다.\n- `save()` 는 검증 실패 시 `null` 을 반환하고 첫 오류 셀로 이동합니다.\n- `grid.errorCount` 로 현재 오류 수를 읽을 수 있습니다.\n\n## 6. API\n\n```js\nconst grid = WUI.createGrid('#grid', options);\n```\n\n### 데이터/컬럼\n\n| 메서드 | 설명 |\n| --- | --- |\n| `setData(rows)` | 데이터 교체. `rows`/`data`/`items` 래퍼 허용 |\n| `getData()` | `_rid` 를 제거한 행 복사본 |\n| `addRow(data?, { focus })` | 선택 행 뒤 또는 끝에 추가 |\n| `removeRows(rids)` | 행 삭제, 삭제 수 반환 |\n| `load(url, ajaxOptions?)` | AJAX 로드. 배열이면 `setData` |\n| `setColumns(columns)` | 컬럼 교체(고정 상태/저장 너비 유지) |\n| `getColumns()` | 사용자 컬럼 복사본 |\n| `setFrozen(key, side)` | 열 고정 변경 |\n| `setRowHeight(px)` / `setHeight(value)` | 높이 변경 |\n| `refreshMetrics()` | CSS 변수 기준 높이 재측정 |\n\n### 정렬/필터/선택\n\n| 메서드 | 설명 |\n| --- | --- |\n| `setSort(key, dir, { additive })` | 정렬 설정. `dir` 이 없으면 해당 키 제거 |\n| `clearSort()` | 전체 정렬 해제 |\n| `setFilter(key, value)` | 열 필터 설정. 빈 값은 해제 |\n| `setQuery(value)` | 전체 검색 |\n| `selectAll()` / `clearSelection()` | 전체 선택/해제 |\n| `selectRow(rid)` | 특정 행 선택 |\n| `getSelected()` | 선택 행 복사본 |\n| `getVisible()` | 현재 뷰(필터/정렬 반영) 행 복사본 |\n\n### 검증/저장/내보내기\n\n| 메서드 | 설명 |\n| --- | --- |\n| `validate()` | 전체 검증, 오류 배열 반환 |\n| `save()` | 검증 후 스냅샷 갱신, 데이터 반환(실패 시 `null`) |\n| `getChanges()` | `{ row, original, rid }[]` |\n| `downloadCSV(filename?)` | BOM 포함 UTF-8 CSV |\n| `getSelected()` | 선택 행 |\n| `focusCell(rid, key)` | 필터 해제 후 해당 셀 포커스 |\n| `setCellValue(rid, key, value, options?)` | 값 설정 |\n| `scrollToIndex(index)` | 행 인덱스로 스크롤 |\n| `setLoading(flag)` / `setStatus(message, tone)` | 로딩/상태 표시 |\n| `on/off/destroy` | 이벤트/정리 |\n\n### getter\n\n- `el`, `id`, `viewport`\n- `rowHeight`\n- `hasChanges`\n- `errorCount`\n\n### AJAX 로드 예\n\n```js\nconst grid = WUI.createGrid('#grid', {\n  columns: [],\n  autoLoad: true,\n  dataUrl: '/api/data/orders',\n});\n\n// 또는\nawait grid.load('/api/data/orders', { params: { page: 1 } });\n```\n\n응답이 `{ columns, rows }` 이면 컬럼이 비어 있을 때 컬럼도 함께 설정합니다.\n\n## 7. 이벤트\n\n| 이벤트 | 페이로드 |\n| --- | --- |\n| `ready` | `api` |\n| `data` | `{ rows, count }` |\n| `change` | `{ rid, row, key, value, index? }` |\n| `edit` | `{ rid, row, key, value }` (입력 중) |\n| `select` | `{ rows, count }` |\n| `sort` | `[{ key, dir }]` |\n| `columns` | 컬럼 배열 |\n| `resize` | `{ key, width }` |\n| `rowadd` | `{ row, index }` |\n| `rowremove` | `{ rids, removed }` |\n| `validate` | 오류 배열 |\n| `save` | 데이터 배열 |\n| `load` | `{ url, count }` |\n| `loaderror` | `{ url, error }` |\n| `footer` | `{ total, visible, selected, errors, changes }` |\n\n```js\ngrid.on('change', ({ rid, key, value }) => {\n  console.log(rid, key, value);\n});\n\ngrid.on('save', (rows) => {\n  fetch('/api/save', {\n    method: 'POST',\n    headers: { 'Content-Type': 'application/json' },\n    body: JSON.stringify({ rows }),\n  });\n});\n```\n\n## 8. 가상 스크롤과 고정\n\n- 헤더는 `position: sticky` 로 고정됩니다.\n- 행은 `position: absolute` + `translateY` 로 배치되고, 스크롤 위치에 해당하는 행만 렌더링합니다.\n- `rowHeight` 는 모든 행이 동일해야 합니다.\n- 고정 열은 `left`/`right` 오프셋과 `position: sticky` 로 유지됩니다.\n- 열 너비 조절은 pointer 이벤트 + `requestAnimationFrame` 으로 처리합니다.\n- `persistWidths: true` 이면 `localStorage` 키 `wui.grid.<id>.widths` 에 저장됩니다.\n\n## 9. 상태와 스냅샷\n\n- 각 행에는 non-enumerable `_rid` 가 부여됩니다.\n- `getData()` / `getVisible()` / `getSelected()` 는 `_rid` 없는 복사본을 반환합니다.\n- 초기 데이터와 `save()` 시점에 JSON 스냅샷을 저장합니다.\n- `getChanges()` 는 현재 값과 스냅샷을 비교합니다.\n- `number` 는 `null | number`, `checkbox` 는 `boolean` 으로 정규화됩니다.\n\n## 10. 스타일과 확장\n\n- 루트: `.wui-grid`, 뷰포트 `.wui-grid-viewport`, 헤더 `.wui-grid-header`, 행 `.wui-grid-row`, 셀 `.wui-grid-cell`.\n- 상태 클래스: `.is-frozen`, `.is-frozen-left`, `.is-frozen-right`, `.is-invalid`, `.is-selected`, `.is-align-right`.\n- `rowClass(row)` 로 행별 클래스를 추가할 수 있습니다.\n- `format` 으로 표시 문자열을, `sortValue` 로 정렬 키를 바꿀 수 있습니다.\n\n## 11. 제한 사항\n\n- 열 순서 변경(드래그), 열 숨김, 그룹핑, 피벗은 제공하지 않습니다.\n- 행 높이는 균일해야 하며 자동 줄바꿈 행 높이는 지원하지 않습니다.\n- 편집은 셀 단위이며, 셀 병합은 지원하지 않습니다.\n- 서버 저장은 `save` 이벤트/콜백에서 직접 구현해야 합니다.\n"
+    },
+    {
+      "id": "06-tree",
+      "file": "06-tree.md",
+      "order": 6,
+      "title": "06. 트리",
+      "summary": "createTree 는 계층 데이터 탐색, 트라이스테이트 체크, 검색, 키보드 탐색, 지연 로딩을 지원하는 트리 컨트롤입니다.",
+      "headings": [
+        {
+          "id": "1-기본-사용",
+          "text": "1. 기본 사용",
+          "level": 2
+        },
+        {
+          "id": "2-옵션",
+          "text": "2. 옵션",
+          "level": 2
+        },
+        {
+          "id": "3-노드-스키마",
+          "text": "3. 노드 스키마",
+          "level": 2
+        },
+        {
+          "id": "지연-로딩",
+          "text": "지연 로딩",
+          "level": 3
+        },
+        {
+          "id": "사용자-렌더",
+          "text": "사용자 렌더",
+          "level": 3
+        },
+        {
+          "id": "4-api",
+          "text": "4. API",
+          "level": 2
+        },
+        {
+          "id": "5-이벤트",
+          "text": "5. 이벤트",
+          "level": 2
+        },
+        {
+          "id": "6-체크-동작",
+          "text": "6. 체크 동작",
+          "level": 2
+        },
+        {
+          "id": "7-키보드-탐색",
+          "text": "7. 키보드 탐색",
+          "level": 2
+        },
+        {
+          "id": "8-검색",
+          "text": "8. 검색",
+          "level": 2
+        },
+        {
+          "id": "9-스타일",
+          "text": "9. 스타일",
+          "level": 2
+        },
+        {
+          "id": "10-제한-사항",
+          "text": "10. 제한 사항",
+          "level": 2
+        }
+      ],
+      "markdown": "# 06. 트리\n\n`createTree` 는 계층 데이터 탐색, 트라이스테이트 체크, 검색, 키보드 탐색, 지연 로딩을 지원하는 트리 컨트롤입니다.\n\n## 1. 기본 사용\n\n```html\n<link rel=\"stylesheet\" href=\"../src/css/tokens.css\">\n<link rel=\"stylesheet\" href=\"../src/css/base.css\">\n<link rel=\"stylesheet\" href=\"../src/css/tree.css\">\n\n<div id=\"tree\"></div>\n\n<script type=\"module\">\n  import WUI from '../src/js/webui.js';\n\n  const tree = WUI.createTree('#tree', {\n    data: [\n      { id: 'company', label: 'WUI 주식회사', icon: '🏢', expanded: true, children: [\n        { id: 'dev', label: '개발본부', icon: '⌨️', children: [\n          { id: 'web', label: '웹플랫폼팀' },\n          { id: 'mobile', label: '모바일팀' },\n        ]},\n        { id: 'design', label: '디자인센터', children: [\n          { id: 'ui', label: 'UI팀', checked: true },\n        ]},\n      ]},\n    ],\n    checkable: true,\n    cascade: true,\n    showSearch: true,\n    defaultExpandLevel: 1,\n    onCheck: ({ checkedNodes }) => console.log(checkedNodes),\n    onSelect: ({ node }) => console.log(node),\n  });\n</script>\n```\n\n## 2. 옵션\n\n| 옵션 | 기본값 | 설명 |\n| --- | --- | --- |\n| `data` | `[]` | 루트 노드 배열 |\n| `checkable` | `true` | 체크박스 표시 |\n| `cascade` | `true` | 부모/자식 체크 전파 |\n| `multiple` | `true` | 다중 선택 |\n| `showIcons` | `true` | 아이콘 표시 |\n| `showLines` | `true` | 연결선 표시 |\n| `showSearch` | `true` | 검색 입력 표시 |\n| `searchPlaceholder` | `트리 검색…` | 검색 placeholder |\n| `showActions` | `true` | 전체 펼침/접힘 버튼 |\n| `indent` | `18` | 레벨당 들여쓰기(px) |\n| `defaultExpandLevel` | `0` | `0` 모두 접힘, `1` 루트 펼침, `-1` 모두 펼침 |\n| `emptyText` | `표시할 항목이 없습니다.` | 빈 상태 문구 |\n| `lazy` | `null` | `{ load: async (node) => children[] }` |\n| `renderNode` | `null` | 사용자 노드 렌더 |\n| `onSelect` | `null` | 선택 콜백 |\n| `onCheck` | `null` | 체크 콜백 |\n| `onExpand` | `null` | 펼침/접힘 콜백 |\n| `onLoad` | `null` | 지연 로딩 완료 콜백 |\n\n## 3. 노드 스키마\n\n```js\n{\n  id: 'dev',                 // 문자열/숫자, 없으면 자동 생성\n  label: '개발본부',          // 표시 텍스트 (text 별칭)\n  icon: '⌨️',                // 아이콘 문자열/HTML\n  disabled: false,\n  selectable: true,\n  checkable: true,\n  checked: false,            // 초기 체크\n  expanded: true,            // 초기 펼침\n  lazy: false,               // true면 children 을 나중에 로드\n  data: { ... },             // 사용자 데이터\n  badge: 'NEW',              // 선택: 라벨 뒤 배지\n  children: [ ... ],         // 하위 노드\n}\n```\n\n문자열 배열도 허용됩니다.\n\n```js\n{ data: ['루트 1', '루트 2'] }\n```\n\n### 지연 로딩\n\n```js\nconst tree = WUI.createTree('#tree', {\n  data: [\n    { id: 'root', label: '서버', lazy: true },\n  ],\n  lazy: {\n    load: async (node) => {\n      const res = await fetch(`/api/nodes/${node.id}/children`);\n      return res.json();\n    },\n  },\n  onLoad: (node, children) => console.log(node.id, children.length),\n});\n```\n\n- `lazy: true` 노드를 처음 펼칠 때 `load(node)` 를 호출합니다.\n- 로딩 중에는 스피너가 표시되고, 실패하면 `loaderror` 이벤트가 발생하며 접힌 상태로 돌아갑니다.\n- 한 번 로드된 노드는 `loaded` 로 표시되어 재요청하지 않습니다.\n\n### 사용자 렌더\n\n```js\nconst tree = WUI.createTree('#tree', {\n  data: nodes,\n  renderNode: ({ node, level, tree }) => {\n    const span = document.createElement('span');\n    span.className = 'my-node';\n    span.textContent = `${node.label} (${node.childrenCount})`;\n    if (node.data && node.data.online) {\n      const dot = document.createElement('i');\n      dot.className = 'dot-online';\n      span.appendChild(dot);\n    }\n    return span;\n  },\n});\n```\n\n`renderNode` 가 문자열을 반환하면 `innerHTML` 로 삽입됩니다. 신뢰할 수 없는 데이터는 직접 이스케이프하세요.\n\n## 4. API\n\n```js\nconst tree = WUI.createTree('#tree', options);\n```\n\n| 메서드 | 설명 |\n| --- | --- |\n| `setData(list)` | 데이터 교체 |\n| `getData()` | 정리된 전체 트리 |\n| `getNode(id)` | 단일 노드 복사본 |\n| `updateNode(id, patch)` | `label/icon/disabled/data/checked` 수정 |\n| `addNode(parentId, raw, index?)` | 부모 아래에 노드 추가. 루트는 `parentId` 에 `null` |\n| `removeNode(id)` | 노드와 하위 노드 삭제 |\n| `setChecked(id, checked)` | 체크 설정(cascade 적용) |\n| `getChecked({ ids, parents })` | 체크 노드 배열 또는 id 배열 |\n| `setCheckAll(flag)` | 전체 체크/해제 |\n| `getSelected()` | 선택 노드(다수면 배열) |\n| `select(id)` | 노드 선택 |\n| `clearSelection()` | 선택 해제 |\n| `toggle(id, force?)` | 펼침/접힘, 지연 로딩 트리거 |\n| `expand(idOrIds, flag?)` | 펼침 상태 직접 설정 |\n| `expandTo(id)` | 조상 노드를 펼쳐 경로 노출 |\n| `expandAll()` / `collapseAll()` | 전체 펼침/접힘 |\n| `filter(query)` / `setQuery(query)` | 검색 |\n| `refresh()` | 다시 렌더 |\n| `on/off/destroy` | 이벤트/정리 |\n\n`getChecked` 는 기본적으로 부모 노드도 포함합니다. 리프만 필요하면 `getChecked({ parents: false })` 를 사용합니다.\n\n```js\nconst ids = tree.getChecked({ ids: true });\nconst leaves = tree.getChecked({ ids: true, parents: false });\n\ntree.expandAll();\ntree.filter('개발');\ntree.addNode('dev', { id: 'qa2', label: 'QA팀' });\ntree.removeNode('qa2');\n```\n\n## 5. 이벤트\n\n| 이벤트 | 페이로드 |\n| --- | --- |\n| `ready` | `api` |\n| `select` | `{ node, selected }` |\n| `check` | `{ node?, checked?, checkedNodes }` |\n| `expand` | `{ node, expanded }` |\n| `expandall` | 없음 |\n| `collapseall` | 없음 |\n| `load` | `{ node, children }` |\n| `loaderror` | `{ node, error }` |\n| `filter` | `{ query }` |\n\n```js\ntree.on('check', ({ checkedNodes }) => {\n  console.log(checkedNodes.map((n) => n.id));\n});\n\ntree.on('select', ({ node, selected }) => {\n  console.log(node.id, selected.length);\n});\n```\n\n## 6. 체크 동작\n\n- `cascade: true` 이면 자식 체크가 부모에 반영되고, 부모 체크가 자식에 전파됩니다.\n- 자식이 일부만 체크되면 부모는 indeterminate 상태가 됩니다.\n- `disabled: true` 또는 `checkable: false` 노드는 체크 대상에서 제외됩니다.\n- 표시 체크 수는 리프 기준, 반환값은 기본적으로 부모 포함입니다.\n\n## 7. 키보드 탐색\n\n| 키 | 동작 |\n| --- | --- |\n| `ArrowDown` / `ArrowUp` | 표시된 행 간 이동 |\n| `ArrowRight` | 접힌 노드 펼침, 펼쳐진 노드의 첫 자식으로 이동 |\n| `ArrowLeft` | 펼쳐진 노드 접기, 접힌 노드의 부모로 이동 |\n| `Home` / `End` | 첫/마지막 행 |\n| `Space` | 체크 토글 |\n| `Enter` | 선택 |\n\n행은 `tabindex` 를 가지며 `focus` 클래스로 현재 위치를 표시합니다.\n\n## 8. 검색\n\n- 입력 후 180ms 디바운스로 `filterTree` 를 호출합니다.\n- 라벨에 검색어가 포함된 노드와 그 조상이 표시됩니다.\n- 일치 부분은 `<mark>` 로 하이라이트됩니다.\n- 검색 중에는 일치 항목의 경로를 자동으로 펼칩니다.\n- 결과가 없으면 검색 결과 없음 상태를 표시합니다.\n\n## 9. 스타일\n\n- 루트 `.wui-tree`, 본문 `.wui-tree-body`, 행 `.wui-tree-row`, 라벨 `.wui-tree-label`.\n- `has-lines` 클래스로 연결선 표시.\n- `--tree-depth` 변수로 들여쓰기 계산.\n- 상태 클래스: `.is-selected`, `.is-checked`, `.is-indeterminate`, `.is-disabled`, `.is-focus`, `.is-loading`.\n\n## 10. 제한 사항\n\n- 노드 드래그 앤 드롭 이동은 제공하지 않습니다.\n- 가상 스크롤은 없습니다. 노드 수가 매우 많으면 지연 로딩 사용을 권장합니다.\n- 다중 선택은 `Ctrl/Cmd` 기반이며 범위 선택은 없습니다.\n"
+    },
+    {
+      "id": "07-layout-json",
+      "file": "07-layout-json.md",
+      "order": 7,
+      "title": "07. JSON 화면 배치",
+      "summary": "createLayout 은 JSON 스키마를 읽어 화면을 구성합니다. 12컬럼 CSS Grid 기반 flow 배치와 pos 좌표 기반 absolute 배치를 지원하고, 조건부 표시/비활성, 검증, 데이터 바인딩, 액션, 사용자 컨트롤 확장을 제공합니다.",
+      "headings": [
+        {
+          "id": "1-기본-사용",
+          "text": "1. 기본 사용",
+          "level": 2
+        },
+        {
+          "id": "2-스키마-구조",
+          "text": "2. 스키마 구조",
+          "level": 2
+        },
+        {
+          "id": "아이템-공통-속성",
+          "text": "아이템 공통 속성",
+          "level": 3
+        },
+        {
+          "id": "3-옵션",
+          "text": "3. 옵션",
+          "level": 2
+        },
+        {
+          "id": "4-컨트롤-31종",
+          "text": "4. 컨트롤 31종",
+          "level": 2
+        },
+        {
+          "id": "옵션-형식",
+          "text": "옵션 형식",
+          "level": 3
+        },
+        {
+          "id": "값이-없는-컨트롤",
+          "text": "값이 없는 컨트롤",
+          "level": 3
+        },
+        {
+          "id": "임베드-예",
+          "text": "임베드 예",
+          "level": 3
+        },
+        {
+          "id": "5-조건부-표시와-비활성",
+          "text": "5. 조건부 표시와 비활성",
+          "level": 2
+        },
+        {
+          "id": "6-검증",
+          "text": "6. 검증",
+          "level": 2
+        },
+        {
+          "id": "7-값과-바인딩",
+          "text": "7. 값과 바인딩",
+          "level": 2
+        },
+        {
+          "id": "초기값-우선순위",
+          "text": "초기값 우선순위",
+          "level": 3
+        },
+        {
+          "id": "bind",
+          "text": "bind",
+          "level": 3
+        },
+        {
+          "id": "값-api",
+          "text": "값 API",
+          "level": 3
+        },
+        {
+          "id": "8-액션",
+          "text": "8. 액션",
+          "level": 2
+        },
+        {
+          "id": "9-absolute-배치",
+          "text": "9. absolute 배치",
+          "level": 2
+        },
+        {
+          "id": "10-사용자-컨트롤",
+          "text": "10. 사용자 컨트롤",
+          "level": 2
+        },
+        {
+          "id": "11-이벤트",
+          "text": "11. 이벤트",
+          "level": 2
+        },
+        {
+          "id": "12-스타일",
+          "text": "12. 스타일",
+          "level": 2
+        },
+        {
+          "id": "13-제한-사항",
+          "text": "13. 제한 사항",
+          "level": 2
+        }
+      ],
+      "markdown": "# 07. JSON 화면 배치\n\n`createLayout` 은 JSON 스키마를 읽어 화면을 구성합니다. 12컬럼 CSS Grid 기반 flow 배치와 `pos` 좌표 기반 absolute 배치를 지원하고, 조건부 표시/비활성, 검증, 데이터 바인딩, 액션, 사용자 컨트롤 확장을 제공합니다.\n\n## 1. 기본 사용\n\n```html\n<link rel=\"stylesheet\" href=\"../src/css/tokens.css\">\n<link rel=\"stylesheet\" href=\"../src/css/base.css\">\n<link rel=\"stylesheet\" href=\"../src/css/layout.css\">\n\n<div id=\"form\"></div>\n\n<script type=\"module\">\n  import WUI from '../src/js/webui.js';\n\n  const schema = {\n    title: '주문 입력',\n    description: '필수값과 형식 검증이 적용됩니다.',\n    cols: 12,\n    gap: 12,\n    actions: [\n      { label: '초기화', action: 'reset' },\n      { label: '저장', action: 'submit', variant: 'primary' },\n    ],\n    groups: [\n      {\n        id: 'basic',\n        title: '주문 정보',\n        items: [\n          { name: 'orderNo', label: '주문번호', type: 'text', span: 4, required: true },\n          { name: 'orderedAt', label: '주문일', type: 'date', span: 4, required: true },\n          { name: 'status', label: '상태', type: 'select', span: 4,\n            options: [\n              { value: 'ready', label: '준비' },\n              { value: 'done', label: '완료' },\n            ] },\n        ],\n      },\n    ],\n  };\n\n  const form = WUI.createLayout('#form', schema, {\n    values: { orderNo: 'ORD-2026-0001' },\n    onSubmit: ({ values }) => console.log(values),\n  });\n</script>\n```\n\n## 2. 스키마 구조\n\n```js\n{\n  title: '화면 제목',\n  description: '설명',\n  cols: 12,\n  gap: 12,\n  mode: 'flow',              // 'flow' | 'absolute'\n  rowHeight: 36,             // absolute 모드 행 높이\n  actions: [ ... ],\n  groups: [\n    {\n      id: 'section-1',\n      title: '섹션 제목',\n      description: '섹션 설명',\n      aside: '<span>HTML</span>',\n      cols: 12,\n      gap: 12,\n      items: [ ... ],\n    },\n  ],\n}\n```\n\n`groups` 가 없으면 `items` 를 단일 그룹으로 사용합니다.\n\n### 아이템 공통 속성\n\n| 속성 | 설명 |\n| --- | --- |\n| `type` | 컨트롤 타입. 없으면 `text`, `render` 가 있으면 `custom` |\n| `name` | 값 키. 없으면 `field_<index>` |\n| `label` | 라벨 텍스트. `false` 면 라벨 숨김 |\n| `labelHint` | 라벨 옆 보조 텍스트 |\n| `help` | 필드 아래 도움말 |\n| `span` | 12컬럼 기준 너비. `'full'` 가능 |\n| `spanSm` | 좁은 화면 너비 |\n| `value` / `default` | 초기값 |\n| `required` | 필수 규칙 추가 |\n| `requiredMessage` | 필수 오류 메시지 |\n| `pattern` | 정규식 규칙 추가 |\n| `min` / `max` | number/range 범위 규칙 + 입력 제한 |\n| `rules` | 검증 규칙 배열 |\n| `hidden` | 항상 숨김 |\n| `disabled` | 항상 비활성 |\n| `readOnly` | 읽기 전용 |\n| `visibleWhen` | 조건부 표시 |\n| `disabledWhen` | 조건부 비활성 |\n| `bind` | 데이터 객체 경로와 양방향 바인딩 |\n| `props` | 타입별 추가 속성. 아이템 속성과 병합 |\n| `group` | `true` 면 렌더에서 제외(구분용) |\n\n`props` 는 다음처럼 병합됩니다.\n\n```js\n{\n  type: 'text',\n  name: 'customer',\n  props: { placeholder: '고객명', autocomplete: 'name' },\n  rules: [{ type: 'maxLength', value: 30 }],\n}\n```\n\n`props` 는 아이템 정의에 병합되어 `placeholder`, `autocomplete`, `min`, `max`, `step` 등 컨트롤이 읽는 속성으로 전달됩니다. `maxLength` 는 현재 입력 요소에 직접 적용되지 않으므로 `rules` 의 `maxLength` 검증으로 처리하세요.\n\n## 3. 옵션\n\n| 옵션 | 기본값 | 설명 |\n| --- | --- | --- |\n| `id` | 자동 | 인스턴스 id |\n| `cols` | `12` | 기본 컬럼 수 |\n| `gap` | `12` | 기본 간격(px) |\n| `mode` | `'flow'` | 기본 모드. 실제 렌더는 스키마의 `mode` 를 따름 |\n| `rowHeight` | `36` | absolute 모드 기본 행 높이 |\n| `labelPosition` | `'top'` | 예약됨(현재 상단 라벨 고정) |\n| `readOnly` | `false` | 전체 읽기 전용 |\n| `values` | `null` | 이름 기준 초기값 |\n| `data` | `null` | `bind` 대상 데이터 객체 |\n| `onChange` | `null` | `{ name, value, values, def }` |\n| `onAction` | `null` | `{ action, def, values, schema }` |\n| `onSubmit` | `null` | `{ values, schema }` |\n| `imageUploader` | `null` | `async (file) => url` |\n| `actions` | `null` | 스키마 액션을 덮어쓰는 액션 배열 |\n\n## 4. 컨트롤 31종\n\n| 타입 | 설명 | 주요 속성 |\n| --- | --- | --- |\n| `text` | 텍스트 | `placeholder`, `maxLength`, `autocomplete` |\n| `string` | `text` 별칭 | 동일 |\n| `email` | 이메일 입력 | `placeholder` |\n| `password` | 비밀번호 | `placeholder` |\n| `number` | 숫자 | `min`, `max`, `step` |\n| `date` | 날짜 | `min`, `max` |\n| `time` | 시간 | `min`, `max` |\n| `datetime` | 일시 | `min`, `max` |\n| `color` | 색상 | 기본 `#2f6fed` |\n| `textarea` | 여러 줄 | `rows`, `height`, `placeholder` |\n| `hidden` | 숨김 값 | `value` |\n| `select` | 선택 | `options`, `multiple`, `placeholder`, `emptyLabel`, `emptyAsNull` |\n| `radio` | 라디오 | `options`, `inline` |\n| `checkbox-group` | 체크박스 그룹 | `options` |\n| `checkboxes` | `checkbox-group` 별칭 | `options` |\n| `checkbox` | 단일 체크 | `text` |\n| `switch` | 스위치 | `text` |\n| `range` | 범위 | `min`, `max`, `step`, `unit` |\n| `slider` | `range` 별칭 | 동일 |\n| `html` | HTML 블록 | `html`/`content` |\n| `heading` | 제목 | `text`, `level` |\n| `divider` | 구분선 | – |\n| `spacer` | 여백 | `height` |\n| `static` | 고정 텍스트 | `text` |\n| `button` | 액션 버튼 | `text`, `action`, `variant`, `title` |\n| `file` | 파일 첨부 | `multiple`, `accept`, `readAsDataUrl`, `buttonText`, `hint` |\n| `image` | 이미지 | `accept`, `uploader` |\n| `editor` | 웹 에디터 | `height`, `toolbar`, `placeholder`, `autosave`, `status` |\n| `grid` | 임베드 그리드 | `columns`, `data`, `dataKey`, `height`, `filterRow`, `toolbar`, `search`, `footer`, `virtual` |\n| `tree` | 임베드 트리 | `data`, `dataKey`, `checkable`, `cascade`, `search`, `actions`, `expandLevel`, `lazy` |\n| `custom` | 사용자 컨트롤 | `render`, `getValue`, `setValue` |\n\n### 옵션 형식\n\n```js\n// 배열\noptions: ['개발', '디자인', '영업']\n\n// { value: label }\noptions: { dev: '개발', design: '디자인' }\n\n// 객체 배열\noptions: [\n  { value: 'dev', label: '개발', disabled: false },\n]\n\n// 행/컨트롤 정의 기반 동적 옵션\noptions: (def) => def.dependsOn ? [...]: [...]\n```\n\n### 값이 없는 컨트롤\n\n`html`, `heading`, `divider`, `spacer`, `button`, `static` 은 `getValues()` 결과에 포함되지 않습니다. `checkbox`/`switch`/`hidden` 은 라벨 없이 렌더되는 타입입니다.\n\n### 임베드 예\n\n```js\n{\n  type: 'grid',\n  name: 'orders',\n  span: 12,\n  dataKey: 'orders',\n  height: 360,\n  filterRow: true,\n  columns: [\n    { key: 'orderNo', title: '주문번호', type: 'text', frozen: 'left', required: true },\n    { key: 'qty', title: '수량', type: 'number' },\n  ],\n}\n```\n\n`dataKey` 는 `options.data.grids[dataKey]` 에서 데이터를 찾습니다. 같은 방식으로 트리는 `options.data.trees[dataKey]` 를 사용합니다.\n\n## 5. 조건부 표시와 비활성\n\n`visibleWhen` / `disabledWhen` 은 조건 객체, 조건 배열, 함수를 받습니다.\n\n```js\n{ field: 'urgent', op: 'truthy' }\n{ field: 'status', op: 'in', value: ['ready', 'shipping'] }\n[{ field: 'type', op: 'eq', value: 'corp' }, { field: 'bizNo', op: 'notEmpty' }]\n(values) => values.amount > 1000000\n```\n\n지원 연산자:\n\n| `op` | 의미 |\n| --- | --- |\n| `eq` / `ne` | 같음/다름(문자열 비교) |\n| `in` / `nin` | 포함/미포함 |\n| `gt` / `gte` / `lt` / `lte` | 숫자 비교 |\n| `empty` / `isEmpty` | 빈 값 |\n| `notEmpty` | 비어 있지 않음 |\n| `contains` | 문자열/배열 포함 |\n| `truthy` / `falsy` | 참/거짓 |\n\n```js\n{\n  name: 'urgentReason',\n  label: '긴급 사유',\n  type: 'text',\n  span: 12,\n  required: true,\n  visibleWhen: { field: 'urgent', op: 'truthy' },\n}\n```\n\n조건이 바뀌면 `evaluateVisibility()` 가 필드의 `hidden`, `display`, `disabled` 상태를 갱신합니다. 숨겨진 필드는 검증에서 제외됩니다.\n\n## 6. 검증\n\n```js\n{\n  name: 'phone',\n  label: '연락처',\n  required: true,\n  pattern: '^01[0-9]-?\\\\d{3,4}-?\\\\d{4}$',\n  rules: [\n    { type: 'pattern', value: '^01[0-9]-?\\\\d{3,4}-?\\\\d{4}$', message: '휴대폰 번호 형식이 아닙니다.' },\n    { type: 'custom', validate: (v, row) => v.length <= 13 || '너무 깁니다.' },\n  ],\n}\n```\n\n- `required` 는 `{ type: 'required' }` 규칙으로 변환됩니다.\n- `pattern` 은 `pattern` 규칙으로 변환됩니다.\n- `min`/`max` 는 `number`/`range` 에서 규칙으로 추가됩니다.\n- 지원 규칙은 그리드와 동일합니다(`required`, `min`, `max`, `minLength`, `maxLength`, `pattern`, `email`, `number`, `custom`, 함수).\n\nAPI:\n\n```js\nconst errors = form.validate();        // [{ name, message, def }]\nform.setErrors({ email: '이미 사용 중입니다.' });\nform.getErrors();                      // { email: '...' }\nconst result = form.submit();          // { valid, values, errors }\n```\n\n검증 실패 시 첫 오류 필드로 스크롤하고 `invalid` 이벤트를 발생시킵니다. `submit()` 은 `submitinvalid` 또는 `submit` 이벤트를 발생시킵니다.\n\n## 7. 값과 바인딩\n\n### 초기값 우선순위\n\n1. `options.values[name]`\n2. `options.data` 의 `bind` 경로\n3. `item.value`\n4. `item.default` (함수 가능)\n5. 타입별 기본값(`checkbox` false, `number` null, 그룹 배열, range min, 그 외 `''`)\n\n### bind\n\n```js\nconst data = { customer: { name: '김하늘', email: 'haneul@example.com' } };\n\nconst form = WUI.createLayout('#form', {\n  items: [\n    { name: 'customerName', label: '고객명', bind: 'customer.name' },\n    { name: 'customerEmail', label: '이메일', type: 'email', bind: 'customer.email' },\n  ],\n}, { data });\n\nform.setValues({ customerName: '이서준' });\nconsole.log(data.customer.name);  // '이서준'\n```\n\n- `getPath`/`setPath` 로 중첩 경로를 읽고 씁니다.\n- `applyData(data)` 는 모든 `bind` 필드를 갱신합니다.\n- `getValues({ visibleOnly: true })` 는 숨겨진 필드를 제외합니다.\n\n### 값 API\n\n| 메서드 | 설명 |\n| --- | --- |\n| `getValues(opts?)` | 현재 값 수집 |\n| `setValues(values, { silent })` | 값 설정 + 조건/오류 갱신 |\n| `applyData(data)` | `bind` 필드에 데이터 적용 |\n| `reset()` | 초기값으로 되돌림 |\n| `getControl(name)` / `getField(name)` | 컨트롤/메타 접근 |\n| `focus(name)` | 필드로 스크롤 + 포커스 |\n| `refresh()` / `refreshVisibility()` | 오류/조건 재평가 |\n\n## 8. 액션\n\n```js\nactions: [\n  { label: 'JSON 보기', action: 'json', variant: 'ghost', position: 'top' },\n  { label: '초기화', action: 'reset' },\n  { label: '저장', action: 'submit', variant: 'primary' },\n]\n```\n\n- `position` 은 `top` 또는 `bottom`(기본)입니다.\n- `submit`/`reset` 은 레이아웃 내장 동작입니다.\n- 나머지는 `action` 이벤트와 `onAction` 콜백으로 전달됩니다.\n- `button` 타입 아이템도 `wui-action` 이벤트를 발생시켜 같은 경로로 처리됩니다.\n- 앱(`createApp`)은 `theme`, `shape`, `density`, `borders`, `skin-reset`, `reload`, `close`, `log`, `json` 액션을 내장 처리합니다.\n\n```js\nconst form = WUI.createLayout('#form', schema, {\n  onAction: ({ action, def, values }) => {\n    if (action === 'preview') {\n      console.log(JSON.stringify(values, null, 2));\n    }\n  },\n});\n```\n\n## 9. absolute 배치\n\n```js\n{\n  mode: 'absolute',\n  rowHeight: 40,\n  groups: [{\n    cols: 12,\n    items: [\n      { type: 'text', name: 'name', label: '이름', pos: { x: 1, y: 1, w: 4, h: 1 } },\n      { type: 'date', name: 'date', label: '날짜', pos: { x: 5, y: 1, w: 3, h: 1 } },\n      { type: 'textarea', name: 'memo', label: '메모', pos: { x: 1, y: 2, w: 7, h: 3 } },\n    ],\n  }],\n}\n```\n\n`pos` 는 CSS `grid-area: y / x / span h / span w` 로 변환됩니다. 섹션 그리드는 `grid-auto-rows: rowHeight` 를 사용합니다. `pos` 가 없으면 flow 규칙(`span`)을 따릅니다.\n\n## 10. 사용자 컨트롤\n\n```js\nWUI.registerControl('rating', (ctx) => {\n  const wrap = document.createElement('div');\n  wrap.className = 'my-rating';\n  let current = Number(ctx.value) || 0;\n\n  const paint = (value) => {\n    current = Math.max(0, Math.min(5, Number(value) || 0));\n    [...wrap.children].forEach((el, i) => {\n      el.textContent = i < current ? '★' : '☆';\n      el.setAttribute('aria-pressed', String(i < current));\n    });\n  };\n\n  const buttons = [1, 2, 3, 4, 5].map((n) => {\n    const b = document.createElement('button');\n    b.type = 'button';\n    b.addEventListener('click', () => {\n      paint(n);\n      ctx.onChange(current);\n    });\n    wrap.appendChild(b);\n    return b;\n  });\n  paint(current);\n\n  return {\n    el: wrap,\n    getValue: () => current,\n    setValue: (v) => paint(v),\n    focus: () => buttons[0].focus(),\n    setDisabled: (flag) => buttons.forEach((b) => { b.disabled = !!flag; }),\n    destroy: () => wrap.remove(),\n  };\n}, { label: '평점' });\n```\n\n스키마에서 `{ type: 'rating', name: 'score', label: '평점' }` 으로 사용합니다. 컨트롤 팩토리는 다음 형태를 반환해야 합니다.\n\n```js\n{\n  el,\n  getValue?,\n  setValue?,\n  focus?,\n  setDisabled?,\n  destroy?,\n}\n```\n\n`ctx` 필드: `def`, `name`, `value`, `label`, `disabled`, `readOnly`, `options`(레이아웃 옵션), `onChange(value, { input })`.\n\n`custom` 타입은 `render(ctx)` 가 반환한 Node/문자열을 표시하고 `getValue`/`setValue`로 값을 제어합니다.\n\n## 11. 이벤트\n\n| 이벤트 | 페이로드 |\n| --- | --- |\n| `ready` | `api` |\n| `change` | `{ name, value, values, def }` |\n| `values` | 전체 값 객체 |\n| `error` | `{ name, message }` |\n| `validate` | 오류 배열 |\n| `invalid` | 오류 배열(첫 오류 포커스) |\n| `submit` | `{ values, schema }` |\n| `submitinvalid` | `{ errors, values }` |\n| `reset` | 값 객체 |\n| `action` | `{ action, def, values, schema }` |\n\n## 12. 스타일\n\n- 루트 `.wui-layout`, 헤드 `.wui-layout-head`, 본문 `.wui-layout-body`.\n- 섹션 `.wui-layout-section`, 그리드 `.wui-layout-grid`, 필드 `.wui-field`.\n- 필드 상태: `.is-invalid`, `.is-hidden`, `.is-disabled`, `.is-bare`, `.is-inline-control`.\n- `--wui-span`, `--wui-span-sm`, `--wui-cols`, `--wui-gap-custom` 변수로 배치를 제어합니다.\n\n## 13. 제한 사항\n\n- 중첩 그룹(그룹 안의 그룹)은 지원하지 않습니다.\n- `labelPosition` 은 현재 예약 옵션이며 상단 라벨로 렌더됩니다.\n- `options.mode` 가 아니라 스키마의 `mode` 가 실제 배치에 사용됩니다.\n- 레이아웃 자체는 서버 통신을 하지 않습니다. 제출/액션은 앱 또는 사용자 콜백에서 처리합니다.\n"
+    },
+    {
+      "id": "08-menu-layer-ajax",
+      "file": "08-menu-layer-ajax.md",
+      "order": 8,
+      "title": "08. 메뉴·레이어·AJAX",
+      "summary": "createApp 은 메뉴 JSON 을 읽어 사이드바를 만들고, 메뉴 클릭 시 레이어 JSON 과 데이터 JSON 을 AJAX 로 읽어 createLayout 으로 화면을 구성합니다. 통신은 core/ajax.js 의 fetch 래퍼를 사용하며, 서버가 없을 때를 위한 mock 폴백을 지원합니다.",
+      "headings": [
+        {
+          "id": "1-앱-사용",
+          "text": "1. 앱 사용",
+          "level": 2
+        },
+        {
+          "id": "2-앱-옵션",
+          "text": "2. 앱 옵션",
+          "level": 2
+        },
+        {
+          "id": "url-템플릿",
+          "text": "URL 템플릿",
+          "level": 3
+        },
+        {
+          "id": "3-메뉴-json",
+          "text": "3. 메뉴 JSON",
+          "level": 2
+        },
+        {
+          "id": "4-레이어-json",
+          "text": "4. 레이어 JSON",
+          "level": 2
+        },
+        {
+          "id": "데이터-json",
+          "text": "데이터 JSON",
+          "level": 3
+        },
+        {
+          "id": "5-로드-흐름",
+          "text": "5. 로드 흐름",
+          "level": 2
+        },
+        {
+          "id": "6-앱-api",
+          "text": "6. 앱 API",
+          "level": 2
+        },
+        {
+          "id": "7-앱-이벤트",
+          "text": "7. 앱 이벤트",
+          "level": 2
+        },
+        {
+          "id": "8-ajax-래퍼",
+          "text": "8. AJAX 래퍼",
+          "level": 2
+        },
+        {
+          "id": "ajaxrequesturl-opts",
+          "text": "ajax.request(url, opts)",
+          "level": 3
+        },
+        {
+          "id": "오류",
+          "text": "오류",
+          "level": 3
+        },
+        {
+          "id": "url-구성",
+          "text": "URL 구성",
+          "level": 3
+        },
+        {
+          "id": "9-mock-폴백",
+          "text": "9. Mock 폴백",
+          "level": 2
+        },
+        {
+          "id": "요청-로그",
+          "text": "요청 로그",
+          "level": 3
+        },
+        {
+          "id": "10-서버-api",
+          "text": "10. 서버 API",
+          "level": 2
+        },
+        {
+          "id": "11-액션-처리",
+          "text": "11. 액션 처리",
+          "level": 2
+        },
+        {
+          "id": "12-보안과-운영-주의",
+          "text": "12. 보안과 운영 주의",
+          "level": 2
+        }
+      ],
+      "markdown": "# 08. 메뉴·레이어·AJAX\n\n`createApp` 은 메뉴 JSON 을 읽어 사이드바를 만들고, 메뉴 클릭 시 레이어 JSON 과 데이터 JSON 을 AJAX 로 읽어 `createLayout` 으로 화면을 구성합니다. 통신은 `core/ajax.js` 의 fetch 래퍼를 사용하며, 서버가 없을 때를 위한 mock 폴백을 지원합니다.\n\n## 1. 앱 사용\n\n```html\n<link rel=\"stylesheet\" href=\"../src/css/tokens.css\">\n<link rel=\"stylesheet\" href=\"../src/css/base.css\">\n<link rel=\"stylesheet\" href=\"../src/css/editor.css\">\n<link rel=\"stylesheet\" href=\"../src/css/grid.css\">\n<link rel=\"stylesheet\" href=\"../src/css/tree.css\">\n<link rel=\"stylesheet\" href=\"../src/css/layout.css\">\n<link rel=\"stylesheet\" href=\"../src/css/app.css\">\n\n<div id=\"app\"></div>\n\n<script type=\"module\">\n  import WUI from '../src/js/webui.js';\n\n  WUI.skin.init({ target: document.documentElement });\n\n  const app = WUI.createApp('#app', {\n    menuUrl: '/api/menu',\n    layerUrl: '/api/layers/{layer}',\n    dataUrl: '/api/data/{data}',\n    submitUrl: '/api/submit',\n    title: 'WUI 스튜디오',\n    subtitle: '메뉴 · 레이어 · 데이터',\n    logo: 'W',\n    hash: true,\n    tabs: true,\n    skinPanel: true,\n  });\n</script>\n```\n\n## 2. 앱 옵션\n\n| 옵션 | 기본값 | 설명 |\n| --- | --- | --- |\n| `menuUrl` | `/api/menu` | 메뉴 JSON URL |\n| `layerUrl` | `/api/layers/{layer}` | 레이어 URL 템플릿/함수 |\n| `dataUrl` | `/api/data/{data}` | 데이터 URL 템플릿/함수 |\n| `submitUrl` | `null` | 기본 제출 URL |\n| `title` | `'WUI'` | 브랜드 제목 |\n| `subtitle` | `'웹 UI 키트'` | 브랜드 부제 |\n| `logo` | `'W'` | 로고 문자 |\n| `hash` | `true` | `#/menu-id` 해시 라우팅 |\n| `cache` | `true` | 예약됨(현재 미사용). 열린 탭의 화면은 항상 유지됩니다 |\n| `tabs` | `true` | 탭 표시 |\n| `skinPanel` | `true` | 사이드바 스킨 패널 |\n| `statusBar` | `true` | 예약됨(현재 옵션과 무관하게 하단 상태 바 표시) |\n| `keepTitle` | `false` | 메뉴 JSON 의 `title` 로 브랜드 제목을 덮어쓰지 않음 |\n| `imageUploader` | `null` | 레이아웃 이미지 업로더 |\n\n### URL 템플릿\n\n지원 변수: `{id}`, `{layer}`, `{data}`, `{menu}`\n\n```js\nlayerUrl: '/api/layers/{layer}',   // menu.layer || menu.id\ndataUrl: '/api/data/{data}',        // menu.data || menu.id\n```\n\n값은 `encodeURIComponent` 로 치환됩니다. 함수를 사용할 수도 있습니다.\n\n```js\ncreateApp('#app', {\n  layerUrl: (menu) => `/api/v2/layers/${encodeURIComponent(menu.id)}`,\n  dataUrl: (menu, state) => menu.data === false ? null : `/api/v2/data/${menu.id}`,\n});\n```\n\n## 3. 메뉴 JSON\n\n```json\n{\n  \"title\": \"WUI 스튜디오\",\n  \"subtitle\": \"바닐라 JS 웹 UI 키트\",\n  \"items\": [\n    { \"id\": \"dashboard\", \"label\": \"대시보드\", \"icon\": \"▦\", \"badge\": \"Grid\" },\n    { \"id\": \"order-form\", \"label\": \"주문 입력\", \"icon\": \"✎\" },\n    { \"id\": \"org\", \"label\": \"조직도\", \"icon\": \"⌘\", \"data\": false },\n    {\n      \"id\": \"settings\",\n      \"label\": \"설정\",\n      \"icon\": \"⚙\",\n      \"children\": [\n        { \"id\": \"settings-general\", \"label\": \"일반 설정\" },\n        { \"id\": \"settings-skin\", \"label\": \"스킨 갤러리\" }\n      ]\n    }\n  ]\n}\n```\n\n| 필드 | 설명 |\n| --- | --- |\n| `id` | 메뉴/탭/URL 식별자 |\n| `label` | 표시 텍스트(`title`, `text` 별칭) |\n| `icon` | 아이콘 문자열 |\n| `badge` | 메뉴 라벨 옆 배지 |\n| `disabled` | 비활성 |\n| `children` / `items` | 하위 메뉴 |\n| `layer` | 레이어 id 재정의 |\n| `data` | 데이터 id 재정의. `false` 면 데이터 요청 생략 |\n\n상위 메뉴는 그룹으로 동작하고, 리프 메뉴를 클릭하면 탭이 열립니다. 초기 화면은 첫 번째 리프 메뉴이거나 해시에 지정된 메뉴입니다.\n\n## 4. 레이어 JSON\n\n레이어는 `createLayout` 스키마에 앱 관련 필드를 더한 형태입니다.\n\n```json\n{\n  \"title\": \"주문 입력\",\n  \"description\": \"12컬럼 flow 배치\",\n  \"submitUrl\": \"/api/submit\",\n  \"actions\": [\n    { \"label\": \"초기화\", \"action\": \"reset\" },\n    { \"label\": \"저장\", \"action\": \"submit\", \"variant\": \"primary\" }\n  ],\n  \"groups\": [\n    {\n      \"id\": \"basic\",\n      \"title\": \"주문 정보\",\n      \"items\": [\n        { \"name\": \"orderNo\", \"label\": \"주문번호\", \"type\": \"text\", \"span\": 4, \"required\": true },\n        { \"name\": \"orderedAt\", \"label\": \"주문일\", \"type\": \"date\", \"span\": 4, \"required\": true }\n      ]\n    }\n  ]\n}\n```\n\n- `layer.submitUrl` 이 있으면 앱의 `submitUrl` 보다 우선합니다.\n- 없으면 저장 시 \"저장 URL 없음\" 토스트만 표시합니다.\n- `actions` 는 레이아웃과 동일하게 동작합니다.\n\n### 데이터 JSON\n\n```json\n{\n  \"values\": {\n    \"orderNo\": \"ORD-2026-0101\",\n    \"customer\": \"김하늘\",\n    \"status\": \"ready\"\n  },\n  \"orders\": [\n    { \"orderNo\": \"ORD-2026-0101\", \"customer\": \"김하늘\", \"qty\": 2 }\n  ]\n}\n```\n\n- `values` 는 레이아웃의 초기값으로 전달됩니다.\n- 나머지 키는 `options.data` 로 전달되어 `dataKey` 기반 그리드/트리 임베드에 사용할 수 있습니다.\n- 데이터 응답이 404 이면 `null` 로 처리하고 레이아웃만 렌더합니다. 그 외 오류는 화면 오류 상태로 표시합니다.\n\n## 5. 로드 흐름\n\n```text\ncreateApp\n  → GET menuUrl\n  → 메뉴 정규화\n  → 첫 리프 메뉴 openMenu\n  → ensureTab\n  → activateTab\n  → GET layerUrl\n  → (menu.data !== false) GET dataUrl\n  → createLayout(host, layer, { values: data.values, data })\n  → 탭 본문 렌더\n```\n\n- 같은 탭을 다시 클릭하면 캐시된 화면을 사용합니다.\n- 새로고침/다시 읽기는 `force: true` 로 레이어와 데이터를 다시 요청합니다.\n- 요청 중에는 로딩 화면, 실패 시 오류 카드와 \"다시 시도\"/\"AJAX 로그\" 버튼을 표시합니다.\n- AJAX 요청 수는 상단 배지(`AJAX n`)에 표시됩니다.\n\n## 6. 앱 API\n\n| 멤버 | 설명 |\n| --- | --- |\n| `el` | 루트 요소 |\n| `open(id)` | 메뉴 열기 |\n| `reloadMenu()` | 메뉴 다시 로드 |\n| `reload()` | 활성 탭 다시 로드 |\n| `closeTab(id)` | 탭 닫기 |\n| `toggleLog(force?)` | AJAX 로그 패널 |\n| `toast(message, tone?)` | 토스트 표시 |\n| `getState()` | `{ menu, items, tabs, activeId, logs, loading, error }` |\n| `on/off/destroy` | 이벤트/정리 |\n\n## 7. 앱 이벤트\n\n| 이벤트 | 페이로드 |\n| --- | --- |\n| `ready` | `api` |\n| `menu` | `{ menu, items }` |\n| `menuready` | `{ menu }` |\n| `menuerror` | `{ error }` |\n| `open` | `{ menu }` |\n| `tabchange` | `{ id, menu }` |\n| `tabclose` | `{ id }` |\n| `load` | `{ tab, layer, data }` |\n| `loaderror` | `{ tab, error }` |\n| `change` | `{ tab, name, value, values, def }` |\n| `submit` | `{ tab, values, response }` |\n| `action` | `{ tab, action, def, values, schema }` |\n\n## 8. AJAX 래퍼\n\n```js\nimport { ajax } from './src/js/webui.js';\n\nconst menu = await ajax.get('/api/menu');\nconst saved = await ajax.post('/api/submit', { menu: 'order-form', values });\nconst res = await ajax.request('/api/items', {\n  method: 'GET',\n  params: { page: 1, size: 20 },\n  timeout: 5000,\n});\n```\n\n### `ajax.request(url, opts)`\n\n| 옵션 | 기본값 | 설명 |\n| --- | --- | --- |\n| `method` | `'GET'` | HTTP 메서드 |\n| `data` | – | GET 이면 쿼리, 그 외 JSON 본문 |\n| `params` | – | 쿼리 파라미터. 배열은 반복 키 |\n| `responseType` | `'json'` | `json`, `text`, `blob`, `arrayBuffer` |\n| `timeout` | `20000` | ms. 0이면 비활성 |\n| `signal` | – | AbortSignal |\n| `headers` | – | 추가 헤더 |\n| `credentials` | `'same-origin'` | fetch credentials |\n| `cache` | `'no-store'` | fetch cache |\n| `mock` | – | `true` 항상 mock, `'fallback'` 실패 시 mock, `false` mock 무시 |\n| `raw` | `false` | Response 객체 반환 |\n\n편의 메서드: `ajax.get`, `ajax.post`, `ajax.put`, `ajax.delete`, `ajax.getJSON`.\n\n### 오류\n\n`AjaxError` 는 `message`, `url`, `status`, `body`, `cause` 를 가집니다.\n\n```js\ntry {\n  await ajax.get('/api/missing');\n} catch (err) {\n  console.log(err.name, err.status, err.url, err.body);\n}\n```\n\n### URL 구성\n\n```js\najax.configure({ baseUrl: 'https://api.example.com' });\najax.buildUrl('/orders', { page: 1, tag: ['a', 'b'] });\n// https://api.example.com/orders?page=1&tag=a&tag=b\n```\n\n절대 URL, `data:`, `blob:` 은 `baseUrl` 을 붙이지 않습니다.\n\n## 9. Mock 폴백\n\n```js\najax.mock('/api/menu', menuData, { delay: 120 });\n\najax.mock('/api/layers/*', (info) => {\n  const id = decodeURIComponent(info.url.split('/').pop().split('?')[0]);\n  return layers[id] || { status: 404, body: { error: '레이어 없음', id } };\n}, { delay: 180 });\n\najax.mock('/api/submit', ({ method }) => ({\n  ok: true,\n  message: `저장되었습니다. (${method})`,\n}), { method: 'POST', delay: 300 });\n```\n\n- 패턴의 `*` 는 와일드카드입니다.\n- `method` 를 지정하면 해당 메서드에만 적용됩니다.\n- 반환값이 `{ status, body, delay }` 형태이면 상태/지연을 제어합니다. `status >= 400` 이면 `AjaxError` 를 던집니다.\n- 기본 모드 `mock: 'fallback'` 은 네트워크 실패 시 mock 을 사용합니다.\n- `configure({ mock: true })` 는 항상 mock, `mock: false` 는 mock 을 무시합니다.\n\n```js\najax.configure({ mock: 'fallback' });\najax.mockAvailable('GET', '/api/menu');  // boolean\najax.listMocks();                         // [{ pattern, delay }]\n```\n\n### 요청 로그\n\n```js\najax.onLog((entry) => {\n  console.log(entry.method, entry.url, entry.status, entry.source, entry.ms);\n});\n\najax.getHistory();   // 최근 60건\najax.clearHistory();\n```\n\n로그 필드: `id`, `method`, `url`, `status`, `ok`, `ms`, `source`(`network`/`mock`/`mock-fallback`), `size`, `error?`, `note?`, `at`.\n\n## 10. 서버 API\n\n`serve.mjs` 는 의존성 없는 Node HTTP 서버입니다.\n\n| 메서드 | 경로 | 설명 |\n| --- | --- | --- |\n| GET | `/api/menu` | `src/data/menu.json` |\n| GET | `/api/layers/:id` | `src/data/layers/:id.json` |\n| GET | `/api/data/:id` | `src/data/data/:id.json` |\n| GET | `/api/tree` | `src/data/tree.json` |\n| POST | `/api/submit` | `{ ok, action, message, menu, fieldCount, at }` |\n| POST | `/api/action/:name` | 액션 모의 응답 |\n| OPTIONS | `/api/*` | CORS preflight |\n\n- `POST /api/submit` 에 `{ fail: true }` 를 보내면 422 응답을 반환합니다.\n- 모든 응답은 `Cache-Control: no-store`.\n- API 지연은 `API_DELAY` 환경변수(ms)로 조절합니다.\n- 정적 파일은 프로젝트 루트 기준으로 제공하며 경로 탈출을 차단합니다.\n\n## 11. 액션 처리\n\n레이아웃 액션이 앱으로 전달되면 다음 순서로 처리합니다.\n\n1. `def.url` 이 있으면 해당 URL 로 `POST`(또는 `def.method`) 요청\n2. 내장 액션: `reload`, `close`, `log`, `theme`, `shape`, `density`, `borders`, `skin-reset`, `json`\n3. 나머지는 `action` 이벤트 발생\n\n```json\n{\n  \"type\": \"button\",\n  \"name\": \"notify\",\n  \"text\": \"알림 보내기\",\n  \"action\": \"notify\",\n  \"url\": \"/api/action/notify\",\n  \"method\": \"POST\"\n}\n```\n\n## 12. 보안과 운영 주의\n\n- 메뉴/레이어 `html` 컨트롤은 신뢰된 JSON 만 사용하세요. 레이아웃은 HTML 문자열을 그대로 삽입합니다.\n- 에디터 HTML 은 `sanitizeHtml` 로 정화되지만, 서버 저장 시에도 별도 검증을 권장합니다.\n- mock 은 개발/데모용입니다. 운영에서는 `ajax.configure({ mock: false })` 로 끄세요.\n- URL 템플릿 값은 인코딩되지만, 함수형 URL 을 사용할 때는 직접 인코딩해야 합니다.\n- 인증이 필요한 API 는 `ajax.configure({ headers: { Authorization: ... } })` 또는 `request` 옵션을 사용하세요.\n"
+    },
+    {
+      "id": "09-skin",
+      "file": "09-skin.md",
+      "order": 9,
+      "title": "09. 스킨",
+      "summary": "WUI 의 스킨은 CSS 변수와 data-wui-* 속성만으로 동작합니다. 컴포넌트 CSS 는 토큰 변수를 참조하고, skin 모듈이 대상 요소의 변수/속성을 바꿉니다.",
+      "headings": [
+        {
+          "id": "1-초기화",
+          "text": "1. 초기화",
+          "level": 2
+        },
+        {
+          "id": "2-빠른-사용",
+          "text": "2. 빠른 사용",
+          "level": 2
+        },
+        {
+          "id": "3-테마-10종",
+          "text": "3. 테마 10종",
+          "level": 2
+        },
+        {
+          "id": "4-모양-4종",
+          "text": "4. 모양 4종",
+          "level": 2
+        },
+        {
+          "id": "5-밀도-3종",
+          "text": "5. 밀도 3종",
+          "level": 2
+        },
+        {
+          "id": "6-api",
+          "text": "6. API",
+          "level": 2
+        },
+        {
+          "id": "7-사용자-테마",
+          "text": "7. 사용자 테마",
+          "level": 2
+        },
+        {
+          "id": "8-사용자-모양",
+          "text": "8. 사용자 모양",
+          "level": 2
+        },
+        {
+          "id": "9-htmlcss-에서-직접-사용",
+          "text": "9. HTML/CSS 에서 직접 사용",
+          "level": 2
+        },
+        {
+          "id": "주요-변수",
+          "text": "주요 변수",
+          "level": 3
+        },
+        {
+          "id": "10-피커-ui",
+          "text": "10. 피커 UI",
+          "level": 2
+        },
+        {
+          "id": "11-저장과-복원",
+          "text": "11. 저장과 복원",
+          "level": 2
+        },
+        {
+          "id": "12-주의-사항",
+          "text": "12. 주의 사항",
+          "level": 2
+        }
+      ],
+      "markdown": "# 09. 스킨\n\nWUI 의 스킨은 CSS 변수와 `data-wui-*` 속성만으로 동작합니다. 컴포넌트 CSS 는 토큰 변수를 참조하고, `skin` 모듈이 대상 요소의 변수/속성을 바꿉니다.\n\n## 1. 초기화\n\n스킨을 사용하려면 대상 요소에 스킨 속성을 적용해야 합니다.\n\n```js\nimport WUI from '../src/js/webui.js';\n\nWUI.skin.init({ target: document.documentElement });\n```\n\n- 기본 대상은 `document.documentElement` 입니다.\n- `createApp` 을 사용하면 앱 루트도 자동으로 대상에 추가됩니다.\n- 여러 영역에 서로 다른 스킨을 적용하려면 `addTarget` 을 사용합니다.\n\n```js\nWUI.skin.init({ target: document.body, persist: false });\nWUI.skin.addTarget(document.querySelector('#preview'));\n```\n\n`init` 은 저장된 스킨(localStorage `wui.skin`)을 복원합니다. `persist: false` 이면 저장/복원을 하지 않습니다.\n\n## 2. 빠른 사용\n\n```js\nWUI.skin.setTheme('green');\nWUI.skin.setShape('round');\nWUI.skin.setDensity('compact');\n\nWUI.skin.setShape({ radius: 10, borderWidth: 2, shadow: 'md', borders: false });\n\nconsole.log(WUI.skin.current());\n// { theme: 'green', shape: 'round', density: 'compact', overrides: {...}, borders: true, dark: false }\n```\n\n## 3. 테마 10종\n\n| 이름 | 라벨 | 대표색 | 다크 |\n| --- | --- | --- | --- |\n| `blue` | 블루 | `#2f6fed` | – |\n| `indigo` | 인디고 | `#4f46e5` | – |\n| `green` | 그린 | `#0f9d58` | – |\n| `teal` | 틸 | `#0d9488` | – |\n| `purple` | 퍼플 | `#9333ea` | – |\n| `orange` | 오렌지 | `#ea580c` | – |\n| `red` | 레드 | `#dc2626` | – |\n| `slate` | 슬레이트 | `#475569` | – |\n| `dark` | 다크 | `#0f172a` | ✓ |\n| `midnight` | 미드나잇 | `#312e81` | ✓ |\n\n```js\nWUI.skin.listThemes();\n// [{ name, label, color, dark }, ...]\n```\n\n테마는 `--wui-primary`, `--wui-primary-hover`, `--wui-primary-fg`, `--wui-primary-weak`, `--wui-primary-weak-fg`, `--wui-accent` 를 바꿉니다. 다크 테마는 배경/표면/텍스트/테두리/그림자 변수도 함께 바꿉니다.\n\n## 4. 모양 4종\n\n| 이름 | 라벨 | 모서리 | 그림자 |\n| --- | --- | --- | --- |\n| `sharp` | 각진 | 0px | none |\n| `soft` | 부드럽게 | 6px | sm |\n| `round` | 둥글게 | 12px | md |\n| `pill` | 캡슐 | 999px | sm |\n\n```js\nWUI.skin.setShape('round');\nWUI.skin.setShape({ radius: 14 });\nWUI.skin.setShape({ borderWidth: 2 });\nWUI.skin.setShape({ shadow: 'lg' });\nWUI.skin.setShape({ borders: false });\n```\n\n- `radius`: `--wui-radius`, `--wui-radius-sm`, `--wui-radius-lg` 를 계산해 적용합니다.\n- `borderWidth`: `--wui-border-width` 를 설정합니다.\n- `shadow`: `none`, `sm`, `md`, `lg` 또는 CSS 그림자 문자열.\n- `borders`: `false` 면 `.wui-no-border` 클래스로 테두리를 숨깁니다.\n\n초기화:\n\n```js\nWUI.skin.setShape({ radius: null, borderWidth: null, shadow: null });\n```\n\n## 5. 밀도 3종\n\n| 이름 | 라벨 | 간격 | 컨트롤 높이 | 행 높이 | 글자 |\n| --- | --- | --- | --- | --- | --- |\n| `compact` | 좁게 | 8px | 28px | 30px | 12.5px |\n| `normal` | 보통 | 12px | 34px | 36px | 13.5px |\n| `comfortable` | 넓게 | 16px | 40px | 44px | 14px |\n\n```js\nWUI.skin.setDensity('comfortable');\n```\n\n밀도는 `--wui-space`, `--wui-control-h`, `--wui-row-h`, `--wui-font-size` 를 바꿉니다. 그리드는 생성 시 `--wui-row-h` 를 측정해 행 높이를 정합니다.\n\n## 6. API\n\n| 함수 | 설명 |\n| --- | --- |\n| `init(options)` | 저장값/기본값 적용, 대상 등록 |\n| `addTarget(el)` / `removeTarget(el)` | 스킨 대상 추가/제거 |\n| `apply(root?, options?)` | 대상에 현재 스킨 적용 또는 새 루트 초기화 |\n| `setTheme(name, { target, persist })` | 테마 변경 |\n| `setShape(nameOrObject, { target, persist })` | 모양 변경 |\n| `setDensity(name, { target, persist })` | 밀도 변경 |\n| `toggleBorders(force?)` | 테두리 토글 |\n| `current()` | 현재 상태 |\n| `listThemes()` / `listShapes()` / `listDensities()` | 목록 |\n| `onChange(fn)` | 변경 구독, 해제 함수 반환 |\n| `reset()` | 기본값으로 |\n| `registerTheme(name, def)` | 사용자 테마 등록 |\n| `registerShape(name, def)` | 사용자 모양 등록 |\n| `createThemePicker(el)` | 테마 스와치 UI |\n| `createShapePicker(el)` | 모양/모서리/테두리 UI |\n\n```js\nconst off = WUI.skin.onChange((state) => {\n  console.log('skin', state);\n});\n\n// 나중에\noff();\n```\n\n## 7. 사용자 테마\n\n```js\nWUI.skin.registerTheme('forest', {\n  label: '포레스트',\n  color: '#166534',\n  vars: {\n    '--wui-primary': '#166534',\n    '--wui-primary-hover': '#14532d',\n    '--wui-primary-fg': '#ffffff',\n    '--wui-primary-weak': '#dcfce7',\n    '--wui-primary-weak-fg': '#166534',\n    '--wui-accent': '#22c55e',\n  },\n});\n\nWUI.skin.setTheme('forest');\n```\n\n`registerTheme` 은 런타임 `<style id=\"wui-skin-runtime\">` 에 `[data-wui-theme=\"forest\"]` 규칙을 추가합니다. 변수 키는 `--wui-` 접두사를 포함해도 되고, 포함하지 않으면 자동으로 붙습니다(단, `registerTheme` 의 vars 는 CSS 규칙으로 직접 출력되므로 `--` 접두사를 권장).\n\n다크 테마를 만들려면 `dark: true` 와 배경/표면/텍스트 변수를 함께 지정하세요.\n\n```js\nWUI.skin.registerTheme('navy', {\n  label: '네이비',\n  color: '#1e3a8a',\n  dark: true,\n  vars: {\n    '--wui-primary': '#93c5fd',\n    '--wui-primary-fg': '#0b1220',\n    '--wui-bg': '#0a1020',\n    '--wui-surface': '#111a30',\n    '--wui-surface-2': '#17223d',\n    '--wui-fg': '#e8eefc',\n    '--wui-muted': '#9fb0cc',\n    '--wui-border': '#243453',\n    '--wui-border-strong': '#34476d',\n  },\n});\n```\n\n## 8. 사용자 모양\n\n```js\nWUI.skin.registerShape('card', {\n  label: '카드',\n  vars: {\n    borderRadius: '16px',\n    radiusSm: '10px',\n    radiusLg: '24px',\n    shadow: 'lg',\n  },\n});\n```\n\n## 9. HTML/CSS 에서 직접 사용\n\n스킨 대상 요소에 속성을 직접 지정할 수 있습니다.\n\n```html\n<div data-wui data-wui-theme=\"green\" data-wui-shape=\"round\" data-wui-density=\"compact\">\n  ...\n</div>\n```\n\n```css\n.my-panel {\n  background: var(--wui-surface);\n  color: var(--wui-fg);\n  border: var(--wui-border-width) solid var(--wui-border);\n  border-radius: var(--wui-radius);\n  box-shadow: var(--wui-shadow);\n}\n```\n\n### 주요 변수\n\n| 변수 | 용도 |\n| --- | --- |\n| `--wui-primary`, `--wui-primary-hover`, `--wui-primary-fg` | 주 색상 |\n| `--wui-primary-weak`, `--wui-primary-weak-fg` | 약한 배경/텍스트 |\n| `--wui-accent` | 강조색 |\n| `--wui-bg`, `--wui-surface`, `--wui-surface-2` | 배경/표면 |\n| `--wui-fg`, `--wui-muted` | 텍스트 |\n| `--wui-border`, `--wui-border-strong`, `--wui-border-width` | 테두리 |\n| `--wui-radius`, `--wui-radius-sm`, `--wui-radius-lg` | 모서리 |\n| `--wui-shadow` | 그림자 |\n| `--wui-space`, `--wui-control-h`, `--wui-row-h`, `--wui-font-size` | 밀도 |\n\n## 10. 피커 UI\n\n```js\nconst themePicker = WUI.skin.createThemePicker('#theme-picker');\nconst shapePicker = WUI.skin.createShapePicker('#shape-picker');\n\n// 정리\nthemePicker.destroy();\nshapePicker.destroy();\n```\n\n- 테마 피커는 `wui-swatches` 컨테이너에 스와치 버튼을 렌더합니다.\n- 모양 피커는 프리셋 버튼, 모서리 슬라이더, 테두리 체크박스를 렌더합니다.\n- 두 피커 모두 `skin.onChange` 를 구독해 자동 갱신합니다.\n\n## 11. 저장과 복원\n\n`localStorage` 키 `wui.skin` 에 다음을 저장합니다.\n\n```json\n{\n  \"theme\": \"green\",\n  \"shape\": \"round\",\n  \"density\": \"normal\",\n  \"overrides\": { \"radius\": 10, \"borderWidth\": null, \"shadow\": null },\n  \"borders\": true\n}\n```\n\n`init()` 이 저장값을 복원합니다. `persist: false` 로 초기화하거나 개별 setter 에 `{ persist: false }` 를 넘기면 저장하지 않습니다.\n\n## 12. 주의 사항\n\n- `skin.init` 없이 setter 만 호출하면 대상이 없어 화면에 적용되지 않을 수 있습니다.\n- 앱이 자체 루트에 스킨을 적용하므로, 앱 외부 요소까지 바꾸려면 `document.documentElement` 를 대상으로 초기화하세요.\n- 스킨은 CSS 변수 기반이므로 컴포넌트 CSS 가 변수를 참조해야 반영됩니다. 하드코딩된 색상은 바뀌지 않습니다.\n- 다크 테마는 일부 컴포넌트의 그림자/이미지 대비를 별도로 점검하는 것이 좋습니다.\n"
+    },
+    {
+      "id": "10-api-reference",
+      "file": "10-api-reference.md",
+      "order": 10,
+      "title": "10. API 레퍼런스",
+      "summary": "이 문서는 WUI 전역 객체와 각 팩토리가 반환하는 API 를 한눈에 찾기 위한 요약입니다. 옵션의 상세 동작과 예제는 04. 에디터, 05. 그리드, 06. 트리, 07. JSON 화면 배치, 08. 메뉴·레이어·AJAX, 09. 스킨을 함께 참고하세요.",
+      "headings": [
+        {
+          "id": "1-전역-표면",
+          "text": "1. 전역 표면",
+          "level": 2
+        },
+        {
+          "id": "2-공통-규약",
+          "text": "2. 공통 규약",
+          "level": 2
+        },
+        {
+          "id": "마운트",
+          "text": "마운트",
+          "level": 3
+        },
+        {
+          "id": "이벤트",
+          "text": "이벤트",
+          "level": 3
+        },
+        {
+          "id": "정리",
+          "text": "정리",
+          "level": 3
+        },
+        {
+          "id": "id",
+          "text": "id",
+          "level": 3
+        },
+        {
+          "id": "3-에디터",
+          "text": "3. 에디터",
+          "level": 2
+        },
+        {
+          "id": "옵션",
+          "text": "옵션",
+          "level": 3
+        },
+        {
+          "id": "멤버",
+          "text": "멤버",
+          "level": 3
+        },
+        {
+          "id": "이벤트-2",
+          "text": "이벤트",
+          "level": 3
+        },
+        {
+          "id": "4-그리드",
+          "text": "4. 그리드",
+          "level": 2
+        },
+        {
+          "id": "옵션-2",
+          "text": "옵션",
+          "level": 3
+        },
+        {
+          "id": "컬럼",
+          "text": "컬럼",
+          "level": 3
+        },
+        {
+          "id": "메서드",
+          "text": "메서드",
+          "level": 3
+        },
+        {
+          "id": "이벤트-3",
+          "text": "이벤트",
+          "level": 3
+        },
+        {
+          "id": "5-트리",
+          "text": "5. 트리",
+          "level": 2
+        },
+        {
+          "id": "옵션-3",
+          "text": "옵션",
+          "level": 3
+        },
+        {
+          "id": "노드",
+          "text": "노드",
+          "level": 3
+        },
+        {
+          "id": "메서드-2",
+          "text": "메서드",
+          "level": 3
+        },
+        {
+          "id": "이벤트-4",
+          "text": "이벤트",
+          "level": 3
+        },
+        {
+          "id": "6-레이아웃",
+          "text": "6. 레이아웃",
+          "level": 2
+        },
+        {
+          "id": "옵션-4",
+          "text": "옵션",
+          "level": 3
+        },
+        {
+          "id": "메서드-3",
+          "text": "메서드",
+          "level": 3
+        },
+        {
+          "id": "이벤트-5",
+          "text": "이벤트",
+          "level": 3
+        },
+        {
+          "id": "컨트롤-등록",
+          "text": "컨트롤 등록",
+          "level": 3
+        },
+        {
+          "id": "7-앱",
+          "text": "7. 앱",
+          "level": 2
+        },
+        {
+          "id": "옵션-5",
+          "text": "옵션",
+          "level": 3
+        },
+        {
+          "id": "메서드-4",
+          "text": "메서드",
+          "level": 3
+        },
+        {
+          "id": "이벤트-6",
+          "text": "이벤트",
+          "level": 3
+        },
+        {
+          "id": "8-ajax",
+          "text": "8. AJAX",
+          "level": 2
+        },
+        {
+          "id": "9-스킨",
+          "text": "9. 스킨",
+          "level": 2
+        },
+        {
+          "id": "10-유틸",
+          "text": "10. 유틸",
+          "level": 2
+        },
+        {
+          "id": "dom이벤트",
+          "text": "DOM/이벤트",
+          "level": 3
+        },
+        {
+          "id": "값날짜검증",
+          "text": "값/날짜/검증",
+          "level": 3
+        },
+        {
+          "id": "11-빠른-색인",
+          "text": "11. 빠른 색인",
+          "level": 2
+        }
+      ],
+      "markdown": "# 10. API 레퍼런스\n\n이 문서는 `WUI` 전역 객체와 각 팩토리가 반환하는 API 를 한눈에 찾기 위한 요약입니다. 옵션의 상세 동작과 예제는 [04. 에디터](04-editor.md), [05. 그리드](05-grid.md), [06. 트리](06-tree.md), [07. JSON 화면 배치](07-layout-json.md), [08. 메뉴·레이어·AJAX](08-menu-layer-ajax.md), [09. 스킨](09-skin.md)을 함께 참고하세요.\n\n## 1. 전역 표면\n\n```js\nimport WUI from './src/js/webui.js';\n// 또는 named import\nimport { createGrid, ajax, skin } from './src/js/webui.js';\n```\n\n`webui.js` 는 모듈을 로드할 때 `window.WUI` 를 설정합니다. `<script type=\"module\">` 이 아닌 일반 스크립트에서는 `webui.js` 를 직접 불러올 수 없으므로, 먼저 모듈에서 `window.WUI` 를 노출한 뒤 사용하세요.\n\n| 키 | 설명 |\n| --- | --- |\n| `VERSION` | 키트 버전 문자열(현재 `1.0.0`) |\n| `util` | 공통 유틸 모음 |\n| `h`, `$`, `$$`, `on` | `util.h`, `util.$`, `util.$$`, `util.on` 단축 |\n| `Emitter` | `on/once/off/emit/destroy` 이벤트 이미터 클래스 |\n| `ajax` | fetch 래퍼 |\n| `AjaxError` | AJAX 오류 클래스 |\n| `skin` | 스킨 모듈 |\n| `createEditor` / `editor` | 에디터 팩토리 / `{ create, sanitizeHtml }` |\n| `sanitizeHtml` | 에디터 HTML 정화 함수 |\n| `createGrid` / `grid` | 그리드 팩토리 / `{ create }` |\n| `createTree` / `tree` | 트리 팩토리 / `{ create }` |\n| `createLayout` / `layout` | 레이아웃 팩토리 / `{ create }` |\n| `createApp` / `app` | 앱 셸 팩토리 / `{ create }` |\n| `registerControl` | 레이아웃 컨트롤 등록 |\n| `getControlFactory` | 등록된 컨트롤 팩토리 조회 |\n| `listControls` | `{ type, label }[]` 반환 |\n| `controlRegistry` | `{ registerControl, getControlFactory, listControls }` |\n\n## 2. 공통 규약\n\n### 마운트\n\n모든 팩토리의 첫 인자는 CSS 선택자 문자열 또는 DOM 요소입니다.\n\n```js\nWUI.createGrid('#grid', options);\nWUI.createGrid(document.querySelector('#grid'), options);\n```\n\n대상이 없으면 오류를 던집니다. `DIV`, `SECTION`, `TEXTAREA` 는 기존 내용을 비우고 마운트합니다. 에디터의 `TEXTAREA` 는 폼 전송을 위해 원본을 숨깁니다.\n\n### 이벤트\n\n모든 인스턴스는 `on(type, fn)`, `off(type, fn)` 을 제공합니다. `on` 은 해제 함수를 반환합니다.\n\n```js\nconst off = grid.on('change', ({ key, value }) => console.log(key, value));\noff();\n```\n\n`options.onXxx` 콜백과 이벤트는 같은 시점에 호출됩니다. 콜백이 먼저인지 이벤트가 먼저인지는 컴포넌트마다 다르므로, 순서에 의존하지 마세요.\n\n### 정리\n\n`destroy()` 는 DOM, 이벤트, 타이머, 하위 컴포넌트를 정리합니다. 앱은 열린 탭의 레이아웃과 스킨 피커까지 정리합니다.\n\n### id\n\n`options.id` 를 생략하면 `wui-grid-1` 같은 자동 id 가 부여됩니다. 그리드 너비 저장, aria 연결 등에 사용됩니다.\n\n## 3. 에디터\n\n```js\nconst editor = WUI.createEditor(mount, options);\n```\n\n### 옵션\n\n| 옵션 | 기본값 | 설명 |\n| --- | --- | --- |\n| `value` | `''` | 초기 HTML |\n| `placeholder` | 안내 문구 | 빈 영역 안내 |\n| `height` | `320` | 편집 영역 높이 |\n| `minHeight` | `180` | 최소 높이 |\n| `toolbar` | `'full'` | `'full'`, `'basic'`, `false` |\n| `stickyToolbar` | `true` | 툴바 sticky |\n| `readOnly` | `false` | 읽기 전용 시작 |\n| `autofocus` | `false` | 시작 시 포커스 |\n| `autosave` | `false` | localStorage 자동저장 |\n| `autosaveKey` | 자동 생성 | 자동저장 키 |\n| `autosaveDelay` | `700` | 자동저장 디바운스(ms) |\n| `image.accept` | `'image/*'` | 파일 입력 accept |\n| `image.maxSize` | `5MB` | 최대 파일 크기 |\n| `image.uploader` | `null` | `async (file) => url` |\n| `table.maxRows` / `maxCols` | `20` / `10` | 표 최대 크기 |\n| `table.defaultRows` / `defaultCols` | `3` / `3` | 기본 표 크기 |\n| `sanitize` | `true` | 입출력 HTML 정화 |\n| `showStatus` | `true` | 하단 상태 표시 |\n| `onChange` | `null` | `{ html, text, empty, chars }` |\n| `onSave` | `null` | `{ html, text, empty, chars }` |\n| `onImage` | `null` | `{ file, src }` |\n\n### 멤버\n\n| 멤버 | 설명 |\n| --- | --- |\n| `el`, `toolbar`, `area`, `id` | 루트/툴바/편집 영역/인스턴스 id |\n| `getHTML({ raw })` | HTML 반환. 기본 정화 |\n| `setHTML(html, { silent })` | HTML 설정. 기본 `silent: true` |\n| `getText()` / `setText(text)` | 텍스트 읽기/쓰기 |\n| `getData()` | `{ html, text, empty, chars }` |\n| `getValue()` / `setValue(v)` | `getHTML` / `setHTML` 별칭 |\n| `focus()` | 편집 영역 포커스 |\n| `exec(command, value)` | `document.execCommand` 실행 |\n| `insertHTML(html)` / `insertText(text)` | HTML/텍스트 삽입 |\n| `insertImage(src, { alt, width })` | URL 이미지 삽입 |\n| `insertImageFile(file)` | 파일 검증 후 업로더/data URL 로 삽입 |\n| `insertTable(rows, cols, header)` | 표 삽입 |\n| `setFontSize(px)` | 선택 영역 글자 크기 |\n| `save()` | 저장 이벤트 + 자동저장 갱신 |\n| `clear()` | 내용 비우기 |\n| `setReadOnly(flag)` | 읽기 전용 전환 |\n| `setSourceMode(flag)` | HTML 소스 모드 |\n| `toggleFullscreen(force)` | 전체화면 |\n| `isDirty()` | 마지막 저장 이후 변경 여부 |\n| `getSelectedText()` | 선택 텍스트 |\n| `on/off/destroy` | 이벤트/정리 |\n\n### 이벤트\n\n`ready`, `change`, `save`, `clear`, `readonly`, `image`, `focus`, `blur`\n\n## 4. 그리드\n\n```js\nconst grid = WUI.createGrid(mount, options);\n```\n\n### 옵션\n\n| 옵션 | 기본값 | 설명 |\n| --- | --- | --- |\n| `id` | 자동 | 인스턴스 id |\n| `title` / `description` | `''` | 제목/설명 |\n| `columns` / `data` | `[]` | 컬럼/초기 행 |\n| `height` / `maxHeight` / `minHeight` | `420` / `560` / `160` | 높이 |\n| `rowHeight` / `headerHeight` | CSS 변수/36, 38 | 행/헤더 높이 |\n| `virtual` / `overscan` | `true` / `6` | 가상 스크롤 |\n| `selectable` / `checkboxColumn` / `indexColumn` | `true` | 선택/체크박스/번호 열 |\n| `stickyHeader` / `zebra` | `true` | 헤더 고정/줄무늬 |\n| `resizable` / `sortable` / `multiSort` | `true` | 너비/정렬 |\n| `search` / `filterRow` | `true` / `false` | 전체 검색/열 필터 |\n| `toolbar` / `footer` / `showCount` | `true` | 도구 모음/집계/건수 |\n| `emptyText` | `'데이터가 없습니다.'` | 빈 상태 문구 |\n| `rowClass` | `null` | `(row) => string` |\n| `persistWidths` | `false` | 너비 localStorage 저장 |\n| `autoLoad` / `dataUrl` | `false` / `null` | 생성 시 AJAX 로드 |\n| `onChange` / `onSave` / `onRowAdd` / `onSelect` / `onSort` | `null` | 콜백 |\n\n### 컬럼\n\n`key`, `title`, `type`, `width`, `minWidth`, `align`, `editable`, `sortable`, `filterable`, `frozen`, `placeholder`, `default`, `decimals`, `unit`, `min`, `max`, `step`, `options`, `rules`, `required`, `requiredMessage`, `format`, `sortValue`, `render` 를 지원합니다. 자세한 형식은 [05. 그리드](05-grid.md)를 참고하세요.\n\n### 메서드\n\n| 그룹 | 메서드 |\n| --- | --- |\n| 데이터 | `setData(rows)`, `getData()`, `addRow(data?, { focus })`, `removeRows(rids)`, `load(url, opts?)` |\n| 컬럼 | `setColumns(cols)`, `getColumns()`, `setFrozen(key, side)`, `updateWidths()` |\n| 정렬/필터 | `setSort(key, dir, { additive })`, `clearSort()`, `setFilter(key, value)`, `setQuery(value)` |\n| 선택 | `selectAll()`, `clearSelection()`, `selectRow(rid)`, `getSelected()`, `getVisible()` |\n| 검증/저장 | `validate()`, `save()`, `getChanges()`, `downloadCSV(filename?)` |\n| 셀/스크롤 | `focusCell(rid, key)`, `setCellValue(rid, key, value, opts?)`, `scrollToIndex(index)` |\n| 크기/상태 | `setRowHeight(px)`, `setHeight(value)`, `refreshMetrics()`, `setLoading(flag)`, `setStatus(message, tone)` |\n| 공통 | `on/off/destroy` |\n\ngetter: `el`, `id`, `viewport`, `rowHeight`, `hasChanges`, `errorCount`\n\n### 이벤트\n\n`ready`, `data`, `change`, `edit`, `select`, `sort`, `columns`, `resize`, `rowadd`, `rowremove`, `validate`, `save`, `load`, `loaderror`, `footer`\n\n## 5. 트리\n\n```js\nconst tree = WUI.createTree(mount, options);\n```\n\n### 옵션\n\n| 옵션 | 기본값 | 설명 |\n| --- | --- | --- |\n| `data` | `[]` | 루트 노드 |\n| `checkable` / `cascade` | `true` | 체크/전파 |\n| `multiple` | `true` | 다중 선택 |\n| `showIcons` / `showLines` / `showSearch` / `showActions` | `true` | 표시 옵션 |\n| `searchPlaceholder` | `'트리 검색…'` | 검색 placeholder |\n| `indent` | `18` | 레벨 들여쓰기(px) |\n| `defaultExpandLevel` | `0` | `0` 접힘, `1` 루트 펼침, `-1` 전체 펼침 |\n| `emptyText` | `'표시할 항목이 없습니다.'` | 빈 상태 |\n| `lazy` | `null` | `{ load: async (node) => children[] }` |\n| `renderNode` | `null` | `({ node, level, tree }) => Node|string` |\n| `onSelect` / `onCheck` / `onExpand` / `onLoad` | `null` | 콜백 |\n\n### 노드\n\n`id`, `label`(`text` 별칭), `icon`, `disabled`, `selectable`, `checkable`, `checked`, `expanded`, `lazy`, `data`, `badge`, `children` 를 지원합니다.\n\n### 메서드\n\n| 그룹 | 메서드 |\n| --- | --- |\n| 데이터 | `setData(list)`, `getData()`, `getNode(id)`, `updateNode(id, patch)`, `addNode(parentId, raw, index?)`, `removeNode(id)` |\n| 체크 | `setChecked(id, checked)`, `getChecked({ ids, parents })`, `setCheckAll(flag)` |\n| 선택 | `select(id)`, `getSelected()`, `clearSelection()` |\n| 펼침 | `toggle(id, force?)`, `expand(idOrIds, flag?)`, `expandTo(id)`, `expandAll()`, `collapseAll()` |\n| 검색/렌더 | `filter(query)`, `setQuery(query)`, `refresh()` |\n| 공통 | `on/off/destroy` |\n\n`getSelected()` 는 선택이 1개면 노드, 여러 개면 배열을 반환합니다. `addNode` 의 첫 인자는 부모 id 이며, 루트에 추가하려면 `null` 을 사용합니다.\n\n### 이벤트\n\n`ready`, `select`, `check`, `expand`, `expandall`, `collapseall`, `load`, `loaderror`, `filter`\n\n## 6. 레이아웃\n\n```js\nconst form = WUI.createLayout(mount, schema, options);\n```\n\n### 옵션\n\n| 옵션 | 기본값 | 설명 |\n| --- | --- | --- |\n| `id` | 자동 | 인스턴스 id |\n| `cols` / `gap` | `12` / `12` | 기본 컬럼/간격 |\n| `mode` | `'flow'` | 예약됨. 실제 배치는 `schema.mode` 사용 |\n| `rowHeight` | `36` | absolute 모드 기본 행 높이 |\n| `labelPosition` | `'top'` | 예약됨. 현재 상단 라벨 고정 |\n| `readOnly` | `false` | 전체 읽기 전용 |\n| `values` | `null` | 이름 기준 초기값 |\n| `data` | `null` | `bind` 대상 데이터 |\n| `imageUploader` | `null` | `async (file) => url` |\n| `actions` | `null` | 스키마 액션 덮어쓰기 |\n| `onChange` | `null` | `{ name, value, values, def }` |\n| `onAction` | `null` | `{ action, def, values, schema }` |\n| `onSubmit` | `null` | `{ values, schema }` |\n\n### 메서드\n\n| 멤버 | 설명 |\n| --- | --- |\n| `el`, `id` | 루트/인스턴스 id |\n| `setSchema(schema, { values }?)` | 스키마 교체. 값 병합 가능 |\n| `getSchema()` | 현재 스키마 |\n| `getValues(opts?)` | 값 수집. `{ visibleOnly: true }` 지원 |\n| `setValues(values, { silent })` | 값 설정 |\n| `applyData(data)` | `bind` 필드 갱신 |\n| `reset()` | 초기값으로 |\n| `validate()` | `{ name, message, def }[]` |\n| `submit()` | `{ valid, values, errors }` |\n| `setErrors(map)` / `getErrors()` | 필드 오류 설정/조회 |\n| `getControl(name)` / `getField(name)` | 컨트롤/메타 조회 |\n| `focus(name)` | 필드로 스크롤 + 포커스 |\n| `refresh()` / `refreshVisibility()` | 오류/조건 재평가 |\n| `runAction(action, def?)` | 액션 실행 |\n| `values` getter | `getValues()` 결과 |\n| `controls` | `Map<name, control>` |\n| `on/off/destroy` | 이벤트/정리 |\n\n### 이벤트\n\n`ready`, `change`, `values`, `error`, `validate`, `invalid`, `submit`, `submitinvalid`, `reset`, `action`\n\n### 컨트롤 등록\n\n```js\nWUI.registerControl(type, factory, meta?);\n```\n\n`factory(ctx)` 는 다음을 반환합니다.\n\n```js\n{\n  el,             // 필수: 컨트롤 요소\n  getValue?,      // () => any\n  setValue?,      // (value) => void\n  focus?,         // () => void\n  setDisabled?,   // (flag) => void\n  destroy?,       // () => void\n}\n```\n\n`ctx` 필드: `def`, `name`, `value`, `label`, `disabled`, `readOnly`, `options`(레이아웃 옵션), `onChange(value, { input })`.\n\n`meta` 는 `{ label }` 을 가질 수 있으며 `listControls()` 에 표시됩니다. `custom` 타입은 `render(ctx)` 가 반환한 Node/문자열을 표시하고 `getValue`/`setValue` 로 값을 제어합니다.\n\n## 7. 앱\n\n```js\nconst app = WUI.createApp(mount, options);\n```\n\n### 옵션\n\n| 옵션 | 기본값 | 설명 |\n| --- | --- | --- |\n| `menuUrl` | `'/api/menu'` | 메뉴 JSON URL |\n| `layerUrl` | `'/api/layers/{layer}'` | 레이어 URL 템플릿/함수 |\n| `dataUrl` | `'/api/data/{data}'` | 데이터 URL 템플릿/함수 |\n| `submitUrl` | `null` | 기본 제출 URL |\n| `title` / `subtitle` / `logo` | `'WUI'` / `'웹 UI 키트'` / `'W'` | 브랜드 |\n| `hash` | `true` | `#/menu-id` 라우팅 |\n| `tabs` | `true` | 탭 표시 |\n| `skinPanel` | `true` | 스킨 패널 |\n| `imageUploader` | `null` | 레이아웃 이미지 업로더 |\n| `keepTitle` | `false` | 메뉴 JSON 의 `title` 로 브랜드 제목을 덮어쓰지 않음 |\n| `cache` | `true` | 예약됨(현재 미사용) |\n| `statusBar` | `true` | 예약됨(현재 항상 표시) |\n\nURL 템플릿 변수: `{id}`, `{layer}`, `{data}`, `{menu}`. 값은 `encodeURIComponent` 로 치환됩니다. 함수는 `(menu, state) => url` 형태입니다.\n\n### 메서드\n\n| 멤버 | 설명 |\n| --- | --- |\n| `el` | 루트 요소 |\n| `open(id)` | 메뉴 열기 |\n| `reloadMenu()` | 메뉴 다시 로드 |\n| `reload()` | 활성 탭 다시 로드 |\n| `closeTab(id)` | 탭 닫기 |\n| `toggleLog(force?)` | AJAX 로그 패널 |\n| `toast(message, tone?)` | 토스트 |\n| `getState()` | `{ menu, items, tabs, activeId, logs, loading, error }` |\n| `on/off/destroy` | 이벤트/정리 |\n\n### 이벤트\n\n`ready`, `menu`, `menuready`, `menuerror`, `open`, `tabchange`, `tabclose`, `load`, `loaderror`, `change`, `submit`, `action`\n\n## 8. AJAX\n\n```js\nconst data = await WUI.ajax.get('/api/menu');\nconst saved = await WUI.ajax.post('/api/submit', { values });\n```\n\n| 멤버 | 설명 |\n| --- | --- |\n| `request(url, opts)` | 핵심 요청 함수 |\n| `get(url, opts)` / `getJSON(url, opts)` | GET |\n| `post(url, data, opts)` / `put(url, data, opts)` | POST/PUT |\n| `delete(url, opts)` | DELETE |\n| `mock(pattern, value, { delay, method })` | 모의 응답 등록 |\n| `configure(options)` | `baseUrl`, `timeout`, `mock`, `headers` 기본값 |\n| `buildUrl(url, params)` | 쿼리 문자열 구성 |\n| `mockAvailable(method, url)` | mock 존재 여부 |\n| `listMocks()` | 등록된 mock 목록 |\n| `onLog(fn)` | 요청 로그 구독, 해제 함수 반환 |\n| `getHistory()` / `clearHistory()` | 최근 60건 로그 |\n| `reset()` | mock/로그/설정 초기화 |\n\n`request` 옵션: `method`, `data`, `params`, `responseType`(`json`/`text`/`blob`/`arrayBuffer`), `timeout`, `signal`, `headers`, `credentials`, `cache`, `mock`(`true`/`'fallback'`/`false`), `raw`.\n\n`AjaxError` 필드: `message`, `url`, `status`, `body`, `cause`.\n\n## 9. 스킨\n\n```js\nWUI.skin.init({ target: document.documentElement });\nWUI.skin.setTheme('green');\n```\n\n| 멤버 | 설명 |\n| --- | --- |\n| `init(options?)` | 저장값/기본값 적용, 대상 등록 |\n| `addTarget(el)` / `removeTarget(el)` | 대상 추가/제거 |\n| `apply(root?, options?)` | 대상에 적용 또는 새 루트 초기화 |\n| `setTheme(name, opts?)` | 테마 |\n| `setShape(nameOrObject, opts?)` | 모양/오버라이드 |\n| `setDensity(name, opts?)` | 밀도 |\n| `toggleBorders(force?)` | 테두리 토글 |\n| `current()` | `{ theme, shape, density, overrides, borders, dark }` |\n| `listThemes()` / `listShapes()` / `listDensities()` | 목록 |\n| `onChange(fn)` | 변경 구독, 해제 함수 반환 |\n| `reset()` | 기본값 |\n| `registerTheme(name, def)` / `registerShape(name, def)` | 사용자 등록 |\n| `createThemePicker(el)` / `createShapePicker(el)` | 피커 UI |\n\nsetter 의 `opts`: `{ target, persist }`. `persist: false` 는 localStorage 저장을 생략합니다.\n\n## 10. 유틸\n\n`WUI.util` 에서 모두 접근할 수 있습니다. DOM 헬퍼와 데이터 변환 위주입니다.\n\n### DOM/이벤트\n\n| 함수 | 설명 |\n| --- | --- |\n| `h(tag, attrs, ...children)` | 요소 생성. `class`, `style`, `on`, `dataset` 지원 |\n| `$(sel, root?)` / `$$(sel, root?)` | 단일/전체 선택 |\n| `on(root, type, selector, handler, options?)` | 위임 이벤트 |\n| `append(parent, children)` / `clear(node)` | 자식 추가/비우기 |\n| `raf(fn)` / `cancelRaf(id)` | requestAnimationFrame 래퍼 |\n| `debounce(fn, wait?)` / `throttle(fn, wait?)` | 지연/제한 |\n| `observeResize(node, callback)` | ResizeObserver 래퍼 |\n| `toggleClass(node, name, force)` / `setStyleVars(node, vars)` | 클래스/변수 |\n| `escapeHtml(value)` | HTML 이스케이프 |\n\n### 값/날짜/검증\n\n| 함수 | 설명 |\n| --- | --- |\n| `clone(value)` / `deepMerge(target, source)` | 복사/병합 |\n| `uid(prefix?)` / `clamp(n, min, max)` | id/범위 |\n| `isFn`, `isStr`, `isNum`, `isObj`, `isPlainObject`, `isArray`, `isEmpty` | 타입 검사 |\n| `pad2(n)` | 2자리 패딩 |\n| `toDate(value)` / `formatDate(value)` / `formatTime(value)` / `formatDateTime(value)` | 날짜 변환 |\n| `todayStr()` / `nowTimeStr()` / `nowDateTimeStr()` / `addDays(value, days)` | 날짜 편의 |\n| `parseNumber(value)` / `formatNumber(value, digits?)` / `cmp(a, b, type?)` | 숫자/비교 |\n| `getPath(obj, path, fallback?)` / `setPath(obj, path, value)` | 중첩 경로 |\n| `parseRules(rules)` / `validateValue(value, rules, ctx?)` | 검증 |\n| `normalizeOptions(options, row?)` | 옵션 배열 정규화 |\n| `readFileAsDataURL(file)` / `readFileAsText(file)` | 파일 읽기 |\n| `storage.get/set/remove` | localStorage JSON 래퍼 |\n| `download(filename, content, mime?)` / `copyToClipboard(text)` | 다운로드/복사 |\n| `csvEscape(value)` / `toCSV(columns, rows)` | CSV |\n\n## 11. 빠른 색인\n\n| 하고 싶은 일 | API |\n| --- | --- |\n| 화면에 그리드 붙이기 | `WUI.createGrid('#grid', { columns, data })` |\n| 그리드 데이터 저장 전 검증 | `grid.validate()`, `grid.save()` |\n| 트리 체크 값 수집 | `tree.getChecked({ ids: true, parents: false })` |\n| JSON 폼 값 수집 | `form.getValues({ visibleOnly: true })` |\n| 사용자 컨트롤 추가 | `WUI.registerControl('rating', factory)` |\n| 메뉴 기반 앱 | `WUI.createApp('#app', { menuUrl, layerUrl, dataUrl })` |\n| 서버 없이 데모 | `WUI.ajax.mock('/api/menu', data, { delay: 120 })` |\n| 테마 바꾸기 | `WUI.skin.setTheme('green')` |\n| 요청 로그 보기 | `WUI.ajax.getHistory()`, `WUI.ajax.onLog(fn)` |\n"
+    },
+    {
+      "id": "11-progress",
+      "file": "11-progress.md",
+      "order": 11,
+      "title": "11. 진행 기록",
+      "summary": "이 문서는 구현 이력, 검증 중 수정한 내용, 실제 실행 점검 결과, 남은 한계를 기록합니다. 기능별 사용법은 04~10 문서를 참고하세요.",
+      "headings": [
+        {
+          "id": "1-현재-상태",
+          "text": "1. 현재 상태",
+          "level": 2
+        },
+        {
+          "id": "2-구현-범위",
+          "text": "2. 구현 범위",
+          "level": 2
+        },
+        {
+          "id": "21-코어",
+          "text": "2.1 코어",
+          "level": 3
+        },
+        {
+          "id": "22-컴포넌트",
+          "text": "2.2 컴포넌트",
+          "level": 3
+        },
+        {
+          "id": "23-스타일데모도구",
+          "text": "2.3 스타일/데모/도구",
+          "level": 3
+        },
+        {
+          "id": "3-구현-이력",
+          "text": "3. 구현 이력",
+          "level": 2
+        },
+        {
+          "id": "4-검증-중-수정한-내용",
+          "text": "4. 검증 중 수정한 내용",
+          "level": 2
+        },
+        {
+          "id": "41-레이아웃-메타의-필드-요소-누락",
+          "text": "4.1 레이아웃 메타의 필드 요소 누락",
+          "level": 3
+        },
+        {
+          "id": "42-스킨-피커-컨테이너-클래스-덮어쓰기",
+          "text": "4.2 스킨 피커 컨테이너 클래스 덮어쓰기",
+          "level": 3
+        },
+        {
+          "id": "43-데모-모듈-상대-경로",
+          "text": "4.3 데모 모듈 상대 경로",
+          "level": 3
+        },
+        {
+          "id": "44-문서-정합성-수정",
+          "text": "4.4 문서 정합성 수정",
+          "level": 3
+        },
+        {
+          "id": "45-그리드-로딩-오버레이가-사라지지-않음",
+          "text": "4.5 그리드 로딩 오버레이가 사라지지 않음",
+          "level": 3
+        },
+        {
+          "id": "5-검증-결과",
+          "text": "5. 검증 결과",
+          "level": 2
+        },
+        {
+          "id": "51-정적-검사",
+          "text": "5.1 정적 검사",
+          "level": 3
+        },
+        {
+          "id": "52-브라우저-실행-점검",
+          "text": "5.2 브라우저 실행 점검",
+          "level": 3
+        },
+        {
+          "id": "53-서버-응답",
+          "text": "5.3 서버 응답",
+          "level": 3
+        },
+        {
+          "id": "6-남은-한계",
+          "text": "6. 남은 한계",
+          "level": 2
+        },
+        {
+          "id": "에디터",
+          "text": "에디터",
+          "level": 3
+        },
+        {
+          "id": "그리드",
+          "text": "그리드",
+          "level": 3
+        },
+        {
+          "id": "트리",
+          "text": "트리",
+          "level": 3
+        },
+        {
+          "id": "레이아웃앱",
+          "text": "레이아웃/앱",
+          "level": 3
+        },
+        {
+          "id": "검증운영",
+          "text": "검증/운영",
+          "level": 3
+        },
+        {
+          "id": "7-다음-작업-후보",
+          "text": "7. 다음 작업 후보",
+          "level": 2
+        }
+      ],
+      "markdown": "# 11. 진행 기록\n\n이 문서는 구현 이력, 검증 중 수정한 내용, 실제 실행 점검 결과, 남은 한계를 기록합니다. 기능별 사용법은 04~10 문서를 참고하세요.\n\n## 1. 현재 상태\n\n| 항목 | 상태 |\n| --- | --- |\n| 코어/컴포넌트 | 완료 |\n| 데모 데이터/서버 | 완료 |\n| 6개 데모 뷰 | 완료 |\n| 문서 11종 + 문서 뷰어 | 완료 |\n| 정적 검사(`npm run check`) | 통과 |\n| Edge 헤드리스 실행 점검 | 통과 |\n\n버전은 `1.0.0` 이며, 런타임 의존성과 빌드 도구는 없습니다. Node.js 는 데모 서버, JSON 생성, 정적 검사에만 사용합니다.\n\n## 2. 구현 범위\n\n### 2.1 코어\n\n- `core/util.js`: DOM 헬퍼, 날짜/숫자, 경로, 검증, 옵션 정규화, 파일, 저장소, CSV\n- `core/emitter.js`: `on/once/off/emit/destroy` 이벤트 이미터\n- `core/ajax.js`: fetch 래퍼, 타임아웃/취소, JSON 파싱, 요청 로그, mock 폴백\n- `core/skin.js`: 테마 10종, 모양 4종, 밀도 3종, localStorage, 사용자 등록, 피커\n\n### 2.2 컴포넌트\n\n- `editor/editor.js`: `contenteditable` 에디터, 서식/표/이미지, HTML 소스, 전체화면, 자동저장, `sanitizeHtml`\n- `grid/grid.js`: sticky 헤더, 좌/우 고정 열, absolute 가상 스크롤, 정렬/검색/필터, 12종 셀 타입, 검증, 변경 추적, CSV\n- `tree/tree.js`: 트라이스테이트 체크, cascade, 검색/하이라이트, 키보드, 추가/수정/삭제, 지연 로딩\n- `layout/controls.js`: 31종 컨트롤 레지스트리와 `registerControl`\n- `layout/layout.js`: 12컬럼 flow, `pos` absolute, 조건부 표시/비활성, 검증, 바인딩, 액션\n- `app/app.js`: 메뉴 → 레이어 → 데이터 AJAX, 탭, 해시, 로딩/오류/재시도, AJAX 로그, 스킨 패널\n- `webui.js`: 전역 `WUI` 와 named export 통합\n\n### 2.3 스타일/데모/도구\n\n- `src/css`: `tokens` → `base` → 컴포넌트 → `app` → `demo` 순서\n- `src/data/seed.js`: 메뉴 6개, 레이어 6개, 데이터 5개, 트리/대시보드 데이터의 단일 소스\n- `serve.mjs`: 정적 파일 + `/api/menu`, `/api/layers/:id`, `/api/data/:id`, `/api/tree`, `/api/submit`, `/api/action/:name`\n- `tools/build-data.mjs`: `seed.js` → JSON\n- `tools/build-docs.mjs`: `DOC/*.md` → `docs-data.js/json`\n- `tools/check.mjs`: 모듈/내보내기/데이터/문서 정적 검사\n- `tools/browser-check.mjs`: Edge CDP 실제 실행 점검\n\n## 3. 구현 이력\n\n| 단계 | 내용 |\n| --- | --- |\n| 1 | 저장소 구조, CSS 토큰, 코어 유틸/이벤트/AJAX 설계 |\n| 2 | 에디터 구현과 HTML 정화, 이미지 파일 처리 |\n| 3 | 그리드 고정 열/가상 스크롤/셀 타입/검증 구현 |\n| 4 | 트리 체크 cascade, 검색, 지연 로딩 구현 |\n| 5 | 31종 레이아웃 컨트롤과 JSON 스키마 구현 |\n| 6 | 메뉴/레이어/데이터 앱 셸, 탭, AJAX 로그, mock 폴백 구현 |\n| 7 | 스킨 테마/모양/밀도와 피커 구현 |\n| 8 | 데모 6개 뷰, seed 데이터, 서버, 생성 도구 구현 |\n| 9 | 문서 01~09 작성, 문서 뷰어와 데이터 생성/검사 추가 |\n| 10 | API 레퍼런스/진행 기록 작성, 문서 정합성 수정, 최종 검증 |\n\n## 4. 검증 중 수정한 내용\n\n### 4.1 레이아웃 메타의 필드 요소 누락\n\n- 증상: 조건부 표시/비활성 갱신 시 `meta.el` 을 기준으로 필드 래퍼를 제어했지만, 메타에 `el` 이 없어 일부 상태 갱신이 어긋났습니다.\n- 원인: 필드 메타 생성 시 `fieldEl` 만 넣고 `el` 별칭을 누락했습니다.\n- 수정: `layout.js` 의 필드 메타에 `el: fieldEl` 을 추가해 표시/숨김과 오류 갱신이 같은 요소를 바라보게 했습니다.\n\n### 4.2 스킨 피커 컨테이너 클래스 덮어쓰기\n\n- 증상: 테마/모양 피커를 앱 사이드바에 붙였을 때 피커 루트의 기존 클래스가 사라져 레이아웃이 깨졌습니다.\n- 원인: 피커 생성 시 `className = 'wui-swatches'` 처럼 기존 클래스를 덮어썼습니다.\n- 수정: `classList.add(...)` 로 필요한 클래스만 추가하도록 변경했습니다.\n\n### 4.3 데모 모듈 상대 경로\n\n- 증상: 데모 페이지에서 일부 모듈 import 가 잘못된 상대 경로를 가리켜 로딩이 실패했습니다.\n- 원인: `src/js/demo.js` 의 import 경로가 실제 폴더 깊이와 맞지 않았습니다.\n- 수정: `../core/...`, `../editor/...`, `../layout/...` 기준으로 경로를 정리했습니다.\n\n### 4.4 문서 정합성 수정\n\n구현과 문서가 어긋난 부분도 함께 정리했습니다.\n\n- `06-tree.md`: `addNode` 의 실제 시그니처를 `addNode(parentId, raw, index?)` 로 수정하고 예제 순서를 바로잡았습니다.\n- `07-layout-json.md`: `props.maxLength` 가 입력 요소에 적용된다는 설명을 제거하고, `rules` 의 `maxLength` 검증으로 안내했습니다. 사용자 컨트롤 예제는 내부 상태(`current`)를 갱신하도록 수정했습니다.\n- `08-menu-layer-ajax.md`: 실제로 사용하지 않는 `cache`, `statusBar` 를 예약 옵션으로 표시하고, 실제 동작하는 `keepTitle` 을 추가했습니다.\n- `02-demo-guide.md`: `npm run check` 에 문서 동기화 검사가 포함된 뒤 검사 항목 6번이 실제 동작과 일치하도록 유지했습니다.\n\n### 4.5 그리드 로딩 오버레이가 사라지지 않음\n\n- 증상: 그리드 데이터를 다 불러온 뒤에도 하단(오버레이)의 \"불러오는 중…\" 메시지가 계속 남아 있었습니다.\n- 원인: 로딩 요소는 `hidden` 속성으로 숨겼지만, `.wui-grid-loading { display: flex }` 규칙이 브라우저 기본 `[hidden] { display: none }` 보다 우선해 `hidden` 이 무시됐습니다.\n- 수정: `base.css` 에 `[hidden] { display: none !important; }` 전역 규칙을 추가했습니다. 같은 원인으로 항상 보이던 에디터 이미지 도구 막대(`.wui-editor-imgbar`)도 함께 해결됩니다.\n- 재발 방지: `tools/browser-check.mjs` 가 앱/데모 화면에서 `hidden` 속성을 가졌지만 계산된 `display` 가 `none` 이 아닌 요소 수를 세어 0 이 아니면 실패하도록 점검을 추가했습니다.\n\n## 5. 검증 결과\n\n### 5.1 정적 검사\n\n```bash\nnpm run check\n```\n\n확인 항목:\n\n1. 11개 ES 모듈 import 성공\n2. `WUI` 전역/named export 와 `VERSION` 일치\n3. 컨트롤 31종, 테마 10종\n4. `seed.js` 메뉴 6개/레이어 6개/데이터 5개 정합성\n5. 생성된 `menu.json`, `layers/*.json`, `data/*.json` 파싱\n6. `DOC/*.md` 와 `docs-data.json` 동기화, 헤딩 id 중복, 내부 `.md` 링크\n7. `DOC/index.html` 이 `docs-data.js`, `doc.css`, `doc.js` 를 참조하는지\n\n결과: 통과.\n\n### 5.2 브라우저 실행 점검\n\nEdge 157 헤드리스(CDP 9333)로 실제 화면을 조작했습니다.\n\n| 영역 | 확인 내용 | 결과 |\n| --- | --- | --- |\n| 앱 메뉴/탭 | 메뉴 로드, 탭 열기/전환/닫기 | 통과 |\n| 대시보드 | KPI HTML, 임베드 그리드 15행, 조직도 트리 11행 | 통과 |\n| 주문 폼 | 14개 필드, 조건부 필드, 검증 1건, 제출 | 통과 |\n| 에디터 뷰 | 서식/표/이미지 영역, HTML 소스, 읽기 전용 | 통과 |\n| 조직도 | `data: false` 데이터 요청 생략, 트리 레이어 | 통과 |\n| 스킨 | 테마/모양/밀도/테두리 전환과 저장 | 통과 |\n| 데모 뷰 | `#app`, `#editor`, `#grid`, `#tree`, `#layout`, `#skin` 중 5개 뷰 | 통과 |\n| 문서 뷰어 | 목록 11개, Markdown 표/코드/목차, `.md` 링크 이동, 검색, 테마, 모바일 목록 | 통과 |\n| 모바일 | 420px 사이드바 토글/오버레이 | 통과 |\n| 숨김 요소 | 로딩 오버레이 등 `hidden` 요소가 화면에 남지 않음 | 통과 |\n| 콘솔 | 오류 0건 | 통과 |\n\n`tools/browser-check.mjs` 는 위 흐름을 자동화하며 스크린샷을 임시 폴더에 저장합니다. Edge 경로가 다른 환경에서는 스크립트 상단의 실행 파일 경로를 조정해야 합니다.\n\n### 5.3 서버 응답\n\n- `GET /api/menu` 200\n- `GET /api/layers/dashboard` 200\n- `GET /api/data/dashboard` 200\n- `GET /api/tree` 200\n- `POST /api/submit` 200, `{ fail: true }` 는 422\n\n## 6. 남은 한계\n\n### 에디터\n\n- 서버 업로드가 내장되어 있지 않습니다. 실제 서비스에서는 `image.uploader` 를 제공해야 합니다.\n- 업로더가 없으면 이미지가 data URL 로 본문에 들어가 HTML 이 커집니다.\n- `document.execCommand` 기반이라 브라우저별 서식 결과가 조금 다릅니다.\n- 표 셀 병합/분할, 이미지 리사이즈 핸들, 협업 편집, 변경 이력은 없습니다.\n\n### 그리드\n\n- 열 순서 드래그, 열 숨김, 그룹핑, 피벗은 없습니다.\n- 행 높이는 균일해야 하며 자동 줄바꿈 행 높이는 지원하지 않습니다.\n- 셀 병합은 없습니다.\n- 서버 저장은 `save` 이벤트/`onSave` 에서 직접 구현해야 합니다.\n- 매우 큰 데이터는 행 가상화로 렌더 비용을 줄이지만, 정렬/필터는 전체 데이터를 대상으로 합니다.\n\n### 트리\n\n- 노드 드래그 앤 드롭 이동은 없습니다.\n- 가상 스크롤이 없어 노드 수가 매우 많으면 지연 로딩이 필요합니다.\n- 범위 선택은 없고 `Ctrl/Cmd` 기반 다중 선택만 지원합니다.\n\n### 레이아웃/앱\n\n- 중첩 그룹(그룹 안의 그룹)은 지원하지 않습니다.\n- `labelPosition`, `options.mode` 는 예약 옵션이며 실제 렌더는 스키마의 `mode` 와 상단 라벨을 따릅니다.\n- 앱의 `cache`, `statusBar` 옵션은 예약 상태입니다. 열린 탭은 항상 유지되고 상태 바는 항상 표시됩니다.\n- 메뉴/레이어의 `html` 컨트롤은 HTML 을 그대로 삽입하므로 신뢰된 JSON 에만 사용해야 합니다.\n- 인증/권한, 서버 저장 정책, 파일 업로드 API 는 데모 범위에 포함되지 않습니다.\n\n### 검증/운영\n\n- 단위 테스트 프레임워크를 두지 않았습니다. 현재 검증은 정적 검사 + Edge CDP 실행 점검입니다.\n- CDP 점검은 로컬 Edge 설치 경로에 의존합니다.\n- 문서 뷰어의 Markdown 렌더러는 문서 작성에 필요한 범위(헤딩/목록/표/코드/인용/링크/이미지/인라인 서식)만 지원합니다. 각주, 수식, 중첩 인용 등은 지원하지 않습니다.\n- 문서 내 검색은 제목/본문 전체 문자열 포함 여부를 사용하며, 전문 검색 인덱스는 없습니다.\n\n## 7. 다음 작업 후보\n\n1. 그리드 열 순서 변경/숨김과 행 높이 자동 계산\n2. 트리 가상 스크롤과 노드 드래그 이동\n3. 에디터 이미지 업로더 예제와 서버 업로드 API\n4. 레이아웃 그룹 중첩과 라벨 위치 옵션 구현\n5. 앱 `cache`/`statusBar` 옵션의 실제 동작 연결\n6. Playwright 등 브라우저 테스트의 CI 연동\n7. 문서 뷰어에 전문 검색/버전별 문서 추가\n\n위 항목은 아직 구현되지 않은 후보입니다. 문서에 적힌 예약 옵션과 혼동하지 마세요.\n"
+    }
+  ]
+};

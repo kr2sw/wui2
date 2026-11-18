@@ -1,0 +1,15 @@
+{
+  "values": {
+    "siteName": "WUI 스튜디오",
+    "timezone": "Asia/Seoul",
+    "locale": "ko",
+    "openAt": "2026-12-01T09:00",
+    "dailyAt": "03:30",
+    "maxRows": 500,
+    "notify": true,
+    "maintenance": false,
+    "themeColor": "#2f6fed",
+    "retention": "90일",
+    "memo": "매주 월요일 오전에 점검합니다."
+  }
+}

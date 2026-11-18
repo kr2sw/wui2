@@ -1,0 +1,225 @@
+/*!
+ * WUI - css/editor.css
+ */
+.wui-editor {
+  --wui-editor-toolbar-bg: var(--wui-surface-2);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--wui-surface);
+  border: var(--wui-border-width) solid var(--wui-border);
+  border-radius: var(--wui-radius);
+  overflow: hidden;
+}
+.wui-editor.is-fullscreen {
+  position: fixed;
+  inset: 12px;
+  z-index: 900;
+  box-shadow: var(--wui-shadow-lg);
+}
+.wui-editor.is-readonly .wui-toolbar { opacity: .6; pointer-events: none; }
+
+.wui-editor-toolbar {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px;
+  padding: 5px 6px;
+  background: var(--wui-editor-toolbar-bg);
+  border-bottom: var(--wui-border-width) solid var(--wui-border);
+}
+.wui-editor.is-sticky .wui-editor-toolbar { position: sticky; top: 0; }
+.wui-editor-group { display: flex; align-items: center; gap: 2px; }
+.wui-editor-group + .wui-editor-group { border-left: var(--wui-border-width) solid var(--wui-border); margin-left: 4px; padding-left: 4px; }
+
+.wui-editor-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; padding: 0;
+  border: 1px solid transparent; border-radius: var(--wui-radius-sm);
+  background: transparent; color: var(--wui-fg-soft);
+  font: inherit; font-size: 12px; font-weight: 700;
+  cursor: pointer;
+  flex: none;
+  transition: background .1s ease, color .1s ease;
+}
+.wui-editor-btn:hover { background: var(--wui-hover); color: var(--wui-fg); }
+.wui-editor-btn:active { background: var(--wui-active); }
+.wui-editor-btn.is-active { background: var(--wui-primary-weak); color: var(--wui-primary-weak-fg); border-color: color-mix(in srgb, var(--wui-primary) 30%, transparent); }
+.wui-editor-btn svg { width: 16px; height: 16px; display: block; }
+.wui-editor-btn.is-wide { width: auto; padding: 0 8px; gap: 4px; }
+.wui-editor-btn[disabled] { opacity: .4; pointer-events: none; }
+
+.wui-editor-select {
+  height: 28px;
+  padding: 0 22px 0 6px;
+  border: 1px solid transparent;
+  border-radius: var(--wui-radius-sm);
+  background-color: transparent;
+  color: var(--wui-fg-soft);
+  font: inherit; font-size: 12px;
+  cursor: pointer;
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--wui-muted) 50%), linear-gradient(135deg, var(--wui-muted) 50%, transparent 50%);
+  background-position: calc(100% - 12px) 50%, calc(100% - 8px) 50%;
+  background-size: 4px 4px, 4px 4px;
+  background-repeat: no-repeat;
+}
+.wui-editor-select:hover { background-color: var(--wui-hover); }
+.wui-editor-select:focus { outline: none; box-shadow: 0 0 0 3px var(--wui-focus-ring); }
+
+.wui-editor-color {
+  position: relative; display: inline-flex;
+  width: 28px; height: 28px; align-items: center; justify-content: center;
+  border-radius: var(--wui-radius-sm); cursor: pointer; color: var(--wui-fg-soft);
+  font-weight: 800; font-size: 13px;
+}
+.wui-editor-color:hover { background: var(--wui-hover); }
+.wui-editor-color input[type="color"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+.wui-editor-color .wui-editor-color-bar { position: absolute; left: 6px; right: 6px; bottom: 4px; height: 3px; border-radius: 2px; background: var(--swatch, currentColor); }
+.wui-editor-color.is-highlight { background: var(--wui-surface-3); }
+.wui-editor-color.is-highlight .wui-editor-color-bar { height: 9px; bottom: 3px; opacity: .75; }
+.wui-editor-color svg { position: relative; z-index: 1; }
+
+.wui-editor-area {
+  flex: 1;
+  min-height: 180px;
+  overflow: auto;
+  padding: 16px 18px;
+  background: var(--wui-editor-bg);
+  color: var(--wui-fg);
+  outline: none;
+  line-height: 1.7;
+  font-size: 14px;
+  word-break: break-word;
+}
+.wui-editor-area:empty::before,
+.wui-editor-area[data-empty="true"]::before {
+  content: attr(data-placeholder);
+  color: var(--wui-muted);
+  pointer-events: none;
+  display: block;
+}
+.wui-editor-area > *:first-child { margin-top: 0; }
+.wui-editor-area p { margin: 0 0 .7em; }
+.wui-editor-area h1, .wui-editor-area h2, .wui-editor-area h3, .wui-editor-area h4 {
+  margin: 1em 0 .5em; line-height: 1.3; font-weight: 800; color: var(--wui-fg);
+}
+.wui-editor-area h1 { font-size: 1.75em; }
+.wui-editor-area h2 { font-size: 1.45em; }
+.wui-editor-area h3 { font-size: 1.2em; }
+.wui-editor-area h4 { font-size: 1.05em; }
+.wui-editor-area ul, .wui-editor-area ol { margin: 0 0 .8em; padding-left: 1.6em; }
+.wui-editor-area li { margin: .2em 0; }
+.wui-editor-area a { color: var(--wui-primary); text-decoration: underline; text-underline-offset: 2px; }
+.wui-editor-area blockquote {
+  margin: .8em 0; padding: .4em 0 .4em 14px;
+  border-left: 3px solid var(--wui-primary);
+  background: var(--wui-primary-weak);
+  color: var(--wui-fg-soft);
+  border-radius: 0 var(--wui-radius-sm) var(--wui-radius-sm) 0;
+}
+.wui-editor-area pre {
+  margin: .8em 0; padding: 10px 12px;
+  background: var(--wui-code-bg);
+  border: var(--wui-border-width) solid var(--wui-border);
+  border-radius: var(--wui-radius-sm);
+  font-family: var(--wui-mono); font-size: 12.5px;
+  white-space: pre-wrap; overflow: auto;
+}
+.wui-editor-area code { font-family: var(--wui-mono); font-size: .92em; background: var(--wui-code-bg); padding: 1px 4px; border-radius: 3px; }
+.wui-editor-area pre code { background: none; padding: 0; }
+.wui-editor-area hr { border: 0; border-top: 1px solid var(--wui-border-strong); margin: 1.2em 0; }
+.wui-editor-area img {
+  max-width: 100%; height: auto; border-radius: var(--wui-radius-sm);
+  box-shadow: 0 0 0 1px var(--wui-border);
+  cursor: pointer;
+}
+.wui-editor-area img.is-selected { box-shadow: 0 0 0 2px var(--wui-primary); }
+.wui-editor-area table {
+  width: 100%; border-collapse: collapse; margin: .8em 0; font-size: .95em;
+  table-layout: fixed;
+}
+.wui-editor-area th, .wui-editor-area td {
+  border: 1px solid var(--wui-border-strong);
+  padding: 6px 8px; vertical-align: top; min-width: 40px;
+}
+.wui-editor-area th { background: var(--wui-grid-header-bg); font-weight: 700; text-align: left; }
+.wui-editor-area td:focus, .wui-editor-area th:focus { outline: none; box-shadow: inset 0 0 0 2px var(--wui-focus-ring); }
+.wui-editor.is-source .wui-editor-area { display: none; }
+
+.wui-editor-source {
+  flex: 1; width: 100%; min-height: 240px; display: none;
+  padding: 14px 16px; border: 0; outline: none; resize: none;
+  background: var(--wui-code-bg); color: var(--wui-fg);
+  font-family: var(--wui-mono); font-size: 12.5px; line-height: 1.65;
+  tab-size: 2;
+}
+.wui-editor.is-source .wui-editor-source { display: block; }
+
+.wui-editor-status {
+  display: flex; align-items: center; gap: 12px;
+  padding: 4px 10px;
+  border-top: var(--wui-border-width) solid var(--wui-border);
+  background: var(--wui-surface-2);
+  color: var(--wui-muted);
+  font-size: var(--wui-fs-sm);
+}
+.wui-editor-status .wui-grow { flex: 1; }
+.wui-editor-status .is-saved { color: var(--wui-success); }
+
+.wui-editor-drop {
+  position: absolute; inset: 0; z-index: 5;
+  display: none; align-items: center; justify-content: center;
+  background: color-mix(in srgb, var(--wui-primary) 12%, transparent);
+  border: 2px dashed var(--wui-primary);
+  color: var(--wui-primary);
+  font-weight: 700; pointer-events: none;
+}
+.wui-editor.is-dragover .wui-editor-drop { display: flex; }
+
+.wui-editor-imgbar {
+  position: absolute; z-index: 6;
+  display: flex; align-items: center; gap: 2px;
+  padding: 3px;
+  background: var(--wui-surface);
+  border: var(--wui-border-width) solid var(--wui-border-strong);
+  border-radius: var(--wui-radius-sm);
+  box-shadow: var(--wui-shadow);
+  font-size: var(--wui-fs-sm);
+}
+.wui-editor-imgbar button {
+  border: 0; background: transparent; color: var(--wui-fg-soft);
+  font: inherit; padding: 3px 6px; border-radius: 3px; cursor: pointer;
+}
+.wui-editor-imgbar button:hover { background: var(--wui-hover); }
+.wui-editor-imgbar .sep { width: 1px; height: 16px; background: var(--wui-border); margin: 0 2px; }
+
+/* 공용 다이얼로그 */
+.wui-dialog-mask {
+  position: absolute; inset: 0; z-index: 20;
+  background: rgba(16, 24, 40, .28);
+  display: flex; align-items: flex-start; justify-content: center;
+  padding: 60px 16px 16px;
+  backdrop-filter: blur(1px);
+}
+.wui-dialog {
+  width: min(360px, 100%);
+  background: var(--wui-surface);
+  border: var(--wui-border-width) solid var(--wui-border);
+  border-radius: var(--wui-radius);
+  box-shadow: var(--wui-shadow-lg);
+  overflow: hidden;
+}
+.wui-dialog-head { padding: 10px 14px; font-weight: 700; border-bottom: var(--wui-border-width) solid var(--wui-border); }
+.wui-dialog-body { padding: 14px; display: grid; gap: 10px; }
+.wui-dialog-row { display: grid; gap: 4px; }
+.wui-dialog-row > span { font-size: var(--wui-fs-sm); font-weight: 700; color: var(--wui-muted); }
+.wui-dialog-foot { padding: 10px 14px; border-top: var(--wui-border-width) solid var(--wui-border); display: flex; justify-content: flex-end; gap: 6px; }
+
+@media (max-width: 640px) {
+  .wui-editor-area { padding: 12px; }
+  .wui-editor-toolbar { gap: 1px; padding: 4px; }
+}

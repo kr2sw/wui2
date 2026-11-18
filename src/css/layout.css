@@ -1,0 +1,136 @@
+/*!
+ * WUI - css/layout.css
+ * JSON 화면 배치 (12 컬럼 그리드)
+ */
+.wui-layout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wui-gap);
+  min-width: 0;
+}
+.wui-layout-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.wui-layout-title { margin: 0; font-size: 18px; font-weight: 800; letter-spacing: -.015em; }
+.wui-layout-desc { margin: 4px 0 0; color: var(--wui-muted); font-size: var(--wui-fs-sm); }
+.wui-layout-body { display: flex; flex-direction: column; gap: var(--wui-gap); }
+
+.wui-layout-section {
+  background: var(--wui-surface);
+  border: var(--wui-border-width) solid var(--wui-border);
+  border-radius: var(--wui-radius);
+  padding: var(--wui-space);
+  min-width: 0;
+}
+.wui-layout-sectionhead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: var(--wui-space);
+  padding-bottom: 8px;
+  border-bottom: var(--wui-border-width) solid var(--wui-border);
+}
+.wui-layout-sectiontitle { margin: 0; font-size: var(--wui-fs-lg); font-weight: 800; }
+.wui-layout-sectiondesc { margin: 3px 0 0; font-size: var(--wui-fs-sm); color: var(--wui-muted); }
+.wui-layout-aside { color: var(--wui-muted); font-size: var(--wui-fs-sm); }
+
+.wui-layout-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--wui-cols, 12), minmax(0, 1fr));
+  gap: var(--wui-gap-custom, 12px);
+  align-items: start;
+}
+.wui-layout-grid.is-absolute {
+  grid-auto-rows: 36px;
+  align-items: stretch;
+}
+.wui-layout-field { grid-column: span var(--wui-span, 12); min-width: 0; }
+.wui-layout-field.is-hidden { display: none !important; }
+.wui-layout-field.is-bare { gap: 0; }
+.wui-layout-field.is-inline-control { justify-content: center; padding-top: 4px; }
+.wui-layout-field.is-inline-control > .wui-field-body { min-height: var(--wui-control-h); display: flex; align-items: center; }
+
+.wui-field-labelhint { color: var(--wui-muted); font-weight: 500; font-size: 11px; }
+.wui-layout-control { width: 100%; }
+.wui-layout-control > * { max-width: 100%; }
+
+.wui-field.is-invalid .wui-input,
+.wui-field.is-invalid .wui-select,
+.wui-field.is-invalid .wui-textarea {
+  border-color: var(--wui-danger);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--wui-danger) 16%, transparent);
+}
+
+/* range */
+.wui-range-wrap { display: flex; align-items: center; gap: 10px; width: 100%; min-height: var(--wui-control-h); }
+.wui-range-wrap .wui-range { flex: 1; min-width: 0; accent-color: var(--wui-primary); }
+.wui-range-out {
+  min-width: 42px; text-align: right;
+  font-size: var(--wui-fs-sm); font-weight: 700; color: var(--wui-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 이미지 / 파일 */
+.wui-image { display: flex; flex-direction: column; gap: 6px; }
+.wui-image-preview {
+  display: flex; align-items: center; justify-content: center;
+  padding: 6px;
+  border: var(--wui-border-width) dashed var(--wui-border-strong);
+  border-radius: var(--wui-radius-sm);
+  background: var(--wui-surface-2);
+  min-height: 60px;
+}
+.wui-image-preview img { max-height: 140px; max-width: 100%; border-radius: var(--wui-radius-sm); display: block; }
+.wui-file { display: flex; flex-direction: column; gap: 6px; }
+.wui-file-list { display: flex; flex-direction: column; gap: 4px; }
+.wui-file-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 8px;
+  border: var(--wui-border-width) solid var(--wui-border);
+  border-radius: var(--wui-radius-sm);
+  background: var(--wui-surface-2);
+  font-size: var(--wui-fs-sm);
+}
+.wui-file-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wui-file-del {
+  border: 0; background: transparent; color: var(--wui-muted);
+  cursor: pointer; font: inherit; padding: 0 4px; border-radius: 3px;
+}
+.wui-file-del:hover { background: var(--wui-danger-weak); color: var(--wui-danger); }
+
+/* 에디터/그리드/트리 임베드 */
+.wui-layout-editor, .wui-layout-gridcontrol, .wui-layout-treecontrol { width: 100%; }
+.wui-layout-gridcontrol .wui-grid { width: 100%; }
+.wui-layout-treecontrol .wui-tree { max-width: 100%; }
+
+/* 장식 요소 */
+.wui-layout-html { color: var(--wui-fg-soft); font-size: var(--wui-fs); }
+.wui-layout-html p { margin: 0 0 6px; }
+.wui-layout-heading { font-weight: 800; color: var(--wui-fg); }
+.wui-layout-heading-1 { font-size: 20px; }
+.wui-layout-heading-2 { font-size: 17px; }
+.wui-layout-heading-3 { font-size: 15px; }
+.wui-layout-heading-4 { font-size: var(--wui-fs-lg); }
+.wui-layout-spacer { width: 100%; }
+.wui-layout-static { color: var(--wui-fg-soft); min-height: var(--wui-control-h); display: flex; align-items: center; }
+.wui-layout-custom { width: 100%; }
+
+/* 액션 */
+.wui-layout-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.wui-layout-actions.is-bottom {
+  justify-content: flex-end;
+  padding-top: 12px;
+  border-top: var(--wui-border-width) solid var(--wui-border);
+}
+.wui-layout-actions.is-top { justify-content: flex-end; }
+.wui-layout.is-readonly .wui-layout-actions { display: none; }
+
+@media (max-width: 760px) {
+  .wui-layout-field { grid-column: span var(--wui-span-sm, 12); }
+  .wui-layout-section { padding: 12px; }
+}

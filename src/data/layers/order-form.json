@@ -1,0 +1,207 @@
+{
+  "title": "주문 입력",
+  "description": "12컬럼 flow 배치, 조건부 표시, 검증, 액션 버튼.",
+  "actions": [
+    {
+      "label": "임시 저장(JSON)",
+      "action": "json",
+      "variant": "ghost"
+    },
+    {
+      "label": "초기화",
+      "action": "reset"
+    },
+    {
+      "label": "저장",
+      "action": "submit",
+      "variant": "primary"
+    }
+  ],
+  "groups": [
+    {
+      "id": "basic",
+      "title": "주문 정보",
+      "description": "필수값과 형식 검증이 적용됩니다.",
+      "items": [
+        {
+          "name": "orderNo",
+          "label": "주문번호",
+          "type": "text",
+          "span": 4,
+          "required": true,
+          "placeholder": "ORD-2026-0000"
+        },
+        {
+          "name": "orderedAt",
+          "label": "주문일",
+          "type": "date",
+          "span": 4,
+          "required": true
+        },
+        {
+          "name": "status",
+          "label": "상태",
+          "type": "select",
+          "span": 4,
+          "options": [
+            {
+              "value": "ready",
+              "label": "준비"
+            },
+            {
+              "value": "shipping",
+              "label": "배송중"
+            },
+            {
+              "value": "done",
+              "label": "완료"
+            },
+            {
+              "value": "hold",
+              "label": "보류"
+            }
+          ],
+          "placeholder": "선택하세요"
+        },
+        {
+          "name": "customer",
+          "label": "고객명",
+          "type": "text",
+          "span": 4,
+          "required": true
+        },
+        {
+          "name": "phone",
+          "label": "연락처",
+          "type": "text",
+          "span": 4,
+          "placeholder": "010-0000-0000",
+          "rules": [
+            {
+              "type": "pattern",
+              "value": "^01[0-9]-?\\d{3,4}-?\\d{4}$",
+              "message": "휴대폰 번호 형식이 아닙니다."
+            }
+          ]
+        },
+        {
+          "name": "email",
+          "label": "이메일",
+          "type": "email",
+          "span": 4,
+          "rules": [
+            "email"
+          ]
+        },
+        {
+          "name": "channel",
+          "label": "유입 채널",
+          "type": "radio",
+          "span": 4,
+          "options": [
+            {
+              "value": "web",
+              "label": "웹"
+            },
+            {
+              "value": "mobile",
+              "label": "모바일"
+            },
+            {
+              "value": "partner",
+              "label": "제휴"
+            },
+            {
+              "value": "offline",
+              "label": "오프라인"
+            }
+          ],
+          "value": "web"
+        },
+        {
+          "name": "urgent",
+          "label": "긴급 주문",
+          "type": "switch",
+          "span": 4,
+          "help": "켜면 긴급 사유를 입력해야 합니다."
+        },
+        {
+          "name": "priority",
+          "label": "우선순위",
+          "type": "range",
+          "span": 4,
+          "min": 0,
+          "max": 10,
+          "value": 5,
+          "unit": "점"
+        },
+        {
+          "name": "urgentReason",
+          "label": "긴급 사유",
+          "type": "text",
+          "span": 12,
+          "placeholder": "예: 고객 요청으로 당일 출고",
+          "required": true,
+          "visibleWhen": {
+            "field": "urgent",
+            "op": "truthy"
+          }
+        }
+      ]
+    },
+    {
+      "id": "shipping",
+      "title": "배송 정보",
+      "items": [
+        {
+          "name": "address",
+          "label": "주소",
+          "type": "text",
+          "span": 8,
+          "required": true
+        },
+        {
+          "name": "postcode",
+          "label": "우편번호",
+          "type": "text",
+          "span": 4,
+          "rules": [
+            {
+              "type": "pattern",
+              "value": "^\\d{5}$",
+              "message": "5자리 우편번호를 입력하세요."
+            }
+          ]
+        },
+        {
+          "name": "memo",
+          "label": "요청사항",
+          "type": "textarea",
+          "span": 12,
+          "rows": 3,
+          "placeholder": "배송 요청사항"
+        },
+        {
+          "name": "options",
+          "label": "부가 옵션",
+          "type": "checkbox-group",
+          "span": 12,
+          "options": [
+            {
+              "value": "gift",
+              "label": "선물 포장"
+            },
+            {
+              "value": "invoice",
+              "label": "세금계산서"
+            },
+            {
+              "value": "insurance",
+              "label": "배송 보험"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

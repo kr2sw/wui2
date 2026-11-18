@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>WUI 문서</title>
+  <script>
+    /* 첫 페인트 전에 저장된/시스템 테마를 적용해 깜빡임을 줄인다. */
+    (function () {
+      try {
+        var theme = localStorage.getItem('wui.doc.theme');
+        if (theme !== 'light' && theme !== 'dark') {
+          theme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (err) { /* noop */ }
+    })();
+  </script>
+  <link rel="stylesheet" href="./doc.css">
+</head>
+<body>
+  <div class="doc-app">
+    <aside class="doc-sidebar" aria-label="문서 목록">
+      <div class="doc-brand">
+        <div class="doc-brand-logo">W</div>
+        <div class="doc-brand-text">
+          <div class="doc-brand-title">WUI 문서</div>
+          <div class="doc-brand-sub">바닐라 JS 웹 UI 키트</div>
+        </div>
+      </div>
+
+      <div class="doc-search">
+        <span class="doc-search-icon" aria-hidden="true">⌕</span>
+        <input id="docSearch" type="search" placeholder="문서 검색" aria-label="문서 검색" autocomplete="off" spellcheck="false">
+        <kbd>/</kbd>
+      </div>
+      <div id="docSearchHint" class="doc-search-hint"></div>
+
+      <nav id="docList" class="doc-nav" aria-label="문서"></nav>
+
+      <div class="doc-sidefoot">
+        <span>WUI 1.0.0</span>
+        <span class="doc-sidefoot-links">
+          <a href="../index.html">데모</a>
+          <a href="../README.md">README</a>
+        </span>
+      </div>
+    </aside>
+
+    <div id="docBackdrop" class="doc-backdrop"></div>
+
+    <main class="doc-main">
+      <header class="doc-topbar">
+        <button id="docMenuBtn" class="doc-menubtn" type="button" aria-label="문서 목록 열기">☰</button>
+        <div id="docCrumb" class="doc-crumb">WUI 문서</div>
+        <div class="doc-topbar-spacer"></div>
+        <a id="docRaw" class="doc-topbtn" href="01-overview.md" target="_blank" rel="noopener" title="Markdown 원문 열기">.md</a>
+        <button id="docTheme" class="doc-topbtn" type="button" title="테마 전환">☾ <span>다크</span></button>
+      </header>
+
+      <div id="docScroll" class="doc-scroll">
+        <div class="doc-wrap">
+          <article id="docArticle" class="doc-article" aria-live="polite">
+            <div class="doc-head">
+              <div class="doc-eyebrow">WUI Documentation</div>
+              <h1 class="doc-title">문서를 불러오는 중…</h1>
+              <p class="doc-summary">DOC/docs-data.js 를 읽고 있습니다.</p>
+            </div>
+            <p>문서가 표시되지 않으면 <code>npm run build:docs</code> 를 실행한 뒤 새로고침하세요.</p>
+          </article>
+          <nav id="docPager" class="doc-pager" aria-label="이전/다음 문서"></nav>
+          <div class="doc-footer">WUI 문서 뷰어 · Markdown + 자체 렌더러 · 외부 CDN 없음</div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div id="docToast" class="doc-toast" role="status" aria-live="polite"></div>
+
+  <script src="./docs-data.js"></script>
+  <script src="./doc.js"></script>
+</body>
+</html>

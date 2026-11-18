@@ -1,0 +1,19 @@
+{
+  "values": {
+    "orderNo": "ORD-2026-1042",
+    "orderedAt": "2026-11-16",
+    "status": "shipping",
+    "customer": "김민준",
+    "phone": "010-2345-6789",
+    "email": "minjun@example.com",
+    "channel": "web",
+    "urgent": false,
+    "priority": 6,
+    "address": "서울시 강남구 테헤란로 123",
+    "postcode": "06234",
+    "memo": "오전 중 배송 요청",
+    "options": [
+      "gift"
+    ]
+  }
+}

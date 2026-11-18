@@ -1,0 +1,183 @@
+{
+  "title": "운영 대시보드",
+  "description": "그리드/트리 컨트롤이 JSON 레이어 안에서 어떻게 조합되는지 보여줍니다.",
+  "actions": [
+    {
+      "label": "입력값 JSON",
+      "action": "json",
+      "variant": "ghost"
+    },
+    {
+      "label": "새로고침",
+      "action": "reload"
+    }
+  ],
+  "groups": [
+    {
+      "id": "kpi",
+      "items": [
+        {
+          "type": "html",
+          "span": 12,
+          "html": "\n            <div class=\"wui-kpis\">\n              <div class=\"wui-kpi\"><span class=\"wui-kpi-label\">오늘 주문</span><strong>1,284</strong><span class=\"wui-kpi-diff is-up\">▲ 12.4%</span></div>\n              <div class=\"wui-kpi\"><span class=\"wui-kpi-label\">매출</span><strong>₩48.2M</strong><span class=\"wui-kpi-diff is-up\">▲ 8.1%</span></div>\n              <div class=\"wui-kpi\"><span class=\"wui-kpi-label\">배송 대기</span><strong>37</strong><span class=\"wui-kpi-diff is-down\">▼ 4.2%</span></div>\n              <div class=\"wui-kpi\"><span class=\"wui-kpi-label\">긴급 건</span><strong>6</strong><span class=\"wui-kpi-diff\">오전 처리</span></div>\n            </div>"
+        }
+      ]
+    },
+    {
+      "id": "orders",
+      "title": "주문 목록",
+      "description": "왼쪽 주문번호·오른쪽 상태 열 고정, 가상 스크롤, 정렬, 필터 행, 인라인 편집.",
+      "aside": "데이터: /api/data/dashboard",
+      "items": [
+        {
+          "type": "grid",
+          "name": "orders",
+          "span": 12,
+          "height": 380,
+          "dataKey": "orders",
+          "filterRow": true,
+          "search": true,
+          "title": "주문",
+          "columns": [
+            {
+              "key": "orderNo",
+              "title": "주문번호",
+              "type": "text",
+              "width": 126,
+              "frozen": "left",
+              "required": true
+            },
+            {
+              "key": "customer",
+              "title": "고객명",
+              "type": "text",
+              "width": 92
+            },
+            {
+              "key": "channel",
+              "title": "채널",
+              "type": "select",
+              "width": 96,
+              "options": [
+                {
+                  "value": "web",
+                  "label": "웹"
+                },
+                {
+                  "value": "mobile",
+                  "label": "모바일"
+                },
+                {
+                  "value": "partner",
+                  "label": "제휴"
+                },
+                {
+                  "value": "offline",
+                  "label": "오프라인"
+                }
+              ]
+            },
+            {
+              "key": "product",
+              "title": "상품",
+              "type": "text",
+              "width": 168
+            },
+            {
+              "key": "qty",
+              "title": "수량",
+              "type": "number",
+              "width": 70,
+              "min": 1,
+              "max": 99
+            },
+            {
+              "key": "unitPrice",
+              "title": "단가",
+              "type": "number",
+              "width": 100
+            },
+            {
+              "key": "amount",
+              "title": "금액",
+              "type": "number",
+              "width": 116,
+              "editable": false
+            },
+            {
+              "key": "orderedAt",
+              "title": "주문일",
+              "type": "date",
+              "width": 112
+            },
+            {
+              "key": "shipTime",
+              "title": "출고시간",
+              "type": "time",
+              "width": 92
+            },
+            {
+              "key": "urgent",
+              "title": "긴급",
+              "type": "checkbox",
+              "width": 66
+            },
+            {
+              "key": "status",
+              "title": "상태",
+              "type": "badge",
+              "width": 84,
+              "options": [
+                {
+                  "value": "ready",
+                  "label": "준비"
+                },
+                {
+                  "value": "shipping",
+                  "label": "배송중"
+                },
+                {
+                  "value": "done",
+                  "label": "완료"
+                },
+                {
+                  "value": "hold",
+                  "label": "보류"
+                }
+              ],
+              "editable": false,
+              "frozen": "right"
+            },
+            {
+              "key": "memo",
+              "title": "메모",
+              "type": "text",
+              "width": 200
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "org",
+      "title": "담당 조직",
+      "description": "트라이스테이트 체크 + 검색 + 지연 로딩 없이 JSON 트리 렌더.",
+      "items": [
+        {
+          "type": "tree",
+          "name": "departments",
+          "span": 5,
+          "dataKey": "departments",
+          "checkable": true,
+          "cascade": true,
+          "expandLevel": 2
+        },
+        {
+          "type": "html",
+          "span": 7,
+          "html": "<div class=\"wui-note\">\n            <strong>트리 선택 값</strong>\n            <p>체크한 조직 ID 배열이 폼 값 <code>departments</code> 로 수집됩니다. 왼쪽 그리드와 같은 데이터 JSON 안에서 <code>trees.departments</code> 로 전달됩니다.</p>\n            <pre class=\"wui-pre\">\"departments\": [\"dev-web\", \"design-ui\"]</pre>\n          </div>"
+        }
+      ]
+    }
+  ]
+}

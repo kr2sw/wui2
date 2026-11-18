@@ -1,0 +1,324 @@
+/*!
+ * WUI - css/base.css
+ * 공통 리셋 + 버튼/입력/필드/카드/탭/툴바 등 기본 컴포넌트
+ */
+*, *::before, *::after { box-sizing: border-box; }
+
+/* hidden 속성은 항상 숨김 — display 를 지정한 컴포넌트 클래스보다 우선 */
+[hidden] { display: none !important; }
+
+.wui-scope,
+[data-wui] {
+  font-family: var(--wui-font);
+  font-size: var(--wui-fs);
+  color: var(--wui-fg);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.wui-scope *, [data-wui] * { box-sizing: border-box; }
+
+.wui-scope ::-webkit-scrollbar,
+[data-wui] ::-webkit-scrollbar { width: 10px; height: 10px; }
+.wui-scope ::-webkit-scrollbar-thumb,
+[data-wui] ::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--wui-muted) 45%, transparent);
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+.wui-scope ::-webkit-scrollbar-thumb:hover,
+[data-wui] ::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--wui-muted) 70%, transparent);
+  background-clip: padding-box;
+}
+.wui-scope ::-webkit-scrollbar-track,
+[data-wui] ::-webkit-scrollbar-track { background: transparent; }
+
+/* ------------------------------- 버튼 ------------------------------- */
+.wui-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: var(--wui-control-h);
+  padding: 0 12px;
+  border: var(--wui-border-width) solid var(--wui-border-strong);
+  border-radius: var(--wui-radius-sm);
+  background: var(--wui-surface);
+  color: var(--wui-fg-soft);
+  font: inherit;
+  font-size: var(--wui-fs);
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  white-space: nowrap;
+  user-select: none;
+  transition: background .12s ease, border-color .12s ease, color .12s ease, box-shadow .12s ease;
+}
+.wui-btn:hover { background: var(--wui-hover); color: var(--wui-fg); }
+.wui-btn:active { background: var(--wui-active); }
+.wui-btn:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--wui-focus-ring); }
+.wui-btn[disabled], .wui-btn.is-disabled { opacity: .5; cursor: not-allowed; }
+.wui-btn.is-active { background: var(--wui-primary-weak); border-color: color-mix(in srgb, var(--wui-primary) 40%, transparent); color: var(--wui-primary-weak-fg); }
+.wui-btn-primary {
+  background: var(--wui-primary); border-color: var(--wui-primary); color: var(--wui-primary-fg);
+}
+.wui-btn-primary:hover { background: var(--wui-primary-hover); border-color: var(--wui-primary-hover); color: var(--wui-primary-fg); }
+.wui-btn-danger { background: var(--wui-surface); border-color: color-mix(in srgb, var(--wui-danger) 40%, var(--wui-border)); color: var(--wui-danger); }
+.wui-btn-danger:hover { background: var(--wui-danger-weak); color: var(--wui-danger); }
+.wui-btn-ghost { border-color: transparent; background: transparent; }
+.wui-btn-ghost:hover { background: var(--wui-hover); }
+.wui-btn-sm { height: calc(var(--wui-control-h) - 8px); padding: 0 8px; font-size: var(--wui-fs-sm); }
+.wui-btn-lg { height: calc(var(--wui-control-h) + 6px); padding: 0 18px; font-size: var(--wui-fs-lg); }
+.wui-btn-icon { width: var(--wui-control-h); padding: 0; }
+.wui-btn-block { width: 100%; }
+
+/* ------------------------------- 입력 ------------------------------- */
+.wui-input, .wui-select, .wui-textarea {
+  width: 100%;
+  height: var(--wui-control-h);
+  padding: 0 10px;
+  border: var(--wui-border-width) solid var(--wui-border-strong);
+  border-radius: var(--wui-radius-sm);
+  background: var(--wui-surface);
+  color: var(--wui-fg);
+  font: inherit;
+  font-size: var(--wui-fs);
+  line-height: normal;
+  transition: border-color .12s ease, box-shadow .12s ease, background .12s ease;
+  min-width: 0;
+}
+.wui-textarea { height: auto; min-height: calc(var(--wui-control-h) * 2.2); padding: 8px 10px; resize: vertical; line-height: 1.5; }
+.wui-select { appearance: none; padding-right: 26px;
+  background-image: linear-gradient(45deg, transparent 50%, var(--wui-muted) 50%), linear-gradient(135deg, var(--wui-muted) 50%, transparent 50%);
+  background-position: calc(100% - 14px) 50%, calc(100% - 9px) 50%;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+}
+.wui-input:hover, .wui-select:hover, .wui-textarea:hover { border-color: color-mix(in srgb, var(--wui-primary) 35%, var(--wui-border-strong)); }
+.wui-input:focus, .wui-select:focus, .wui-textarea:focus {
+  outline: none;
+  border-color: var(--wui-primary);
+  box-shadow: 0 0 0 3px var(--wui-focus-ring);
+}
+.wui-input::placeholder, .wui-textarea::placeholder { color: color-mix(in srgb, var(--wui-muted) 75%, transparent); }
+.wui-input[disabled], .wui-select[disabled], .wui-textarea[disabled] {
+  background: var(--wui-surface-2); color: var(--wui-muted); cursor: not-allowed;
+}
+.wui-input.is-invalid, .wui-select.is-invalid, .wui-textarea.is-invalid {
+  border-color: var(--wui-danger);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--wui-danger) 18%, transparent);
+}
+.wui-input-sm { height: calc(var(--wui-control-h) - 8px); font-size: var(--wui-fs-sm); padding: 0 8px; }
+.wui-input-group { display: flex; align-items: center; gap: 6px; }
+.wui-input-group .wui-btn { flex: none; }
+
+/* 체크박스 / 라디오 */
+.wui-check, .wui-radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+  font-size: var(--wui-fs);
+  color: var(--wui-fg-soft);
+  min-height: 22px;
+}
+.wui-check input[type="checkbox"], .wui-radio input[type="radio"], .wui-switch input {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 16px; height: 16px;
+  margin: 0;
+  border: var(--wui-border-width) solid var(--wui-border-strong);
+  border-radius: var(--wui-radius-sm);
+  background: var(--wui-surface);
+  cursor: pointer;
+  flex: none;
+  position: relative;
+  transition: background .12s ease, border-color .12s ease;
+}
+.wui-radio input[type="radio"] { border-radius: 50%; }
+.wui-check input[type="checkbox"]:checked,
+.wui-radio input[type="radio"]:checked { background: var(--wui-primary); border-color: var(--wui-primary); }
+.wui-check input[type="checkbox"]:checked::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: var(--wui-primary-fg);
+  clip-path: polygon(18% 48%, 8% 60%, 40% 88%, 94% 24%, 84% 14%, 39% 68%);
+}
+.wui-radio input[type="radio"]:checked::after {
+  content: '';
+  position: absolute; inset: 4px; border-radius: 50%; background: var(--wui-primary-fg);
+}
+.wui-check input:focus-visible, .wui-radio input:focus-visible, .wui-switch input:focus-visible {
+  outline: none; box-shadow: 0 0 0 3px var(--wui-focus-ring);
+}
+.wui-check.is-disabled, .wui-radio.is-disabled { opacity: .55; cursor: not-allowed; }
+
+/* 스위치 */
+.wui-switch { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; }
+.wui-switch input {
+  width: 38px; height: 22px; border-radius: var(--wui-radius-pill);
+  background: var(--wui-border-strong); position: relative; border: none;
+  transition: background .15s ease;
+}
+.wui-switch input::after {
+  content: ''; position: absolute; top: 3px; left: 3px;
+  width: 16px; height: 16px; border-radius: 50%; background: #fff;
+  transition: transform .15s ease;
+  box-shadow: 0 1px 2px rgba(0,0,0,.2);
+}
+.wui-switch input:checked { background: var(--wui-primary); }
+.wui-switch input:checked::after { transform: translateX(16px); }
+
+/* ------------------------------- 필드 ------------------------------- */
+.wui-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.wui-field-label {
+  display: flex; align-items: center; gap: 6px;
+  font-size: var(--wui-fs-sm); font-weight: 700; color: var(--wui-fg-soft);
+  letter-spacing: .01em;
+}
+.wui-field-label .wui-req { color: var(--wui-danger); font-weight: 700; }
+.wui-field-help { font-size: var(--wui-fs-sm); color: var(--wui-muted); }
+.wui-field-error { font-size: var(--wui-fs-sm); color: var(--wui-danger); display: none; }
+.wui-field.is-invalid .wui-field-error { display: block; }
+.wui-field.is-invalid .wui-field-label { color: var(--wui-danger); }
+.wui-field-inline { flex-direction: row; align-items: center; gap: 12px; }
+.wui-field-inline .wui-field-label { min-width: 110px; }
+.wui-field-body { min-width: 0; }
+.wui-field .wui-range { width: 100%; }
+
+/* 라디오 그룹 */
+.wui-radio-group, .wui-check-group { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; min-height: var(--wui-control-h); }
+
+/* ------------------------------- 카드/박스 ------------------------------- */
+.wui-card {
+  background: var(--wui-surface);
+  border: var(--wui-border-width) solid var(--wui-border);
+  border-radius: var(--wui-radius);
+  box-shadow: var(--wui-shadow);
+}
+.wui-card-header {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 10px var(--wui-space);
+  border-bottom: var(--wui-border-width) solid var(--wui-border);
+}
+.wui-card-title { font-weight: 700; font-size: var(--wui-fs-lg); display: flex; align-items: center; gap: 8px; }
+.wui-card-sub { color: var(--wui-muted); font-size: var(--wui-fs-sm); }
+.wui-card-body { padding: var(--wui-space); }
+.wui-card-footer { padding: 10px var(--wui-space); border-top: var(--wui-border-width) solid var(--wui-border); display: flex; justify-content: flex-end; gap: 8px; }
+
+.wui-hr { height: 1px; border: 0; background: var(--wui-border); margin: var(--wui-space) 0; }
+
+/* 배지 / 태그 */
+.wui-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px; border-radius: var(--wui-radius-pill);
+  background: var(--wui-primary-weak); color: var(--wui-primary-weak-fg);
+  font-size: 11.5px; font-weight: 700; line-height: 1.6; white-space: nowrap;
+}
+.wui-badge-success { background: var(--wui-success-weak); color: var(--wui-success); }
+.wui-badge-danger { background: var(--wui-danger-weak); color: var(--wui-danger); }
+.wui-badge-warn { background: var(--wui-warn-weak); color: var(--wui-warn); }
+.wui-badge-info { background: var(--wui-info-weak); color: var(--wui-info); }
+.wui-badge-muted { background: var(--wui-surface-3); color: var(--wui-muted); }
+.wui-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; flex: none; }
+
+/* 툴바 / 탭 */
+.wui-toolbar {
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  padding: 6px 8px;
+  background: var(--wui-surface-2);
+  border-bottom: var(--wui-border-width) solid var(--wui-border);
+}
+.wui-toolbar-group { display: flex; align-items: center; gap: 4px; }
+.wui-toolbar-sep { width: 1px; height: 20px; background: var(--wui-border); margin: 0 4px; }
+.wui-toolbar-spacer { flex: 1; }
+
+.wui-tabs { display: flex; gap: 2px; border-bottom: var(--wui-border-width) solid var(--wui-border); overflow-x: auto; }
+.wui-tab {
+  padding: 8px 14px; border: 0; background: transparent; color: var(--wui-muted);
+  font: inherit; font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent;
+  white-space: nowrap;
+}
+.wui-tab:hover { color: var(--wui-fg); background: var(--wui-hover); }
+.wui-tab.is-active { color: var(--wui-primary); border-bottom-color: var(--wui-primary); }
+
+/* 스피너 / 상태 */
+.wui-spinner {
+  width: 18px; height: 18px; flex: none;
+  border: 2px solid color-mix(in srgb, var(--wui-primary) 25%, transparent);
+  border-top-color: var(--wui-primary);
+  border-radius: 50%;
+  animation: wui-spin .7s linear infinite;
+}
+@keyframes wui-spin { to { transform: rotate(360deg); } }
+
+.wui-loading {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 42px 16px; color: var(--wui-muted);
+}
+.wui-empty {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+  padding: 40px 16px; color: var(--wui-muted); text-align: center;
+}
+.wui-empty-icon { font-size: 26px; opacity: .7; }
+.wui-empty-title { font-weight: 700; color: var(--wui-fg-soft); }
+
+.wui-alert {
+  display: flex; gap: 10px; align-items: flex-start;
+  padding: 10px 12px; border-radius: var(--wui-radius-sm);
+  border: var(--wui-border-width) solid var(--wui-border);
+  background: var(--wui-surface-2); color: var(--wui-fg-soft);
+  font-size: var(--wui-fs);
+}
+.wui-alert-danger { background: var(--wui-danger-weak); border-color: color-mix(in srgb, var(--wui-danger) 30%, transparent); color: var(--wui-danger); }
+.wui-alert-warn { background: var(--wui-warn-weak); border-color: color-mix(in srgb, var(--wui-warn) 30%, transparent); color: var(--wui-warn); }
+.wui-alert-info { background: var(--wui-info-weak); border-color: color-mix(in srgb, var(--wui-info) 30%, transparent); color: var(--wui-info); }
+
+/* 스와치(테마 선택) */
+.wui-swatches { display: flex; flex-wrap: wrap; gap: 6px; }
+.wui-swatch {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 9px 4px 5px;
+  border: var(--wui-border-width) solid var(--wui-border);
+  border-radius: var(--wui-radius-pill);
+  background: var(--wui-surface);
+  color: var(--wui-fg-soft);
+  font: inherit; font-size: var(--wui-fs-sm); font-weight: 600;
+  cursor: pointer;
+}
+.wui-swatch:hover { background: var(--wui-hover); }
+.wui-swatch.is-active { border-color: var(--wui-primary); color: var(--wui-primary); background: var(--wui-primary-weak); }
+.wui-swatch-color { width: 16px; height: 16px; border-radius: 50%; flex: none; box-shadow: inset 0 0 0 1px rgba(0,0,0,.08); }
+.wui-shape-picker { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.wui-shape-radius, .wui-shape-border { display: inline-flex; align-items: center; gap: 6px; font-size: var(--wui-fs-sm); color: var(--wui-muted); }
+.wui-shape-radius input[type="range"] { width: 88px; }
+
+/* 스크롤 영역 */
+.wui-scroll { overflow: auto; }
+
+/* 스킨 유틸 */
+.wui-muted { color: var(--wui-muted); }
+.wui-small { font-size: var(--wui-fs-sm); }
+.wui-bold { font-weight: 700; }
+.wui-mono { font-family: var(--wui-mono); }
+.wui-nowrap { white-space: nowrap; }
+.wui-ellipsis { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wui-flex { display: flex; align-items: center; gap: 8px; }
+.wui-flex-between { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.wui-grow { flex: 1; min-width: 0; }
+.wui-hidden { display: none !important; }
+.wui-sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* 코드 */
+.wui-code {
+  font-family: var(--wui-mono); font-size: 12.5px;
+  background: var(--wui-code-bg); border: var(--wui-border-width) solid var(--wui-border);
+  border-radius: var(--wui-radius-sm); padding: 2px 6px;
+}

@@ -1,0 +1,210 @@
+/*!
+ * WUI - css/tokens.css
+ * 디자인 토큰 + 색상 테마 + 모양/밀도 프리셋
+ */
+
+:root,
+[data-wui] {
+  /* 기본 팔레트 (라이트) */
+  --wui-font: 'Pretendard', 'Malgun Gothic', 'Apple SD Gothic Neo', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --wui-mono: 'JetBrains Mono', 'D2Coding', Consolas, 'Courier New', monospace;
+
+  --wui-bg: #f4f6fb;
+  --wui-surface: #ffffff;
+  --wui-surface-2: #f8fafc;
+  --wui-surface-3: #eef2f8;
+  --wui-fg: #101828;
+  --wui-fg-soft: #344054;
+  --wui-muted: #667085;
+  --wui-border: #e2e7f0;
+  --wui-border-strong: #cfd7e5;
+  --wui-hover: #f1f4fa;
+  --wui-active: #e8eefb;
+
+  --wui-primary: #2f6fed;
+  --wui-primary-hover: #255fd4;
+  --wui-primary-fg: #ffffff;
+  --wui-primary-weak: #e8efff;
+  --wui-primary-weak-fg: #1c4fc4;
+  --wui-accent: #0ea5e9;
+  --wui-focus-ring: rgba(47, 111, 237, .28);
+
+  --wui-danger: #d92d20;
+  --wui-danger-weak: #fef3f2;
+  --wui-success: #079455;
+  --wui-success-weak: #ecfdf3;
+  --wui-warn: #dc6803;
+  --wui-warn-weak: #fffaeb;
+  --wui-info: #1570ef;
+  --wui-info-weak: #eff8ff;
+
+  --wui-editor-bg: #ffffff;
+  --wui-grid-header-bg: #f4f7fd;
+  --wui-grid-stripe: #fafbfe;
+  --wui-code-bg: #f4f6fb;
+
+  /* 모양 */
+  --wui-radius: 6px;
+  --wui-radius-sm: 4px;
+  --wui-radius-lg: 10px;
+  --wui-radius-pill: 999px;
+  --wui-border-width: 1px;
+  --wui-shadow-color: rgba(16, 24, 40, .12);
+  --wui-shadow: 0 1px 2px rgba(16, 24, 40, .06), 0 1px 3px rgba(16, 24, 40, .08);
+  --wui-shadow-lg: 0 12px 32px var(--wui-shadow-color), 0 4px 8px rgba(16, 24, 40, .06);
+
+  /* 밀도 */
+  --wui-space: 12px;
+  --wui-control-h: 34px;
+  --wui-fs: 13.5px;
+  --wui-fs-sm: 12px;
+  --wui-fs-lg: 15px;
+  --wui-row-h: 36px;
+  --wui-header-h: 38px;
+  --wui-gap: 12px;
+
+  --wui-z-header: 20;
+  --wui-z-frozen: 10;
+  --wui-z-toolbar: 30;
+  --wui-z-popup: 1000;
+}
+
+/* ----------------------------- 색상 테마 ----------------------------- */
+[data-wui-theme="blue"], :root:not([data-wui-theme]) {
+  --wui-primary: #2f6fed; --wui-primary-hover: #255fd4; --wui-primary-fg: #fff;
+  --wui-primary-weak: #e8efff; --wui-primary-weak-fg: #1c4fc4; --wui-accent: #0ea5e9;
+  --wui-focus-ring: rgba(47, 111, 237, .28);
+}
+[data-wui-theme="indigo"] {
+  --wui-primary: #4f46e5; --wui-primary-hover: #4338ca; --wui-primary-fg: #fff;
+  --wui-primary-weak: #eceafe; --wui-primary-weak-fg: #4038c8; --wui-accent: #8b5cf6;
+  --wui-focus-ring: rgba(79, 70, 229, .28);
+}
+[data-wui-theme="green"] {
+  --wui-primary: #0f9d58; --wui-primary-hover: #0b8349; --wui-primary-fg: #fff;
+  --wui-primary-weak: #e5f7ee; --wui-primary-weak-fg: #0a7a45; --wui-accent: #22c55e;
+  --wui-focus-ring: rgba(15, 157, 88, .26);
+}
+[data-wui-theme="teal"] {
+  --wui-primary: #0d9488; --wui-primary-hover: #0f766e; --wui-primary-fg: #fff;
+  --wui-primary-weak: #e0f5f2; --wui-primary-weak-fg: #0b6b62; --wui-accent: #14b8a6;
+  --wui-focus-ring: rgba(13, 148, 136, .26);
+}
+[data-wui-theme="purple"] {
+  --wui-primary: #9333ea; --wui-primary-hover: #7e22ce; --wui-primary-fg: #fff;
+  --wui-primary-weak: #f3e8ff; --wui-primary-weak-fg: #7623c0; --wui-accent: #c084fc;
+  --wui-focus-ring: rgba(147, 51, 234, .26);
+}
+[data-wui-theme="orange"] {
+  --wui-primary: #ea580c; --wui-primary-hover: #c2410c; --wui-primary-fg: #fff;
+  --wui-primary-weak: #ffedd5; --wui-primary-weak-fg: #b3400a; --wui-accent: #f97316;
+  --wui-focus-ring: rgba(234, 88, 12, .26);
+}
+[data-wui-theme="red"] {
+  --wui-primary: #dc2626; --wui-primary-hover: #b91c1c; --wui-primary-fg: #fff;
+  --wui-primary-weak: #fee2e2; --wui-primary-weak-fg: #a61b1b; --wui-accent: #f87171;
+  --wui-focus-ring: rgba(220, 38, 38, .26);
+}
+[data-wui-theme="slate"] {
+  --wui-primary: #475569; --wui-primary-hover: #334155; --wui-primary-fg: #fff;
+  --wui-primary-weak: #e2e8f0; --wui-primary-weak-fg: #334155; --wui-accent: #64748b;
+  --wui-focus-ring: rgba(71, 85, 105, .26);
+}
+[data-wui-theme="dark"] {
+  --wui-primary: #60a5fa; --wui-primary-hover: #93c5fd; --wui-primary-fg: #0b1220;
+  --wui-primary-weak: #1e293b; --wui-primary-weak-fg: #bfdbfe; --wui-accent: #38bdf8;
+  --wui-focus-ring: rgba(96, 165, 250, .3);
+  --wui-bg: #0b1220;
+  --wui-surface: #111a2b;
+  --wui-surface-2: #16213a;
+  --wui-surface-3: #1c2942;
+  --wui-fg: #e6edf8;
+  --wui-fg-soft: #c9d6ea;
+  --wui-muted: #93a4bf;
+  --wui-border: #25324a;
+  --wui-border-strong: #354563;
+  --wui-hover: #1b2942;
+  --wui-active: #22334f;
+  --wui-danger: #f97066;
+  --wui-danger-weak: #3b1d1f;
+  --wui-success: #4ade80;
+  --wui-success-weak: #10301f;
+  --wui-warn: #fbbf24;
+  --wui-warn-weak: #35290d;
+  --wui-info: #60a5fa;
+  --wui-info-weak: #12233d;
+  --wui-editor-bg: #0e1728;
+  --wui-grid-header-bg: #16213a;
+  --wui-grid-stripe: #0f1929;
+  --wui-code-bg: #0b1424;
+  --wui-shadow-color: rgba(0, 0, 0, .5);
+  color-scheme: dark;
+}
+[data-wui-theme="midnight"] {
+  --wui-primary: #a5b4fc; --wui-primary-hover: #c7d2fe; --wui-primary-fg: #161436;
+  --wui-primary-weak: #262450; --wui-primary-weak-fg: #c7d2fe; --wui-accent: #f472b6;
+  --wui-focus-ring: rgba(165, 180, 252, .3);
+  --wui-bg: #0d0b22;
+  --wui-surface: #151232;
+  --wui-surface-2: #1c1840;
+  --wui-surface-3: #241f4f;
+  --wui-fg: #eae7ff;
+  --wui-fg-soft: #d3cff5;
+  --wui-muted: #a49fd0;
+  --wui-border: #2b2757;
+  --wui-border-strong: #3c3775;
+  --wui-hover: #211d47;
+  --wui-active: #2a2556;
+  --wui-danger: #fb7185;
+  --wui-danger-weak: #3a1626;
+  --wui-success: #34d399;
+  --wui-success-weak: #0f2f2a;
+  --wui-warn: #fbbf24;
+  --wui-warn-weak: #33280f;
+  --wui-info: #93c5fd;
+  --wui-info-weak: #1a2447;
+  --wui-editor-bg: #120f2c;
+  --wui-grid-header-bg: #1b1740;
+  --wui-grid-stripe: #131030;
+  --wui-code-bg: #100d28;
+  --wui-shadow-color: rgba(0, 0, 0, .55);
+  color-scheme: dark;
+}
+
+/* ----------------------------- 모양 프리셋 ----------------------------- */
+[data-wui-shape="sharp"] {
+  --wui-radius: 0px; --wui-radius-sm: 0px; --wui-radius-lg: 0px; --wui-radius-pill: 0px;
+  --wui-shadow: none;
+}
+[data-wui-shape="soft"] {
+  --wui-radius: 6px; --wui-radius-sm: 4px; --wui-radius-lg: 10px;
+}
+[data-wui-shape="round"] {
+  --wui-radius: 12px; --wui-radius-sm: 8px; --wui-radius-lg: 18px;
+  --wui-shadow: 0 2px 6px rgba(16, 24, 40, .07), 0 1px 2px rgba(16, 24, 40, .05);
+}
+[data-wui-shape="pill"] {
+  --wui-radius: 999px; --wui-radius-sm: 999px; --wui-radius-lg: 999px;
+}
+[data-wui].wui-no-border,
+.wui-no-border {
+  --wui-border-width: 0px;
+}
+
+/* ----------------------------- 밀도 프리셋 ----------------------------- */
+[data-wui-density="compact"] {
+  --wui-space: 8px; --wui-control-h: 28px; --wui-fs: 12.5px; --wui-row-h: 30px;
+  --wui-header-h: 32px; --wui-gap: 8px;
+}
+[data-wui-density="normal"] {
+  --wui-space: 12px; --wui-control-h: 34px; --wui-fs: 13.5px; --wui-row-h: 36px;
+  --wui-header-h: 38px; --wui-gap: 12px;
+}
+[data-wui-density="comfortable"] {
+  --wui-space: 16px; --wui-control-h: 40px; --wui-fs: 14px; --wui-row-h: 44px;
+  --wui-header-h: 44px; --wui-gap: 16px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { scroll-behavior: auto !important; }
+}

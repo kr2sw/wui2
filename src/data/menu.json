@@ -1,0 +1,47 @@
+{
+  "title": "WUI 스튜디오",
+  "subtitle": "바닐라 JS 웹 UI 키트",
+  "items": [
+    {
+      "id": "dashboard",
+      "label": "대시보드",
+      "icon": "▦",
+      "badge": "Grid"
+    },
+    {
+      "id": "order-form",
+      "label": "주문 입력",
+      "icon": "✎"
+    },
+    {
+      "id": "approval",
+      "label": "결재 문서",
+      "icon": "◫",
+      "badge": "Editor"
+    },
+    {
+      "id": "org",
+      "label": "조직도",
+      "icon": "⌘",
+      "data": false,
+      "badge": "Tree"
+    },
+    {
+      "id": "settings",
+      "label": "설정",
+      "icon": "⚙",
+      "children": [
+        {
+          "id": "settings-general",
+          "label": "일반 설정",
+          "icon": "·"
+        },
+        {
+          "id": "settings-skin",
+          "label": "스킨 갤러리",
+          "icon": "◐"
+        }
+      ]
+    }
+  ]
+}

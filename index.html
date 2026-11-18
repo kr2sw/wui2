@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WUI — 바닐라 JS 웹 UI 키트</title>
+  <meta name="description" content="웹 에디터 · 편집형 그리드 · JSON 화면 배치 · 트리 · 스킨을 제공하는 의존성 없는 바닐라 자바스크립트 UI 키트">
+  <link rel="stylesheet" href="./src/css/tokens.css">
+  <link rel="stylesheet" href="./src/css/base.css">
+  <link rel="stylesheet" href="./src/css/editor.css">
+  <link rel="stylesheet" href="./src/css/grid.css">
+  <link rel="stylesheet" href="./src/css/tree.css">
+  <link rel="stylesheet" href="./src/css/layout.css">
+  <link rel="stylesheet" href="./src/css/app.css">
+  <link rel="stylesheet" href="./src/css/demo.css">
+</head>
+<body>
+  <div class="demo-shell">
+    <header class="demo-top">
+      <a class="demo-brand" href="#app" title="WUI 데모">
+        <span class="demo-brandlogo">W</span>
+        <span class="demo-brandtext">
+          <strong>WUI</strong>
+          <span>바닐라 JS 웹 UI 키트</span>
+        </span>
+      </a>
+
+      <nav class="demo-nav" role="tablist" aria-label="데모 선택">
+        <button class="demo-navbtn" type="button" role="tab" data-view="app">통합 앱</button>
+        <button class="demo-navbtn" type="button" role="tab" data-view="editor">에디터</button>
+        <button class="demo-navbtn" type="button" role="tab" data-view="grid">그리드</button>
+        <button class="demo-navbtn" type="button" role="tab" data-view="tree">트리</button>
+        <button class="demo-navbtn" type="button" role="tab" data-view="layout">레이아웃</button>
+        <button class="demo-navbtn" type="button" role="tab" data-view="skin">스킨</button>
+      </nav>
+
+      <div class="demo-topactions">
+        <span class="demo-status" title="서버 없이 file:// 로 열면 AJAX mock 으로 동작합니다.">MOCK↺ fallback</span>
+        <button class="wui-btn wui-btn-sm wui-btn-ghost" type="button" id="demo-skin-reset" title="테마/모양/밀도 초기화">스킨 초기화</button>
+        <a class="wui-btn wui-btn-sm" href="./DOC/index.html">문서</a>
+      </div>
+    </header>
+
+    <main class="demo-main">
+      <!-- 1. 통합 앱: 메뉴 JSON → 레이어 JSON + 데이터 JSON -->
+      <section class="demo-view" data-view="app" aria-label="통합 앱 데모">
+        <div id="app-host"></div>
+      </section>
+
+      <!-- 2. 웹 에디터 -->
+      <section class="demo-view" data-view="editor" aria-label="에디터 데모">
+        <div class="demo-pagehead">
+          <div>
+            <p class="demo-eyebrow">WUI.createEditor</p>
+            <h1>웹 에디터</h1>
+            <p>서식 · 표(행/열 편집) · 이미지 파일/붙여넣기/드래그 · HTML 소스 · 전체화면 · 자동저장.</p>
+          </div>
+          <code class="wui-code">createEditor('#mount', { height: 380, toolbar: 'full' })</code>
+        </div>
+      </section>
+
+      <!-- 3. 편집형 그리드 -->
+      <section class="demo-view" data-view="grid" aria-label="그리드 데모">
+        <div class="demo-pagehead">
+          <div>
+            <p class="demo-eyebrow">WUI.createGrid</p>
+            <h1>편집형 그리드</h1>
+            <p>상단 고정 · 좌/우 열 고정 · 가상 스크롤 · 정렬/검색/필터 · 12가지 셀 타입 · 검증 · 변경 내역 · CSV.</p>
+          </div>
+          <code class="wui-code">createGrid('#grid', { columns, data, filterRow: true })</code>
+        </div>
+      </section>
+
+      <!-- 4. 트리 -->
+      <section class="demo-view" data-view="tree" aria-label="트리 데모">
+        <div class="demo-pagehead">
+          <div>
+            <p class="demo-eyebrow">WUI.createTree</p>
+            <h1>트리</h1>
+            <p>트라이스테이트 체크 · cascade · 검색/하이라이트 · 키보드 탐색 · 추가/삭제/갱신 · 지연 로딩.</p>
+          </div>
+          <code class="wui-code">createTree('#tree', { data, checkable: true, cascade: true })</code>
+        </div>
+      </section>
+
+      <!-- 5. JSON 화면 배치 -->
+      <section class="demo-view" data-view="layout" aria-label="레이아웃 데모">
+        <div class="demo-pagehead">
+          <div>
+            <p class="demo-eyebrow">WUI.createLayout</p>
+            <h1>JSON 화면 배치</h1>
+            <p>12컬럼 flow · pos 기반 absolute · 조건부 표시 · 검증 · 데이터 바인딩 · 에디터/그리드/트리 임베드.</p>
+          </div>
+          <code class="wui-code">createLayout('#form', schema, { values, data })</code>
+        </div>
+      </section>
+
+      <!-- 6. 스킨 -->
+      <section class="demo-view" data-view="skin" aria-label="스킨 데모">
+        <div class="demo-pagehead">
+          <div>
+            <p class="demo-eyebrow">WUI.skin</p>
+            <h1>스킨</h1>
+            <p>10가지 색상 테마 · 모양(모서리/테두리) · 밀도. CSS 변수와 data 속성만으로 전환됩니다.</p>
+          </div>
+          <code class="wui-code">WUI.skin.setTheme('green')</code>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="./src/js/demo.js"></script>
+</body>
+</html>

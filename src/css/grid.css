@@ -1,0 +1,298 @@
+/*!
+ * WUI - css/grid.css
+ * 편집형 그리드: 상단 고정 헤더 / 좌우 고정 열 / 가상 스크롤
+ */
+.wui-grid {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: var(--wui-surface);
+  border: var(--wui-border-width) solid var(--wui-border);
+  border-radius: var(--wui-radius);
+  overflow: hidden;
+  color: var(--wui-fg);
+}
+
+/* ------------------------------- 상단 툴바 ------------------------------- */
+.wui-grid-top {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px 10px;
+  background: var(--wui-surface);
+  border-bottom: var(--wui-border-width) solid var(--wui-border);
+}
+.wui-grid-top.is-empty { display: none; }
+.wui-grid-titlebox { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.wui-grid-title { font-size: var(--wui-fs-lg); font-weight: 800; letter-spacing: -.01em; }
+.wui-grid-desc { font-size: var(--wui-fs-sm); color: var(--wui-muted); }
+.wui-grid-search { width: 190px; max-width: 42vw; }
+.wui-grid-top .wui-btn { flex: none; }
+
+/* ------------------------------- 뷰포트 ------------------------------- */
+.wui-grid-viewport {
+  position: relative;
+  overflow: auto;
+  overflow-anchor: none;
+  background: var(--wui-surface);
+  outline: none;
+  overscroll-behavior: contain;
+}
+.wui-grid-viewport:focus-visible { box-shadow: inset 0 0 0 2px var(--wui-focus-ring); }
+.wui-grid-canvas { position: relative; min-width: 100%; }
+
+/* ------------------------------- 헤더 ------------------------------- */
+.wui-grid-header {
+  position: sticky;
+  top: 0;
+  z-index: var(--wui-z-header);
+  background: var(--wui-grid-header-bg);
+  box-shadow: 0 1px 0 var(--wui-border);
+}
+.wui-grid-header:not(.is-sticky) { position: relative; }
+.wui-grid-hrow { display: flex; align-items: stretch; }
+.wui-grid-hcell {
+  position: relative;
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: var(--wui-grid-header-bg);
+  border-right: var(--wui-border-width) solid var(--wui-border);
+  border-bottom: var(--wui-border-width) solid var(--wui-border);
+}
+.wui-grid-hcell.is-frozen { position: sticky; z-index: 3; }
+.wui-grid-hcell.is-sortable { cursor: pointer; }
+.wui-grid-hcell.is-sortable:hover .wui-grid-htitle { background: var(--wui-hover); }
+.wui-grid-hcell.is-edge-left { box-shadow: 3px 0 6px -4px var(--wui-shadow-color); }
+.wui-grid-hcell.is-edge-right { box-shadow: -3px 0 6px -4px var(--wui-shadow-color); }
+
+.wui-grid-htitle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: none;
+  padding: 0 8px;
+  font-size: var(--wui-fs-sm);
+  font-weight: 700;
+  color: var(--wui-fg-soft);
+  min-width: 0;
+  border-radius: 2px;
+}
+.wui-grid-htext { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wui-grid-hunit { font-weight: 500; color: var(--wui-muted); font-size: 11px; }
+.wui-grid-sort { font-size: 9px; color: var(--wui-primary); flex: none; line-height: 1; }
+.wui-grid-sort.is-idle { color: var(--wui-muted); opacity: .45; }
+.wui-grid-hcell.is-sortable:hover .wui-grid-sort.is-idle { opacity: .9; }
+.wui-grid-hcell.is-align-right .wui-grid-htitle { justify-content: flex-end; }
+.wui-grid-hcell.is-align-center .wui-grid-htitle { justify-content: center; }
+.wui-grid-hcell.is-align-center .wui-grid-htext { flex: none; }
+
+.wui-grid-colmenu {
+  flex: none;
+  width: 18px; height: 18px;
+  border: 0; border-radius: 3px;
+  background: transparent; color: var(--wui-muted);
+  font: inherit; font-size: 14px; line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity .1s ease, background .1s ease;
+}
+.wui-grid-hcell:hover .wui-grid-colmenu, .wui-grid-colmenu:focus-visible { opacity: 1; }
+.wui-grid-colmenu:hover { background: var(--wui-surface-3); color: var(--wui-fg); }
+
+.wui-grid-hfilter { display: flex; align-items: center; padding: 0 4px 4px; }
+.wui-grid-filter {
+  width: 100%; height: 24px;
+  border: var(--wui-border-width) solid var(--wui-border);
+  border-radius: var(--wui-radius-sm);
+  background: var(--wui-surface);
+  color: var(--wui-fg);
+  font: inherit; font-size: 11.5px;
+  padding: 0 6px;
+  min-width: 0;
+}
+.wui-grid-filter:focus { outline: none; border-color: var(--wui-primary); }
+.wui-grid-resizer {
+  position: absolute; top: 0; right: -3px;
+  width: 6px; height: 100%;
+  cursor: col-resize; z-index: 4;
+  touch-action: none;
+}
+.wui-grid-resizer:hover { background: color-mix(in srgb, var(--wui-primary) 45%, transparent); }
+
+/* ------------------------------- 바디 ------------------------------- */
+.wui-grid-rows { position: absolute; left: 0; top: 0; }
+.wui-grid-row {
+  --row-bg: var(--wui-surface);
+  position: absolute;
+  left: 0;
+  display: flex;
+  align-items: stretch;
+}
+.wui-grid-row.is-odd { --row-bg: var(--wui-grid-stripe); }
+.wui-grid-row:hover { --row-bg: var(--wui-hover); }
+.wui-grid-row.is-selected { --row-bg: var(--wui-primary-weak); }
+.wui-grid-row.is-modified { --row-bg: color-mix(in srgb, var(--wui-warn) 12%, var(--wui-surface)); box-shadow: inset 3px 0 0 var(--wui-warn); }
+.wui-grid-row.is-modified.is-odd { --row-bg: color-mix(in srgb, var(--wui-warn) 16%, var(--wui-grid-stripe)); }
+.wui-grid-row.is-new { --row-bg: color-mix(in srgb, var(--wui-success) 12%, var(--wui-surface)); box-shadow: inset 3px 0 0 var(--wui-success); }
+.wui-grid-row.is-new.is-odd { --row-bg: color-mix(in srgb, var(--wui-success) 16%, var(--wui-grid-stripe)); }
+.wui-grid-row.is-modified.is-selected, .wui-grid-row.is-new.is-selected { box-shadow: inset 3px 0 0 var(--wui-primary); }
+
+.wui-grid-cell {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  height: 100%;
+  padding: 0 5px;
+  background: var(--row-bg);
+  border-right: var(--wui-border-width) solid var(--wui-border);
+  border-bottom: var(--wui-border-width) solid var(--wui-border);
+  overflow: hidden;
+}
+.wui-grid-cell.is-frozen { position: sticky; z-index: 2; }
+.wui-grid-cell.is-edge-left { box-shadow: 3px 0 6px -4px var(--wui-shadow-color); }
+.wui-grid-cell.is-edge-right { box-shadow: -3px 0 6px -4px var(--wui-shadow-color); }
+.wui-grid-cell.is-align-center { justify-content: center; }
+.wui-grid-cell.is-invalid { outline: 1px solid var(--wui-danger); outline-offset: -1px; background: color-mix(in srgb, var(--wui-danger) 7%, var(--row-bg)); }
+.wui-grid-cell.is-pseudo { justify-content: center; }
+
+.wui-grid-input, .wui-grid-select {
+  width: 100%;
+  min-width: 0;
+  height: calc(100% - 8px);
+  padding: 0 6px;
+  border: 1px solid transparent;
+  border-radius: var(--wui-radius-sm);
+  background: transparent;
+  color: var(--wui-fg);
+  font: inherit;
+  font-size: var(--wui-fs);
+  line-height: normal;
+}
+.wui-grid-input:hover, .wui-grid-select:hover { border-color: var(--wui-border); }
+.wui-grid-input:focus, .wui-grid-select:focus {
+  outline: none;
+  border-color: var(--wui-primary);
+  background: var(--wui-surface);
+  box-shadow: 0 0 0 2px var(--wui-focus-ring);
+}
+.wui-grid-input::placeholder { color: color-mix(in srgb, var(--wui-muted) 60%, transparent); }
+.wui-grid-select { appearance: none; padding-right: 18px; background-image: linear-gradient(45deg, transparent 50%, var(--wui-muted) 50%), linear-gradient(135deg, var(--wui-muted) 50%, transparent 50%); background-position: calc(100% - 10px) 50%, calc(100% - 6px) 50%; background-size: 4px 4px, 4px 4px; background-repeat: no-repeat; }
+.wui-grid-textarea { height: calc(100% - 8px); padding: 4px 6px; resize: none; overflow: auto; font-size: var(--wui-fs-sm); }
+
+.wui-grid-input[type="date"], .wui-grid-input[type="time"], .wui-grid-input[type="datetime-local"] {
+  font-size: 12px;
+  padding: 0 2px;
+}
+.wui-grid-input::-webkit-calendar-picker-indicator { opacity: .45; cursor: pointer; }
+.wui-grid-input::-webkit-calendar-picker-indicator:hover { opacity: .9; }
+
+.wui-grid-cell.is-align-right .wui-grid-input { text-align: right; }
+.wui-grid-cell.is-align-center .wui-grid-input { text-align: center; }
+
+.wui-grid-index { font-size: var(--wui-fs-sm); color: var(--wui-muted); font-variant-numeric: tabular-nums; }
+.wui-grid-statusmark { display: inline-flex; align-items: center; justify-content: center; min-width: 28px; height: 18px; padding: 0 6px; border-radius: 999px; font-size: 10px; font-weight: 700; color: var(--wui-muted); }
+.wui-grid-statusmark.is-modified { color: var(--wui-warn-fg, #92400e); background: color-mix(in srgb, var(--wui-warn) 22%, transparent); }
+.wui-grid-statusmark.is-new { color: var(--wui-success-fg, #166534); background: color-mix(in srgb, var(--wui-success) 22%, transparent); }
+.wui-grid-text {
+  width: 100%;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-size: var(--wui-fs);
+  color: var(--wui-fg-soft);
+}
+.wui-grid-cell.is-align-right .wui-grid-text { text-align: right; }
+.wui-grid-cell.is-align-center .wui-grid-text { text-align: center; }
+
+.wui-grid-checkwrap { display: inline-flex; align-items: center; justify-content: center; width: 100%; height: 100%; }
+.wui-grid-check, .wui-grid-rowcheck, .wui-grid-headcheck {
+  width: 15px; height: 15px; margin: 0; cursor: pointer;
+  accent-color: var(--wui-primary);
+}
+.wui-grid-headcheck { width: 14px; height: 14px; }
+
+.wui-grid-radios { display: flex; align-items: center; gap: 8px; width: 100%; overflow: hidden; }
+.wui-grid-radio { display: inline-flex; align-items: center; gap: 3px; font-size: 11px; color: var(--wui-fg-soft); white-space: nowrap; cursor: pointer; }
+.wui-grid-radio input { margin: 0; accent-color: var(--wui-primary); width: 13px; height: 13px; cursor: pointer; }
+
+.wui-grid-sliderwrap { display: flex; align-items: center; gap: 6px; width: 100%; }
+.wui-grid-slider { flex: 1; min-width: 0; accent-color: var(--wui-primary); cursor: pointer; height: 16px; }
+.wui-grid-slider-out { min-width: 30px; text-align: right; font-size: 11px; color: var(--wui-muted); font-variant-numeric: tabular-nums; }
+
+.wui-grid-custom { width: 100%; min-width: 0; overflow: hidden; display: flex; align-items: center; }
+.wui-grid-custom > * { max-width: 100%; }
+
+/* ------------------------------- 푸터 / 상태 ------------------------------- */
+.wui-grid-footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 10px;
+  border-top: var(--wui-border-width) solid var(--wui-border);
+  background: var(--wui-surface-2);
+  font-size: var(--wui-fs-sm);
+  color: var(--wui-muted);
+  min-height: 30px;
+}
+.wui-grid-counts { white-space: nowrap; }
+.wui-grid-errorbtn {
+  border: 0; background: transparent; color: var(--wui-muted);
+  font: inherit; font-size: var(--wui-fs-sm); cursor: pointer;
+  padding: 2px 6px; border-radius: var(--wui-radius-sm);
+}
+.wui-grid-errorbtn:hover { background: var(--wui-hover); }
+.wui-grid-errorbtn.is-danger { color: var(--wui-danger); font-weight: 700; background: var(--wui-danger-weak); }
+.wui-grid-errorbtn:disabled { cursor: default; opacity: .65; }
+.wui-grid-status { color: var(--wui-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.wui-grid-loading {
+  position: absolute; inset: 0; z-index: 40;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  background: color-mix(in srgb, var(--wui-surface) 72%, transparent);
+  color: var(--wui-muted); font-weight: 600;
+  backdrop-filter: blur(1px);
+}
+.wui-grid-empty {
+  position: absolute; left: 0; right: 0; top: 96px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 6px; color: var(--wui-muted); text-align: center;
+  padding: 24px; pointer-events: none;
+}
+
+/* ------------------------------- 열 메뉴 ------------------------------- */
+.wui-grid-menu {
+  position: absolute;
+  z-index: 60;
+  min-width: 156px;
+  padding: 4px;
+  background: var(--wui-surface);
+  border: var(--wui-border-width) solid var(--wui-border);
+  border-radius: var(--wui-radius-sm);
+  box-shadow: var(--wui-shadow-lg);
+}
+.wui-grid-menuitem {
+  display: block;
+  width: 100%;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--wui-fg-soft);
+  font: inherit;
+  font-size: var(--wui-fs-sm);
+  text-align: left;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.wui-grid-menuitem:hover { background: var(--wui-hover); color: var(--wui-fg); }
+.wui-grid-menuitem:disabled { opacity: .45; cursor: default; background: transparent; }
+.wui-grid-menusep { height: 1px; margin: 4px 6px; background: var(--wui-border); }
+
+@media (max-width: 640px) {
+  .wui-grid-top { padding: 6px; }
+  .wui-grid-search { width: 100%; max-width: none; order: 10; }
+  .wui-grid-footer { flex-wrap: wrap; gap: 6px; }
+}

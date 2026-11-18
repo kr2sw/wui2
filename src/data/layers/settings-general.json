@@ -1,0 +1,151 @@
+{
+  "title": "일반 설정",
+  "description": "세부 입력 컨트롤 모음 (날짜/시간/숫자/체크박스/사용자 정의).",
+  "submitUrl": "/api/submit",
+  "actions": [
+    {
+      "label": "기본값",
+      "action": "reset"
+    },
+    {
+      "label": "저장",
+      "action": "submit",
+      "variant": "primary"
+    }
+  ],
+  "groups": [
+    {
+      "id": "general",
+      "title": "사이트",
+      "items": [
+        {
+          "name": "siteName",
+          "label": "사이트 이름",
+          "type": "text",
+          "span": 6,
+          "required": true
+        },
+        {
+          "name": "timezone",
+          "label": "시간대",
+          "type": "select",
+          "span": 3,
+          "options": [
+            "Asia/Seoul",
+            "UTC",
+            "Asia/Tokyo"
+          ],
+          "value": "Asia/Seoul"
+        },
+        {
+          "name": "locale",
+          "label": "언어",
+          "type": "select",
+          "span": 3,
+          "options": [
+            {
+              "value": "ko",
+              "label": "한국어"
+            },
+            {
+              "value": "en",
+              "label": "English"
+            },
+            {
+              "value": "ja",
+              "label": "日本語"
+            }
+          ],
+          "value": "ko"
+        },
+        {
+          "name": "openAt",
+          "label": "오픈 일시",
+          "type": "datetime",
+          "span": 4
+        },
+        {
+          "name": "dailyAt",
+          "label": "일일 점검 시간",
+          "type": "time",
+          "span": 4,
+          "value": "03:30"
+        },
+        {
+          "name": "maxRows",
+          "label": "최대 행 수",
+          "type": "number",
+          "span": 4,
+          "min": 10,
+          "max": 10000,
+          "value": 500
+        },
+        {
+          "name": "notify",
+          "label": "알림 사용",
+          "type": "checkbox",
+          "span": 3,
+          "value": true
+        },
+        {
+          "name": "maintenance",
+          "label": "점검 모드",
+          "type": "switch",
+          "span": 3
+        },
+        {
+          "name": "themeColor",
+          "label": "대표 색상",
+          "type": "color",
+          "span": 3,
+          "value": "#2f6fed"
+        },
+        {
+          "name": "retention",
+          "label": "보관 기간",
+          "type": "select",
+          "span": 3,
+          "options": [
+            "30일",
+            "90일",
+            "1년"
+          ],
+          "value": "90일"
+        },
+        {
+          "name": "memo",
+          "label": "운영 메모",
+          "type": "textarea",
+          "span": 12,
+          "rows": 3,
+          "value": "매주 월요일 오전에 점검합니다."
+        }
+      ]
+    },
+    {
+      "id": "actions-demo",
+      "title": "버튼 액션",
+      "description": "type:\"button\" 은 폼 값을 유지한 채 action 이벤트만 발생시킵니다.",
+      "items": [
+        {
+          "type": "button",
+          "name": "btn-json",
+          "span": 3,
+          "text": "값 JSON 내려받기",
+          "action": "json"
+        },
+        {
+          "type": "button",
+          "name": "btn-log",
+          "span": 3,
+          "text": "AJAX 로그 열기",
+          "action": "log"
+        },
+        {
+          "type": "spacer",
+          "span": 6
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,95 @@
+{
+  "title": "결재 문서 작성",
+  "description": "웹 에디터(서식·표·이미지) + 첨부 파일 + 결재선 트리.",
+  "actions": [
+    {
+      "label": "미리보기",
+      "action": "preview",
+      "variant": "ghost"
+    },
+    {
+      "label": "상신",
+      "action": "submit",
+      "variant": "primary"
+    }
+  ],
+  "groups": [
+    {
+      "id": "doc",
+      "title": "문서",
+      "items": [
+        {
+          "name": "title",
+          "label": "제목",
+          "type": "text",
+          "span": 8,
+          "required": true,
+          "placeholder": "문서 제목"
+        },
+        {
+          "name": "docType",
+          "label": "문서 종류",
+          "type": "select",
+          "span": 4,
+          "options": [
+            {
+              "value": "report",
+              "label": "보고서"
+            },
+            {
+              "value": "request",
+              "label": "요청서"
+            },
+            {
+              "value": "plan",
+              "label": "계획서"
+            }
+          ]
+        },
+        {
+          "name": "content",
+          "label": "본문",
+          "type": "editor",
+          "span": 12,
+          "height": 320,
+          "placeholder": "표·이미지·서식을 사용해 문서를 작성하세요."
+        },
+        {
+          "name": "attach",
+          "label": "첨부 파일",
+          "type": "file",
+          "span": 6,
+          "multiple": true,
+          "hint": "파일을 선택하면 목록에 표시됩니다."
+        },
+        {
+          "name": "cover",
+          "label": "대표 이미지",
+          "type": "image",
+          "span": 6
+        },
+        {
+          "name": "approvers",
+          "label": "결재선",
+          "type": "tree",
+          "span": 6,
+          "dataKey": "approvers",
+          "expandLevel": 1
+        },
+        {
+          "name": "keep",
+          "label": "보관 기간",
+          "type": "select",
+          "span": 6,
+          "options": [
+            "1년",
+            "3년",
+            "5년",
+            "영구"
+          ],
+          "value": "3년"
+        }
+      ]
+    }
+  ]
+}

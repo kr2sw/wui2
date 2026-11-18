@@ -1,0 +1,17 @@
+{
+  "name": "wui-web-ui-kit",
+  "version": "1.0.0",
+  "private": true,
+  "description": "바닐라 자바스크립트 웹 UI 키트 (웹에디터 · 편집형 그리드 · JSON 화면 배치 · 트리 · 스킨)",
+  "type": "module",
+  "scripts": {
+    "start": "node serve.mjs",
+    "build": "node tools/build-data.mjs && node tools/build-docs.mjs",
+    "build:data": "node tools/build-data.mjs",
+    "build:docs": "node tools/build-docs.mjs",
+    "check": "node tools/check.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

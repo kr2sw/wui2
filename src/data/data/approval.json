@@ -1,0 +1,82 @@
+{
+  "values": {
+    "title": "2026년 4분기 UI 개선 보고",
+    "docType": "report",
+    "content": "<h2>4분기 UI 개선 보고</h2>\n        <p>WUI 키트 도입 이후 화면 개발 리드타임이 <strong>38%</strong> 단축되었습니다.</p>\n        <table>\n          <thead><tr><th>항목</th><th>도입 전</th><th>도입 후</th></tr></thead>\n          <tbody>\n            <tr><td>화면 1개 개발</td><td>3.5일</td><td>2.1일</td></tr>\n            <tr><td>공통 컴포넌트</td><td>12개</td><td>34개</td></tr>\n            <tr><td>QA 결함</td><td>21건</td><td>9건</td></tr>\n          </tbody>\n        </table>\n        <p>다음 분기에는 스킨 토큰과 접근성 검사를 확대할 예정입니다.</p>",
+    "attach": [],
+    "cover": "",
+    "approvers": [
+      "dev-web",
+      "design-ui"
+    ],
+    "keep": "3년"
+  },
+  "trees": {
+    "approvers": [
+      {
+        "id": "company",
+        "label": "WUI 주식회사",
+        "icon": "🏢",
+        "expanded": true,
+        "children": [
+          {
+            "id": "dev",
+            "label": "개발본부",
+            "icon": "⌨️",
+            "children": [
+              {
+                "id": "dev-web",
+                "label": "웹플랫폼팀",
+                "icon": "🌐"
+              },
+              {
+                "id": "dev-mobile",
+                "label": "모바일팀",
+                "icon": "📱"
+              },
+              {
+                "id": "dev-qa",
+                "label": "품질관리팀",
+                "icon": "🧪"
+              }
+            ]
+          },
+          {
+            "id": "design",
+            "label": "디자인센터",
+            "icon": "🎨",
+            "children": [
+              {
+                "id": "design-ui",
+                "label": "UI팀",
+                "icon": "✏️"
+              },
+              {
+                "id": "design-brand",
+                "label": "브랜드팀",
+                "icon": "🖌️"
+              }
+            ]
+          },
+          {
+            "id": "business",
+            "label": "사업본부",
+            "icon": "📈",
+            "children": [
+              {
+                "id": "biz-sales",
+                "label": "영업1팀",
+                "icon": "🤝"
+              },
+              {
+                "id": "biz-cs",
+                "label": "고객지원팀",
+                "icon": "🎧"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

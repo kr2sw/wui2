@@ -1,0 +1,66 @@
+[
+  {
+    "id": "company",
+    "label": "WUI 주식회사",
+    "icon": "🏢",
+    "expanded": true,
+    "children": [
+      {
+        "id": "dev",
+        "label": "개발본부",
+        "icon": "⌨️",
+        "children": [
+          {
+            "id": "dev-web",
+            "label": "웹플랫폼팀",
+            "icon": "🌐"
+          },
+          {
+            "id": "dev-mobile",
+            "label": "모바일팀",
+            "icon": "📱"
+          },
+          {
+            "id": "dev-qa",
+            "label": "품질관리팀",
+            "icon": "🧪"
+          }
+        ]
+      },
+      {
+        "id": "design",
+        "label": "디자인센터",
+        "icon": "🎨",
+        "children": [
+          {
+            "id": "design-ui",
+            "label": "UI팀",
+            "icon": "✏️"
+          },
+          {
+            "id": "design-brand",
+            "label": "브랜드팀",
+            "icon": "🖌️"
+          }
+        ]
+      },
+      {
+        "id": "business",
+        "label": "사업본부",
+        "icon": "📈",
+        "children": [
+          {
+            "id": "biz-sales",
+            "label": "영업1팀",
+            "icon": "🤝"
+          },
+          {
+            "id": "biz-cs",
+            "label": "고객지원팀",
+            "icon": "🎧"
+          }
+        ]
+      }
+    ]
+  }
+]
