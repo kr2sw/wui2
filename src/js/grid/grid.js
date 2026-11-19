@@ -55,11 +55,17 @@ const DEFAULT_OPTIONS = {
   persistWidths: false,
   autoLoad: false,
   dataUrl: null,
+  tree: false,
+  treeColumn: null,
+  childrenKey: 'children',
+  defaultExpandLevel: 0,
+  indent: 18,
   onChange: null,
   onSave: null,
   onRowAdd: null,
   onSelect: null,
   onSort: null,
+  onExpand: null,
 };
 
 const ALIGN_RIGHT = new Set(['number', 'slider']);
@@ -151,6 +157,9 @@ export function createGrid(mount, options = {}) {
     viewEnd: -1,
     snapshot: new Map(),
     hasChanges: false,
+    roots: [],
+    expanded: new Set(),
+    treeMeta: new Map(),
   };
 
   let rowHeight = opts.rowHeight || 36;
@@ -160,6 +169,55 @@ export function createGrid(mount, options = {}) {
   let scrollRaf = null;
   let destroyed = false;
   let statusTimer = null;
+  let treeMode = !!(opts.tree || opts.treeColumn);
+  let treeColKey = opts.treeColumn || null;
+  const childrenKey = opts.childrenKey || 'children';
+
+  function cleanRow(row) {
+    const out = {};
+    for (const key of Object.keys(row)) {
+      if (treeMode && key === childrenKey) continue;
+      out[key] = row[key];
+    }
+    return out;
+  }
+
+  function nodeMeta(rid) { return state.treeMeta.get(rid) || null; }
+  function nodeLevel(rid) { const m = nodeMeta(rid); return m ? m.level : 0; }
+  function nodeHasChildren(row) {
+    if (!treeMode || !row) return false;
+    const ch = row[childrenKey];
+    return Array.isArray(ch) && ch.length > 0;
+  }
+  function isExpanded(rid) { return state.expanded.has(rid); }
+
+  function ingestTreeNode(source = {}, parentRid = null, level = 0, outFlat) {
+    const raw = isPlainObject(source) ? { ...source } : { value: source };
+    const childSrc = Array.isArray(raw[childrenKey]) ? raw[childrenKey] : [];
+    const row = { ...raw };
+    ridSeq += 1;
+    Object.defineProperty(row, '_rid', { value: `r${ridSeq}`, enumerable: false, configurable: true, writable: true });
+    for (const col of userColumns()) {
+      if (row[col.key] === undefined) row[col.key] = defaultFor(col);
+    }
+    const children = childSrc.map((c) => ingestTreeNode(c, row._rid, level + 1, outFlat));
+    row[childrenKey] = children;
+    state.treeMeta.set(row._rid, { level, parentRid });
+    state.rowMap.set(row._rid, row);
+    outFlat.push(row);
+    return row;
+  }
+
+  function applyDefaultExpand() {
+    state.expanded = new Set();
+    const lvl = opts.defaultExpandLevel;
+    if (lvl === 0 || lvl === '0' || lvl === false || lvl === null || lvl === undefined) return;
+    for (const row of state.data) {
+      if (!nodeHasChildren(row)) continue;
+      const level = nodeLevel(row._rid);
+      if (lvl === -1 || lvl === '-1' || level < Number(lvl)) state.expanded.add(row._rid);
+    }
+  }
 
   /* ------------------------------ 마크업 ------------------------------ */
   const rootEl = h('div.wui-grid', { 'data-wui-grid': id, role: 'grid', 'aria-label': opts.title || '데이터 그리드' });
@@ -291,6 +349,10 @@ export function createGrid(mount, options = {}) {
 
   /* ------------------------------ 뷰 계산 ------------------------------ */
   function rebuildView() {
+    if (treeMode) {
+      rebuildTreeView();
+      return;
+    }
     const q = state.query.trim().toLowerCase();
     const filters = Object.entries(state.filters).filter(([, v]) => String(v || '').trim() !== '');
     let rows = state.data;
@@ -331,6 +393,84 @@ export function createGrid(mount, options = {}) {
       rows = indexed.map((x) => x.row);
     }
     state.view = rows;
+  }
+
+  function rebuildTreeView() {
+    const q = state.query.trim().toLowerCase();
+    const filterEntries = Object.entries(state.filters).filter(([, v]) => String(v || '').trim() !== '');
+    const hasFilter = q || filterEntries.length;
+
+    function directMatch(row) {
+      let qOk = !q;
+      if (q) {
+        qOk = false;
+        for (const col of userColumns()) {
+          if (!col.filterable) continue;
+          const text = String(displayValue(col, row[col.key], row)).toLowerCase();
+          if (text.includes(q)) { qOk = true; break; }
+        }
+      }
+      if (!qOk) return false;
+      for (const [key, value] of filterEntries) {
+        const col = colByKey(key);
+        if (!col) continue;
+        const text = String(displayValue(col, row[key], row)).toLowerCase();
+        if (!text.includes(String(value).toLowerCase())) return false;
+      }
+      return true;
+    }
+
+    let keep = null;
+    if (hasFilter) {
+      keep = new Set();
+      const mark = (nodes) => {
+        let any = false;
+        for (const node of nodes) {
+          const children = node[childrenKey] || [];
+          const childAny = mark(children);
+          const self = directMatch(node);
+          if (self || childAny) { keep.add(node._rid); any = true; }
+        }
+        return any;
+      };
+      mark(state.roots);
+    }
+
+    if (state.sort.length) {
+      const sortNodes = (nodes) => {
+        const indexed = nodes.map((row, i) => ({ row, i }));
+        indexed.sort((a, b) => {
+          for (const s of state.sort) {
+            const col = colByKey(s.key);
+            const av = col && col.sortValue ? col.sortValue(a.row[s.key], a.row) : a.row[s.key];
+            const bv = col && col.sortValue ? col.sortValue(b.row[s.key], b.row) : b.row[s.key];
+            const r = cmp(av, bv, sortType(col));
+            if (r) return s.dir === 'desc' ? -r : r;
+          }
+          return a.i - b.i;
+        });
+        nodes.splice(0, nodes.length, ...indexed.map((x) => x.row));
+        for (const n of nodes) {
+          const ch = n[childrenKey];
+          if (ch && ch.length) sortNodes(ch);
+        }
+      };
+      sortNodes(state.roots);
+    }
+
+    const out = [];
+    const walk = (nodes) => {
+      for (const node of nodes) {
+        if (keep && !keep.has(node._rid)) continue;
+        out.push(node);
+        const children = node[childrenKey] || [];
+        if (!children.length) continue;
+        const open = hasFilter ? children.some((c) => keep.has(c._rid)) : state.expanded.has(node._rid);
+        if (open) walk(children);
+      }
+    };
+    walk(state.roots);
+    state.view = out;
   }
 
   /* ------------------------------ 셀 렌더 ------------------------------ */
@@ -479,6 +619,31 @@ export function createGrid(mount, options = {}) {
         'aria-label': label || '변경 없음',
       }, label || '');
     }
+    if (treeMode && col.key === treeColKey) {
+      const level = nodeLevel(row._rid);
+      const hasCh = nodeHasChildren(row);
+      const expanded = isExpanded(row._rid);
+      const toggle = hasCh
+        ? h('button.wui-grid-tree-toggle', {
+            type: 'button',
+            'data-tree-toggle': row._rid,
+            class: expanded ? 'is-expanded' : '',
+            'aria-label': expanded ? '접기' : '펼치기',
+            title: expanded ? '접기' : '펼치기',
+          })
+        : h('span.wui-grid-tree-spacer', { 'aria-hidden': 'true' });
+      let inner;
+      if (!col.editable) {
+        const text = displayValue(col, value, row);
+        if (col.type === 'badge') inner = h('span.wui-badge.wui-badge-muted', { title: text }, text || '-');
+        else inner = h('span.wui-grid-text', { title: text }, text || '');
+      } else {
+        inner = buildEditor(col, row);
+      }
+      const wrap = h('div.wui-grid-treecell', { style: { paddingLeft: `${level * (Number(opts.indent) || 18)}px` } }, toggle, inner);
+      if (col.type === 'custom' && inner && inner._ctx) wrap._custom = inner;
+      return wrap;
+    }
     if (!col.editable) {
       const text = displayValue(col, value, row);
       if (col.type === 'badge') {
@@ -510,7 +675,10 @@ export function createGrid(mount, options = {}) {
     if (err) { cell.classList.add('is-invalid'); cell.title = err; }
     const content = buildCellContent(col, row);
     cell.appendChild(content);
-    if (col.type === 'custom' && content && content._ctx) content._ctx.cell = cell;
+    if (col.type === 'custom') {
+      const ctxEl = (content && content._custom) ? content._custom : content;
+      if (ctxEl && ctxEl._ctx) ctxEl._ctx.cell = cell;
+    }
     return cell;
   }
 
@@ -894,8 +1062,33 @@ export function createGrid(mount, options = {}) {
     viewportEl.style.opacity = flag ? '.4' : '';
   }
 
+  let filterToggleBtn = null;
+
+  function updateFilterToggleBtn() {
+    if (!filterToggleBtn) return;
+    const on = !!opts.filterRow;
+    filterToggleBtn.classList.toggle('is-active', on);
+    filterToggleBtn.setAttribute('aria-pressed', String(on));
+  }
+
+  function setFilterRowEnabled(enabled, { clear = true } = {}) {
+    const on = Boolean(enabled);
+    if (!!opts.filterRow === on) {
+      updateFilterToggleBtn();
+      return on;
+    }
+    opts.filterRow = on;
+    if (!on && clear) state.filters = {};
+    refreshMetrics();
+    rerender();
+    updateFilterToggleBtn();
+    emitter.emit('filterrow', { enabled: on });
+    return on;
+  }
+
   function buildToolbar() {
     topEl.innerHTML = '';
+    filterToggleBtn = null;
     const hasTitle = opts.title || opts.description;
     topEl.classList.toggle('is-empty', !opts.toolbar && !hasTitle && !opts.search);
     if (!opts.toolbar && !opts.search && !hasTitle) { topEl.hidden = true; return; }
@@ -937,7 +1130,15 @@ export function createGrid(mount, options = {}) {
       const csvBtn = h('button.wui-btn.wui-btn-sm', { type: 'button', title: 'CSV 내보내기' }, 'CSV');
       csvBtn.addEventListener('click', () => api.downloadCSV());
 
-      append(topEl, [addBtn, delBtn, validBtn, saveBtn, csvBtn]);
+      filterToggleBtn = h('button.wui-btn.wui-btn-sm', {
+        type: 'button',
+        title: '열 필터 행 표시/숨김',
+        'aria-pressed': String(!!opts.filterRow),
+        class: opts.filterRow ? 'is-active' : '',
+      }, '필터');
+      filterToggleBtn.addEventListener('click', () => setFilterRowEnabled(!opts.filterRow));
+
+      append(topEl, [addBtn, delBtn, validBtn, saveBtn, csvBtn, filterToggleBtn]);
 
       if (opts.dataUrl) {
         const reloadBtn = h('button.wui-btn.wui-btn-sm', { type: 'button', title: '데이터 다시 불러오기' }, '새로고침');
@@ -989,6 +1190,7 @@ export function createGrid(mount, options = {}) {
     }
     if (e.target.closest('.wui-grid-resizer')) return;
     if (e.target.closest('[data-role="select-all"]')) return;
+    if (e.target.closest('.wui-grid-hfilter') || e.target.closest('[data-filter-key]')) return;
     const cell = e.target.closest('.wui-grid-hcell');
     if (!cell) return;
     const col = colByKey(cell.dataset.key);
@@ -1090,6 +1292,13 @@ export function createGrid(mount, options = {}) {
   rowsEl.addEventListener('click', (e) => {
     const rowEl = e.target.closest('.wui-grid-row');
     if (!rowEl) return;
+    const treeToggle = e.target.closest('[data-tree-toggle]');
+    if (treeToggle) {
+      e.preventDefault();
+      e.stopPropagation();
+      api.toggleExpand(treeToggle.dataset.treeToggle);
+      return;
+    }
     const interactive = e.target.closest('input,select,textarea,button,label,a');
     if (interactive) {
       if (!interactive.matches('[data-role="row-select"]') && !interactive.closest('.wui-grid-custom')) {
@@ -1236,23 +1445,99 @@ export function createGrid(mount, options = {}) {
     return '';
   }
 
+  function cleanTreeNode(node) {
+    const out = cleanRow(node);
+    if (treeMode && nodeHasChildren(node)) {
+      out[childrenKey] = (node[childrenKey] || []).map(cleanTreeNode);
+    } else if (treeMode) {
+      // keep no children key for leaves
+    }
+    return out;
+  }
+
   function setData(rows = []) {
     const list = Array.isArray(rows) ? rows : (rows.rows || rows.data || rows.items || []);
-    state.data = list.map((r) => normalizeRow(r));
     state.selection.clear();
     state.errors.clear();
     state.snapshot = new Map();
     state.hasChanges = false;
-    rebuildRowMap();
-    state.data.forEach(snapshotRow);
     state.anchorRid = null;
     viewportEl.scrollTop = 0;
+
+    if (treeMode) {
+      state.treeMeta = new Map();
+      state.rowMap = new Map();
+      state.roots = [];
+      const flat = [];
+      state.roots = list.map((r) => ingestTreeNode(r, null, 0, flat));
+      state.data = flat;
+      applyDefaultExpand();
+    } else {
+      state.data = list.map((r) => normalizeRow(r));
+      rebuildRowMap();
+    }
+    state.data.forEach(snapshotRow);
     rerender();
     emitter.emit('data', { rows: api.getData(), count: state.data.length });
     return state.data.length;
   }
 
-  function addRow(data = {}, { focus = true, markNew = true } = {}) {
+  function addRow(data = {}, { focus = true, markNew = true, parentRid = null } = {}) {
+    if (treeMode) {
+      const flat = [];
+      let targetParentRid = parentRid;
+      let level = 0;
+      let listRef = state.roots;
+      let at = state.roots.length;
+      if (!targetParentRid) {
+        const selectedRows = state.data.filter((r) => state.selection.has(r._rid));
+        if (selectedRows.length) {
+          const sel = selectedRows[selectedRows.length - 1];
+          const meta = nodeMeta(sel._rid);
+          targetParentRid = meta ? meta.parentRid : null;
+          level = meta ? meta.level : 0;
+          if (targetParentRid) {
+            const parent = state.rowMap.get(targetParentRid);
+            listRef = parent ? parent[childrenKey] : state.roots;
+          } else {
+            listRef = state.roots;
+          }
+          at = listRef.indexOf(sel) + 1;
+          if (at < 0) at = listRef.length;
+        }
+      } else {
+        const parent = state.rowMap.get(targetParentRid);
+        if (parent) {
+          listRef = parent[childrenKey] || (parent[childrenKey] = []);
+          level = nodeLevel(targetParentRid) + 1;
+          at = listRef.length;
+          state.expanded.add(targetParentRid);
+        } else {
+          targetParentRid = null;
+          listRef = state.roots;
+          level = 0;
+          at = state.roots.length;
+        }
+      }
+      const row = ingestTreeNode(data, targetParentRid, level, flat);
+      listRef.splice(at, 0, row);
+      // insert flat nodes into state.data (after last descendant of previous sibling or at end)
+      state.data.push(...flat);
+      if (!markNew) flat.forEach(snapshotRow);
+      recomputeHasChanges();
+      state.selection.clear();
+      state.selection.add(row._rid);
+      state.anchorRid = row._rid;
+      rerender();
+      const firstCol = userColumns().find((c) => c.editable);
+      if (focus && firstCol) {
+        setTimeout(() => api.focusCell(row._rid, firstCol.key), 20);
+      }
+      emitter.emit('rowadd', { row: cleanRow(row), index: at, status: rowStatus(row._rid) });
+      if (isFn(opts.onRowAdd)) opts.onRowAdd(cleanRow(row));
+      return row;
+    }
+
     const row = normalizeRow(data);
     const selectedRows = state.data.filter((r) => state.selection.has(r._rid));
     const at = selectedRows.length ? state.data.indexOf(selectedRows[selectedRows.length - 1]) + 1 : state.data.length;
@@ -1281,12 +1566,47 @@ export function createGrid(mount, options = {}) {
     const set = new Set(rids);
     if (!set.size) return 0;
     const before = state.data.length;
-    state.data = state.data.filter((r) => !set.has(r._rid));
-    for (const rid of set) {
-      state.selection.delete(rid);
-      state.errors.delete(rid);
-      state.snapshot.delete(rid);
-      state.rowMap.delete(rid);
+
+    if (treeMode) {
+      const toRemove = new Set(set);
+      // include descendants
+      const collect = (nodes) => {
+        for (const n of nodes) {
+          if (toRemove.has(n._rid)) {
+            const addDesc = (x) => {
+              toRemove.add(x._rid);
+              (x[childrenKey] || []).forEach(addDesc);
+            };
+            (n[childrenKey] || []).forEach(addDesc);
+          } else {
+            collect(n[childrenKey] || []);
+          }
+        }
+      };
+      collect(state.roots);
+      const prune = (nodes) => nodes.filter((n) => {
+        if (toRemove.has(n._rid)) return false;
+        if (n[childrenKey] && n[childrenKey].length) n[childrenKey] = prune(n[childrenKey]);
+        return true;
+      });
+      state.roots = prune(state.roots);
+      state.data = state.data.filter((r) => !toRemove.has(r._rid));
+      for (const rid of toRemove) {
+        state.selection.delete(rid);
+        state.errors.delete(rid);
+        state.snapshot.delete(rid);
+        state.rowMap.delete(rid);
+        state.treeMeta.delete(rid);
+        state.expanded.delete(rid);
+      }
+    } else {
+      state.data = state.data.filter((r) => !set.has(r._rid));
+      for (const rid of set) {
+        state.selection.delete(rid);
+        state.errors.delete(rid);
+        state.snapshot.delete(rid);
+        state.rowMap.delete(rid);
+      }
     }
     recomputeHasChanges();
     rerender();
@@ -1334,6 +1654,7 @@ export function createGrid(mount, options = {}) {
   }
 
   function getData() {
+    if (treeMode) return state.roots.map(cleanTreeNode);
     return state.data.map(cleanRow);
   }
 
@@ -1374,6 +1695,13 @@ export function createGrid(mount, options = {}) {
       if (search) search.value = '';
       const filterInputs = headerEl.querySelectorAll('[data-filter-key]');
       filterInputs.forEach((i) => { i.value = ''; });
+      if (treeMode) {
+        let cur = nodeMeta(rid);
+        while (cur && cur.parentRid) {
+          state.expanded.add(cur.parentRid);
+          cur = nodeMeta(cur.parentRid);
+        }
+      }
       rebuildView();
       index = state.view.indexOf(row);
     }
@@ -1395,6 +1723,45 @@ export function createGrid(mount, options = {}) {
     }, 20);
   }
 
+  function expandRow(rid, emit = true) {
+    if (!treeMode) return false;
+    const row = state.rowMap.get(rid);
+    if (!row || !nodeHasChildren(row) || state.expanded.has(rid)) return false;
+    state.expanded.add(rid);
+    rerender();
+    if (emit) emitter.emit('expand', { rid, expanded: true, row: cleanRow(row) });
+    if (isFn(opts.onExpand)) opts.onExpand({ rid, expanded: true, row: cleanRow(row) });
+    return true;
+  }
+
+  function collapseRow(rid, emit = true) {
+    if (!treeMode) return false;
+    const row = state.rowMap.get(rid);
+    if (!row || !nodeHasChildren(row) || !state.expanded.has(rid)) return false;
+    state.expanded.delete(rid);
+    rerender();
+    if (emit) emitter.emit('expand', { rid, expanded: false, row: cleanRow(row) });
+    if (isFn(opts.onExpand)) opts.onExpand({ rid, expanded: false, row: cleanRow(row) });
+    return true;
+  }
+
+  function toggleExpandRow(rid) {
+    if (!treeMode) return false;
+    return state.expanded.has(rid) ? collapseRow(rid) : expandRow(rid);
+  }
+
+  function expandAllRows() {
+    if (!treeMode) return;
+    for (const row of state.data) if (nodeHasChildren(row)) state.expanded.add(row._rid);
+    rerender();
+  }
+
+  function collapseAllRows() {
+    if (!treeMode) return;
+    state.expanded.clear();
+    rerender();
+  }
+
   function setCellValue(rid, key, value, options = {}) {
     commitValue(rid, key, value, { silent: true, ...options });
     renderRows(true);
@@ -1403,6 +1770,10 @@ export function createGrid(mount, options = {}) {
   function setColumns(columns) {
     const prevFrozen = new Map(state.columns.map((c) => [c.key, c.frozen]));
     state.columns = buildDisplayColumns(columns);
+    if (treeMode && !treeColKey) {
+      const first = userColumns()[0];
+      treeColKey = first ? first.key : null;
+    }
     state.columns.forEach((col) => {
       col.originalWidth = col.width;
       if (prevFrozen.has(col.key) && prevFrozen.get(col.key)) col.frozen = prevFrozen.get(col.key);
@@ -1491,11 +1862,19 @@ export function createGrid(mount, options = {}) {
     setData, getData, addRow, removeRows, load,
     setColumns, getColumns, setFrozen,
     setSort, clearSort, setFilter, setQuery,
+    setFilterRow(enabled) { return setFilterRowEnabled(enabled); },
+    toggleFilterRow() { return setFilterRowEnabled(!opts.filterRow); },
     validate, save, getChanges, getSelected, getVisible,
     focusCell, setCellValue, scrollToIndex,
     setRowHeight, setHeight, refreshMetrics,
     downloadCSV, updateWidths,
     getRowStatus(rid) { return rowStatus(rid); },
+    expand(rid) { return expandRow(rid); },
+    collapse(rid) { return collapseRow(rid); },
+    toggleExpand(rid) { return toggleExpandRow(rid); },
+    expandAll() { return expandAllRows(); },
+    collapseAll() { return collapseAllRows(); },
+    isExpanded(rid) { return isExpanded(rid); },
     selectAll() {
       state.view.forEach((r) => state.selection.add(r._rid));
       updateSelectionUI();
@@ -1518,6 +1897,8 @@ export function createGrid(mount, options = {}) {
     get rowHeight() { return rowHeight; },
     get hasChanges() { return state.hasChanges; },
     get errorCount() { return countErrors(); },
+    get filterRow() { return !!opts.filterRow; },
+    get tree() { return !!treeMode; },
   };
 
   /* ------------------------------ 초기화 ------------------------------ */

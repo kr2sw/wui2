@@ -296,3 +296,40 @@
   .wui-grid-search { width: 100%; max-width: none; order: 10; }
   .wui-grid-footer { flex-wrap: wrap; gap: 6px; }
 }
+
+/* ------------------------------- 셀 타입: 커스텀 ------------------------------- */
+.wui-grid-custom { width: 100%; min-width: 0; overflow: hidden; display: flex; align-items: center; }
+.wui-grid-custom > * { max-width: 100%; }
+
+/* ------------------------------- 트리(계층) ------------------------------- */
+.wui-grid-treecell {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  min-width: 0;
+}
+.wui-grid-treecell .wui-grid-text,
+.wui-grid-treecell .wui-grid-input,
+.wui-grid-treecell .wui-grid-select,
+.wui-grid-treecell .wui-grid-custom,
+.wui-grid-treecell .wui-badge { flex: 1; min-width: 0; }
+.wui-grid-tree-toggle {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--wui-muted);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+.wui-grid-tree-toggle:hover { background: var(--wui-hover); color: var(--wui-fg); }
+.wui-grid-tree-toggle::before { content: '▶'; font-size: 9px; display: inline-block; transition: transform .12s ease; }
+.wui-grid-tree-toggle.is-expanded::before { transform: rotate(90deg); }
+.wui-grid-tree-spacer { flex: none; width: 18px; height: 18px; display: inline-block; }

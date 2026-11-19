@@ -138,20 +138,22 @@ const grid = WUI.createGrid(mount, options);
 | --- | --- | --- |
 | `id` | 자동 | 인스턴스 id |
 | `title` / `description` | `''` | 제목/설명 |
-| `columns` / `data` | `[]` | 컬럼/초기 행 |
+| `columns` / `data` | `[]` | 컬럼/초기 행(트리 모드: 중첩 `children`) |
 | `height` / `maxHeight` / `minHeight` | `420` / `560` / `160` | 높이 |
 | `rowHeight` / `headerHeight` | CSS 변수/36, 38 | 행/헤더 높이 |
 | `virtual` / `overscan` | `true` / `6` | 가상 스크롤 |
-| `selectable` / `checkboxColumn` / `indexColumn` | `true` | 선택/체크박스/번호 열 |
+| `selectable` / `checkboxColumn` / `indexColumn` / `statusColumn` | `true` / `true` / `true` / `false` | 선택/체크박스/번호/수정상태 열 |
 | `stickyHeader` / `zebra` | `true` | 헤더 고정/줄무늬 |
 | `resizable` / `sortable` / `multiSort` | `true` | 너비/정렬 |
-| `search` / `filterRow` | `true` / `false` | 전체 검색/열 필터 |
+| `search` / `filterRow` | `true` / `false` | 전체 검색/열 필터 행 |
 | `toolbar` / `footer` / `showCount` | `true` | 도구 모음/집계/건수 |
 | `emptyText` | `'데이터가 없습니다.'` | 빈 상태 문구 |
 | `rowClass` | `null` | `(row) => string` |
 | `persistWidths` | `false` | 너비 localStorage 저장 |
 | `autoLoad` / `dataUrl` | `false` / `null` | 생성 시 AJAX 로드 |
-| `onChange` / `onSave` / `onRowAdd` / `onSelect` / `onSort` | `null` | 콜백 |
+| `tree` / `treeColumn` / `childrenKey` | `false` / 첫 사용자 컬럼 / `'children'` | 계층(트리) 행 |
+| `defaultExpandLevel` / `indent` | `0` / `18` | 트리 초기 펼침 레벨/들여쓰기(px) |
+| `onChange` / `onSave` / `onRowAdd` / `onSelect` / `onSort` / `onExpand` | `null` | 콜백 |
 
 ### 컬럼
 
@@ -161,20 +163,21 @@ const grid = WUI.createGrid(mount, options);
 
 | 그룹 | 메서드 |
 | --- | --- |
-| 데이터 | `setData(rows)`, `getData()`, `addRow(data?, { focus })`, `removeRows(rids)`, `load(url, opts?)` |
+| 데이터 | `setData(rows)`, `getData()`, `addRow(data?, { focus, markNew, parentRid })`, `removeRows(rids)`, `load(url, opts?)` |
 | 컬럼 | `setColumns(cols)`, `getColumns()`, `setFrozen(key, side)`, `updateWidths()` |
-| 정렬/필터 | `setSort(key, dir, { additive })`, `clearSort()`, `setFilter(key, value)`, `setQuery(value)` |
+| 정렬/필터 | `setSort(key, dir, { additive })`, `clearSort()`, `setFilter(key, value)`, `setQuery(value)`, `setFilterRow(enabled)`, `toggleFilterRow()` |
 | 선택 | `selectAll()`, `clearSelection()`, `selectRow(rid)`, `getSelected()`, `getVisible()` |
-| 검증/저장 | `validate()`, `save()`, `getChanges()`, `downloadCSV(filename?)` |
+| 트리 | `expand(rid)`, `collapse(rid)`, `toggleExpand(rid)`, `expandAll()`, `collapseAll()`, `isExpanded(rid)` |
+| 검증/저장 | `validate()`, `save()`, `getChanges()`, `getRowStatus(rid)`, `downloadCSV(filename?)` |
 | 셀/스크롤 | `focusCell(rid, key)`, `setCellValue(rid, key, value, opts?)`, `scrollToIndex(index)` |
 | 크기/상태 | `setRowHeight(px)`, `setHeight(value)`, `refreshMetrics()`, `setLoading(flag)`, `setStatus(message, tone)` |
 | 공통 | `on/off/destroy` |
 
-getter: `el`, `id`, `viewport`, `rowHeight`, `hasChanges`, `errorCount`
+getter: `el`, `id`, `viewport`, `rowHeight`, `hasChanges`, `errorCount`, `filterRow`, `tree`
 
 ### 이벤트
 
-`ready`, `data`, `change`, `edit`, `select`, `sort`, `columns`, `resize`, `rowadd`, `rowremove`, `validate`, `save`, `load`, `loaderror`, `footer`
+`ready`, `data`, `change`, `edit`, `select`, `sort`, `columns`, `resize`, `rowadd`, `rowremove`, `validate`, `save`, `load`, `loaderror`, `expand`, `filterrow`, `footer`
 
 ## 5. 트리
 

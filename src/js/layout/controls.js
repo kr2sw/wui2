@@ -406,10 +406,17 @@ registerControl('grid', (ctx) => {
     selectable: ctx.def.selectable !== false,
     checkboxColumn: ctx.def.checkboxColumn !== false,
     indexColumn: ctx.def.indexColumn !== false,
+    statusColumn: Boolean(ctx.def.statusColumn),
     filterRow: Boolean(ctx.def.filterRow),
+    tree: Boolean(ctx.def.tree),
+    treeColumn: ctx.def.treeColumn || null,
+    childrenKey: ctx.def.childrenKey || 'children',
+    defaultExpandLevel: ctx.def.defaultExpandLevel ?? 0,
+    indent: ctx.def.indent,
     title: ctx.def.title || '',
-    onChange: (payload) => ctx.onChange(gridApi.getData()),
+    onChange: () => ctx.onChange(gridApi.getData()),
     onSave: (rows) => ctx.onChange(rows),
+    onExpand: ctx.def.onExpand,
   });
   return {
     el: mount,
@@ -523,6 +530,346 @@ registerControl('tree-grid', (ctx) => {
     grid: gridApi,
   };
 }, { label: '트리 그리드' });
+
+/* ------------------------------ 콤보/스플리터 ------------------------------ */
+function comboBase(ctx) {
+  let current = ctx.value;
+  let open = false;
+  let disabled = Boolean(ctx.disabled || ctx.readOnly);
+  const popupClass = ctx.def.popupClass || '';
+  const wrap = h('div.wui-combo', { class: disabled ? 'is-disabled' : '' });
+  const trigger = h('button.wui-combo-trigger', { type: 'button', disabled });
+  const valueEl = h('span.wui-combo-value');
+  const arrow = h('span.wui-combo-arrow', {}, '▼');
+  trigger.append(valueEl, arrow);
+  const popup = h('div.wui-combo-popup' + (popupClass ? '.' + popupClass : ''), { hidden: true });
+  wrap.append(trigger, popup);
+
+  function getOpts() { return normalizeOptions(ctx.def.options || [], null); }
+  function close() {
+    if (!open) return;
+    open = false; wrap.classList.remove('is-open'); popup.hidden = true;
+  }
+  function syncValue() { /* overridden */ }
+  function renderPopup() { /* overridden */ }
+  function openPopup() {
+    if (disabled) return;
+    open = true; wrap.classList.add('is-open'); popup.hidden = false;
+    renderPopup();
+  }
+  function toggle() { if (disabled) return; open ? close() : openPopup(); }
+
+  trigger.addEventListener('click', (e) => { e.preventDefault(); toggle(); });
+  trigger.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { close(); trigger.focus(); }
+    else if ((e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') && !open) { e.preventDefault(); openPopup(); }
+  });
+
+  const onDoc = (e) => { if (open && !wrap.contains(e.target)) close(); };
+  document.addEventListener('mousedown', onDoc);
+
+  const api = {
+    wrap, trigger, valueEl, popup, getOpts, close, openPopup, toggle,
+    get current() { return current; },
+    setCurrent(v, opts = {}) {
+      current = v;
+      syncValue();
+      if (opts.emit !== false) ctx.onChange(v);
+    },
+    setSync(fn) { syncValue = fn; syncValue(); },
+    setRender(fn) { renderPopup = fn; },
+    setDisabled(flag) {
+      disabled = Boolean(flag);
+      wrap.classList.toggle('is-disabled', disabled);
+      trigger.disabled = disabled;
+      if (disabled) close();
+    },
+    destroy() { document.removeEventListener('mousedown', onDoc); wrap.remove(); },
+  };
+  return api;
+}
+
+registerControl('image-combo', (ctx) => {
+  const c = comboBase(ctx);
+  c.setSync(() => {
+    const opts = c.getOpts();
+    const sel = opts.find((o) => String(o.value) === String(c.current));
+    c.valueEl.innerHTML = '';
+    c.valueEl.classList.toggle('is-placeholder', !sel);
+    if (!sel) { c.valueEl.textContent = ctx.def.placeholder || '선택'; return; }
+    const src = sel.raw?.image || sel.raw?.img || sel.raw?.src || sel.raw?.icon;
+    if (src) c.valueEl.appendChild(h('img.wui-combo-thumb', { src, alt: '' }));
+    c.valueEl.appendChild(document.createTextNode(sel.label != null ? String(sel.label) : String(sel.value)));
+  });
+  c.setRender(() => {
+    const opts = c.getOpts();
+    c.popup.innerHTML = '';
+    if (!opts.length) { c.popup.appendChild(h('div.wui-combo-empty', {}, '항목 없음')); return; }
+    for (const opt of opts) {
+      const selected = String(opt.value) === String(c.current);
+      const src = opt.raw?.image || opt.raw?.img || opt.raw?.src || opt.raw?.icon;
+      const btn = h('button.wui-combo-option', { type: 'button', class: selected ? 'is-selected' : '', disabled: opt.disabled });
+      if (src) btn.appendChild(h('img.wui-combo-thumb', { src, alt: '' }));
+      btn.appendChild(h('span', {}, opt.label != null ? String(opt.label) : String(opt.value)));
+      btn.addEventListener('click', () => {
+        if (opt.disabled) return;
+        c.setCurrent(opt.value);
+        c.close();
+        c.trigger.focus();
+      });
+      c.popup.appendChild(btn);
+    }
+  });
+  return {
+    el: c.wrap,
+    getValue: () => c.current ?? null,
+    setValue: (v) => c.setCurrent(v, { emit: false }),
+    focus: () => c.trigger.focus(),
+    setDisabled: (f) => c.setDisabled(f),
+    destroy: () => c.destroy(),
+  };
+}, { label: '이미지 콤보' });
+
+registerControl('checkbox-combo', (ctx) => {
+  const c = comboBase(ctx);
+  if (!Array.isArray(c.current)) c.current = Array.isArray(ctx.value) ? [...ctx.value] : [];
+  c.setSync(() => {
+    const opts = c.getOpts();
+    const vals = Array.isArray(c.current) ? c.current.map(String) : [];
+    const selected = opts.filter((o) => vals.includes(String(o.value)));
+    c.valueEl.innerHTML = '';
+    c.valueEl.classList.toggle('is-placeholder', !selected.length);
+    if (!selected.length) { c.valueEl.textContent = ctx.def.placeholder || '선택'; return; }
+    const text = selected.length <= 2
+      ? selected.map((o) => (o.label != null ? o.label : o.value)).join(', ')
+      : selected.length + '개 선택';
+    c.valueEl.textContent = String(text);
+  });
+  c.setRender(() => {
+    const opts = c.getOpts();
+    const vals = new Set((Array.isArray(c.current) ? c.current : []).map(String));
+    c.popup.innerHTML = '';
+    if (!opts.length) { c.popup.appendChild(h('div.wui-combo-empty', {}, '항목 없음')); return; }
+    for (const opt of opts) {
+      const checked = vals.has(String(opt.value));
+      const btn = h('button.wui-combo-option', { type: 'button', class: checked ? 'is-selected' : '', disabled: opt.disabled });
+      const cb = h('input', { type: 'checkbox', checked, tabindex: '-1' });
+      cb.disabled = Boolean(opt.disabled);
+      btn.append(h('span.wui-check', {}, cb, h('span', {}, opt.label != null ? String(opt.label) : String(opt.value))));
+      btn.addEventListener('click', () => {
+        if (opt.disabled) return;
+        const next = new Set((Array.isArray(c.current) ? c.current : []).map(String));
+        if (next.has(String(opt.value))) next.delete(String(opt.value)); else next.add(String(opt.value));
+        const mapped = opts.filter((o) => next.has(String(o.value))).map((o) => o.value);
+        c.setCurrent(mapped);
+        c.renderPopup();
+      });
+      c.popup.appendChild(btn);
+    }
+  });
+  c.setSync(() => {
+    const opts = c.getOpts();
+    const vals = Array.isArray(c.current) ? c.current.map(String) : [];
+    const selected = opts.filter((o) => vals.includes(String(o.value)));
+    c.valueEl.innerHTML = '';
+    c.valueEl.classList.toggle('is-placeholder', !selected.length);
+    if (!selected.length) { c.valueEl.textContent = ctx.def.placeholder || '선택'; return; }
+    const text = selected.length <= 2
+      ? selected.map((o) => (o.label != null ? o.label : o.value)).join(', ')
+      : selected.length + '개 선택';
+    c.valueEl.textContent = String(text);
+  });
+  return {
+    el: c.wrap,
+    getValue: () => (Array.isArray(c.current) ? [...c.current] : []),
+    setValue: (v) => c.setCurrent(Array.isArray(v) ? [...v] : (v == null || v === '' ? [] : [v]), { emit: false }),
+    focus: () => c.trigger.focus(),
+    setDisabled: (f) => c.setDisabled(f),
+    destroy: () => c.destroy(),
+  };
+}, { label: '체크박스 콤보' });
+
+registerControl('tree-combo', (ctx) => {
+  ctx.def.popupClass = 'wui-combo-tree';
+  const c = comboBase(ctx);
+  let treeApi = null;
+  let suppressSelect = false;
+  const data = ctx.def.data || (ctx.options.data && ctx.options.data.trees && ctx.options.data.trees[ctx.def.dataKey]) || ctx.def.options || [];
+  function findLabel(nodes, id) {
+    for (const n of nodes || []) {
+      const nid = n.id != null ? String(n.id) : null;
+      if (nid === String(id)) return n.label || n.text || nid;
+      const found = findLabel(n.children, id);
+      if (found) return found;
+    }
+    return null;
+  }
+  c.setSync(() => {
+    c.valueEl.innerHTML = '';
+    const has = c.current != null && c.current !== '';
+    c.valueEl.classList.toggle('is-placeholder', !has);
+    if (!has) { c.valueEl.textContent = ctx.def.placeholder || '선택'; return; }
+    let label = null;
+    if (treeApi && isFn(treeApi.getNode)) {
+      try { const node = treeApi.getNode(c.current); if (node) label = node.label; } catch (_) {}
+    }
+    if (!label) label = findLabel(Array.isArray(data) ? data : [], c.current);
+    c.valueEl.textContent = label || String(c.current);
+  });
+  c.setRender(() => {
+    c.popup.innerHTML = '';
+    const mount = h('div');
+    c.popup.appendChild(mount);
+    try { if (treeApi) treeApi.destroy(); } catch (_) {}
+    suppressSelect = false;
+    treeApi = createTree(mount, {
+      data: Array.isArray(data) ? data : [],
+      checkable: false,
+      showSearch: ctx.def.search !== false,
+      showActions: false,
+      defaultExpandLevel: ctx.def.expandLevel ?? 1,
+      onSelect: (node) => {
+        if (!node) return;
+        if (suppressSelect) {
+          c.setCurrent(node.id, { emit: false });
+          return;
+        }
+        c.setCurrent(node.id);
+        c.close();
+        c.trigger.focus();
+      },
+    });
+    if (c.current != null && c.current !== '') {
+      try {
+        suppressSelect = true;
+        if (isFn(treeApi.expandTo)) treeApi.expandTo(c.current);
+        if (isFn(treeApi.select)) treeApi.select(c.current);
+      } catch (_) {}
+      suppressSelect = false;
+    }
+  });
+  return {
+    el: c.wrap,
+    getValue: () => (c.current ?? null),
+    setValue: (v) => c.setCurrent(v, { emit: false }),
+    focus: () => c.trigger.focus(),
+    setDisabled: (f) => c.setDisabled(f),
+    destroy: () => { try { if (treeApi) treeApi.destroy(); } catch (_) {} c.destroy(); },
+    tree: () => treeApi,
+  };
+}, { label: '트리 콤보' });
+
+registerControl('splitter', (ctx) => {
+  const orientation = ctx.def.orientation === 'vertical' ? 'vertical' : 'horizontal';
+  let ratio = typeof ctx.def.ratio === 'number' ? ctx.def.ratio : (typeof ctx.value === 'number' ? ctx.value : 0.5);
+  ratio = Math.min(0.9, Math.max(0.1, ratio));
+  const minSize = Number(ctx.def.minSize || ctx.def.min || 60);
+  const gutterSize = Number(ctx.def.gutterSize || ctx.def.gutter || 8);
+  const height = ctx.def.height || 220;
+  const panesDef = Array.isArray(ctx.def.panes) ? ctx.def.panes : [ctx.def.pane1 || ctx.def.first || {}, ctx.def.pane2 || ctx.def.second || {}];
+
+  const root = h('div.wui-splitter' + (orientation === 'vertical' ? '.is-vertical' : '.is-horizontal'), {
+    style: { height: typeof height === 'number' ? (height + 'px') : String(height) },
+  });
+
+  function paneContent(def) {
+    const p = h('div.wui-splitter-pane');
+    if (def && def.title) p.appendChild(h('div.wui-splitter-pane-title', {}, def.title));
+    if (def && def.html) {
+      const ctn = h('div'); ctn.innerHTML = String(def.html); p.appendChild(ctn);
+    } else if (def && def.text) {
+      p.appendChild(h('div', {}, String(def.text)));
+    } else if (def && isFn(def.render)) {
+      const out = def.render({ def, ctx });
+      if (out instanceof Node) p.appendChild(out);
+      else if (out != null) { const ctn = h('div'); ctn.innerHTML = String(out); p.appendChild(ctn); }
+    }
+    return p;
+  }
+
+  const pane1 = paneContent(panesDef[0] || {});
+  const pane2 = paneContent(panesDef[1] || {});
+  const gutter = h('div.wui-splitter-gutter', { role: 'separator', 'aria-orientation': orientation, tabindex: '0', title: '드래그하여 크기 조절' });
+  root.append(pane1, gutter, pane2);
+
+  function apply() {
+    const total = orientation === 'horizontal' ? root.clientWidth : root.clientHeight;
+    const avail = Math.max(0, total - gutterSize);
+    if (avail <= 0) return;
+    let first = Math.round(avail * ratio);
+    first = Math.max(minSize, Math.min(avail - minSize, first));
+    const second = Math.max(0, avail - first);
+    if (orientation === 'horizontal') {
+      pane1.style.flex = '0 0 ' + first + 'px';
+      pane1.style.width = first + 'px';
+      pane2.style.flex = '1 1 ' + second + 'px';
+      pane2.style.width = '';
+      pane1.style.height = '100%';
+      pane2.style.height = '100%';
+    } else {
+      pane1.style.flex = '0 0 ' + first + 'px';
+      pane1.style.height = first + 'px';
+      pane2.style.flex = '1 1 ' + second + 'px';
+      pane2.style.height = '';
+      pane1.style.width = '100%';
+      pane2.style.width = '100%';
+    }
+    gutter.style.flex = '0 0 ' + gutterSize + 'px';
+  }
+
+  requestAnimationFrame(apply);
+  let ro = null;
+  if (typeof ResizeObserver !== 'undefined') {
+    ro = new ResizeObserver(() => apply());
+    ro.observe(root);
+  }
+
+  let dragging = false;
+  function onMove(e) {
+    if (!dragging) return;
+    const rect = root.getBoundingClientRect();
+    const total = orientation === 'horizontal' ? rect.width : rect.height;
+    const avail = Math.max(1, total - gutterSize);
+    let pos = orientation === 'horizontal' ? (e.clientX - rect.left) : (e.clientY - rect.top);
+    pos = Math.max(minSize, Math.min(avail - minSize, pos));
+    ratio = pos / avail;
+    apply();
+  }
+  function onUp() {
+    if (!dragging) return;
+    dragging = false;
+    root.classList.remove('is-dragging');
+    window.removeEventListener('mousemove', onMove);
+    window.removeEventListener('mouseup', onUp);
+    ctx.onChange(Number(ratio.toFixed(4)));
+  }
+  gutter.addEventListener('mousedown', (e) => {
+    e.preventDefault();
+    dragging = true;
+    root.classList.add('is-dragging');
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+  });
+  gutter.addEventListener('keydown', (e) => {
+    const step = e.shiftKey ? 0.1 : 0.02;
+    if ((orientation === 'horizontal' && e.key === 'ArrowLeft') || (orientation === 'vertical' && e.key === 'ArrowUp')) {
+      e.preventDefault();
+      ratio = Math.max(0.1, ratio - step); apply(); ctx.onChange(Number(ratio.toFixed(4)));
+    } else if ((orientation === 'horizontal' && e.key === 'ArrowRight') || (orientation === 'vertical' && e.key === 'ArrowDown')) {
+      e.preventDefault();
+      ratio = Math.min(0.9, ratio + step); apply(); ctx.onChange(Number(ratio.toFixed(4)));
+    }
+  });
+
+  return {
+    el: root,
+    getValue: () => Number(ratio.toFixed(4)),
+    setValue: (v) => { if (typeof v === 'number' && isFinite(v)) { ratio = Math.min(0.9, Math.max(0.1, v)); apply(); } },
+    focus: () => gutter.focus(),
+    setDisabled: () => {},
+    destroy: () => { try { if (ro) ro.disconnect(); } catch (_) {} root.remove(); },
+  };
+}, { label: '스플리터' });
 
 /* ------------------------------ 사용자 정의 ------------------------------ */
 registerControl('custom', (ctx) => {

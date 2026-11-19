@@ -33,7 +33,7 @@ const DEFAULTS = {
 
 const BARE_TYPES = new Set(['html', 'heading', 'divider', 'spacer', 'button', 'hidden', 'checkbox', 'switch']);
 const NO_VALUE_TYPES = new Set(['html', 'heading', 'divider', 'spacer', 'button', 'static']);
-const WIDE_TYPES = new Set(['editor', 'grid', 'tree', 'html', 'divider', 'heading']);
+const WIDE_TYPES = new Set(['editor', 'grid', 'tree', 'tree-grid', 'html', 'divider', 'heading', 'splitter']);
 
 let layoutSeq = 0;
 

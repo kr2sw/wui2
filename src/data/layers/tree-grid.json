@@ -148,6 +148,82 @@
       ]
     },
     {
+      "id": "hier-grid",
+      "title": "계층(트리) 그리드 예제",
+      "description": "그리드 컴포넌트의 tree 옵션으로 부모-자식 행을 한 그리드 안에서 계층 편집합니다.",
+      "items": [
+        {
+          "type": "grid",
+          "name": "wbs",
+          "span": 12,
+          "dataKey": "wbs",
+          "height": 320,
+          "tree": true,
+          "treeColumn": "name",
+          "childrenKey": "children",
+          "defaultExpandLevel": 1,
+          "statusColumn": true,
+          "filterRow": true,
+          "search": true,
+          "columns": [
+            {
+              "key": "name",
+              "title": "항목",
+              "type": "text",
+              "width": 260,
+              "frozen": "left",
+              "required": true
+            },
+            {
+              "key": "owner",
+              "title": "담당자",
+              "type": "text",
+              "width": 110
+            },
+            {
+              "key": "type",
+              "title": "구분",
+              "type": "select",
+              "width": 100,
+              "options": [
+                "조직",
+                "팀",
+                "업무"
+              ]
+            },
+            {
+              "key": "status",
+              "title": "상태",
+              "type": "select",
+              "width": 110,
+              "options": [
+                {
+                  "value": "active",
+                  "label": "진행"
+                },
+                {
+                  "value": "hold",
+                  "label": "보류"
+                },
+                {
+                  "value": "done",
+                  "label": "완료"
+                }
+              ]
+            },
+            {
+              "key": "progress",
+              "title": "진행률",
+              "type": "slider",
+              "width": 180,
+              "min": 0,
+              "max": 100
+            }
+          ]
+        }
+      ]
+    },
+    {
       "id": "guide",
       "title": "화면 구성 안내",
       "items": [

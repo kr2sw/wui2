@@ -389,6 +389,38 @@ const treeGridLayer = {
       ],
     },
     {
+      id: 'hier-grid',
+      title: '계층(트리) 그리드 예제',
+      description: '그리드 컴포넌트의 tree 옵션으로 부모-자식 행을 한 그리드 안에서 계층 편집합니다.',
+      items: [
+        {
+          type: 'grid',
+          name: 'wbs',
+          span: 12,
+          dataKey: 'wbs',
+          height: 320,
+          tree: true,
+          treeColumn: 'name',
+          childrenKey: 'children',
+          defaultExpandLevel: 1,
+          statusColumn: true,
+          filterRow: true,
+          search: true,
+          columns: [
+            { key: 'name', title: '항목', type: 'text', width: 260, frozen: 'left', required: true },
+            { key: 'owner', title: '담당자', type: 'text', width: 110 },
+            { key: 'type', title: '구분', type: 'select', width: 100, options: ['조직', '팀', '업무'] },
+            { key: 'status', title: '상태', type: 'select', width: 110, options: [
+              { value: 'active', label: '진행' },
+              { value: 'hold', label: '보류' },
+              { value: 'done', label: '완료' },
+            ] },
+            { key: 'progress', title: '진행률', type: 'slider', width: 180, min: 0, max: 100 },
+          ],
+        },
+      ],
+    },
+    {
       id: 'guide',
       title: '화면 구성 안내',
       items: [
@@ -563,6 +595,44 @@ export const dataMap = {
         { task: '브랜드 아이콘 세트 업데이트', owner: '강수아', dept: 'design-brand', due: '2026-11-26', priority: 'low', progress: 20, done: false, note: '' },
         { task: '파트너 제안서 템플릿 작성', owner: '윤지호', dept: 'biz-sales', due: '2026-11-25', priority: 'high', progress: 10, done: false, note: '신규 거래처용' },
         { task: '고객 문의 FAQ 정비', owner: '임하은', dept: 'biz-cs', due: '2026-11-19', priority: 'normal', progress: 100, done: true, note: '배포 완료' },
+      ],
+      wbs: [
+        {
+          name: '개발본부', owner: '김민준', type: '조직', status: 'active', progress: 62,
+          children: [
+            {
+              name: '웹플랫폼팀', owner: '이서연', type: '팀', status: 'active', progress: 70,
+              children: [
+                { name: '디자인 시스템 토큰 정리', owner: '박도윤', type: '업무', status: 'active', progress: 85 },
+                { name: '접근성 점검 자동화', owner: '최지우', type: '업무', status: 'hold', progress: 40 },
+              ],
+            },
+            {
+              name: '모바일팀', owner: '정하준', type: '팀', status: 'active', progress: 48,
+              children: [
+                { name: '푸시 알림 설정 화면', owner: '강수아', type: '업무', status: 'active', progress: 55 },
+                { name: '앱 내 검색 개선', owner: '조은우', type: '업무', status: 'active', progress: 30 },
+              ],
+            },
+          ],
+        },
+        {
+          name: '디자인센터', owner: '윤지호', type: '조직', status: 'active', progress: 58,
+          children: [
+            {
+              name: 'UI팀', owner: '장서준', type: '팀', status: 'active', progress: 60,
+              children: [
+                { name: '컴포넌트 스펙 문서화', owner: '임하은', type: '업무', status: 'active', progress: 50 },
+              ],
+            },
+            {
+              name: '브랜드팀', owner: '한예준', type: '팀', status: 'done', progress: 100,
+              children: [
+                { name: '아이콘 세트 업데이트', owner: '오지안', type: '업무', status: 'done', progress: 100 },
+              ],
+            },
+          ],
+        },
       ],
     },
     trees: { departments: DEPARTMENT_TREE },

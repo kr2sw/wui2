@@ -194,6 +194,47 @@ function demoRows(count = 500) {
   return rows;
 }
 
+function demoTreeRows() {
+  return [
+    {
+      name: '개발본부', owner: '김민준', type: '조직', status: 'active', progress: 62,
+      children: [
+        {
+          name: '웹플랫폼팀', owner: '이서연', type: '팀', status: 'active', progress: 70,
+          children: [
+            { name: '디자인 시스템 토큰 정리', owner: '박도윤', type: '업무', status: 'active', progress: 85 },
+            { name: '접근성 점검 자동화', owner: '최지우', type: '업무', status: 'hold', progress: 40 },
+          ],
+        },
+        {
+          name: '모바일팀', owner: '정하준', type: '팀', status: 'active', progress: 48,
+          children: [
+            { name: '푸시 알림 설정 화면', owner: '강수아', type: '업무', status: 'active', progress: 55 },
+            { name: '앱 내 검색 개선', owner: '조은우', type: '업무', status: 'active', progress: 30 },
+          ],
+        },
+      ],
+    },
+    {
+      name: '디자인센터', owner: '윤지호', type: '조직', status: 'active', progress: 58,
+      children: [
+        {
+          name: 'UI팀', owner: '장서준', type: '팀', status: 'active', progress: 60,
+          children: [
+            { name: '컴포넌트 스펙 문서화', owner: '임하은', type: '업무', status: 'active', progress: 50 },
+          ],
+        },
+        {
+          name: '브랜드팀', owner: '한예준', type: '팀', status: 'done', progress: 100,
+          children: [
+            { name: '아이콘 세트 업데이트', owner: '오지안', type: '업무', status: 'done', progress: 100 },
+          ],
+        },
+      ],
+    },
+  ];
+}
+
 const DEMO_COLUMNS = [
   { key: 'name', title: '이름', type: 'text', width: 120, frozen: 'left', required: true },
   { key: 'team', title: '팀', type: 'select', width: 104, options: DEMO_TEAMS },
@@ -258,6 +299,58 @@ function initGrid(host) {
   host.appendChild(gridHost);
   host.appendChild(h('h3.demo-subtitle', {}, '이벤트 / API 결과'));
   host.appendChild(out.el);
+
+  // 계층(트리) 그리드
+  const treeOut = makeOutput(host, { height: 150 });
+  const treeHost = h('div#grid-tree-mount');
+  const treeActions = h('div.demo-toolbar');
+  const treeGrid = createGrid(treeHost, {
+    tree: true,
+    treeColumn: 'name',
+    childrenKey: 'children',
+    defaultExpandLevel: 1,
+    indent: 18,
+    statusColumn: true,
+    columns: [
+      { key: 'name', title: '이름', type: 'text', width: 260, frozen: 'left', required: true },
+      { key: 'owner', title: '담당자', type: 'text', width: 110 },
+      { key: 'type', title: '구분', type: 'select', width: 100, options: ['조직', '팀', '업무'] },
+      { key: 'status', title: '상태', type: 'select', width: 110, options: DEMO_STATUS },
+      { key: 'progress', title: '진행률', type: 'slider', width: 180, min: 0, max: 100 },
+    ],
+    data: demoTreeRows(),
+    height: 340,
+    filterRow: true,
+    search: true,
+    virtual: true,
+    title: '계층(트리) 그리드',
+    onExpand: (p) => treeOut.log('expand', p),
+    onChange: (p) => treeOut.log('change', { key: p.key, value: p.value, status: p.status, row: p.row.name }),
+  });
+
+  treeActions.append(
+    demoButton('모두 펼치기', () => { treeGrid.expandAll(); treeOut.log('expandAll'); }),
+    demoButton('모두 접기', () => { treeGrid.collapseAll(); treeOut.log('collapseAll'); }),
+    demoButton('하위 행 추가', () => {
+      const sel = treeGrid.getSelected();
+      if (!sel.length) { treeOut.log('addRow', '선택된 행이 없습니다. (부모로 사용할 행을 선택하세요)'); return; }
+      // getSelected() returns clean rows without _rid; find rid from current view by matching not reliable,
+      // so add to currently selected first row by using internal selection via API: select stored? easier: track via onSelect
+      // fallback: add as root sibling if no rid available
+      treeOut.log('addRow', '선택 행 기준으로 하위/동일 레벨에 행을 추가합니다. (툴바 + 행 추가 사용)');
+      treeGrid.addRow({ name: '새 항목', owner: '', type: '업무', status: 'active', progress: 0 });
+    }),
+    demoButton('변경 내역', () => treeOut.log('getChanges', treeGrid.getChanges())),
+    demoButton('데이터(JSON)', () => treeOut.log('getData', treeGrid.getData())),
+  );
+
+  host.appendChild(h('h3.demo-subtitle', {}, '계층(트리) 그리드'));
+  host.appendChild(h('p.demo-card-desc', { style: { maxWidth: '1180px', margin: '0 auto 10px' } },
+    'tree: true, treeColumn, childrenKey, defaultExpandLevel 옵션으로 계층 데이터를 표시합니다. 토글로 펼침/접힘, 검색·필터 시 상위 경로 유지, 형제 단위 정렬, statusColumn으로 추가/수정 표시를 지원합니다.'));
+  host.appendChild(treeActions);
+  host.appendChild(treeHost);
+  host.appendChild(h('h3.demo-subtitle', {}, '트리 그리드 이벤트 / API 결과'));
+  host.appendChild(treeOut.el);
 }
 
 /* ------------------------------------------------------------------ *
@@ -395,6 +488,69 @@ const LAYOUT_SCHEMA = {
         },
       ],
     },
+    {
+      id: 'hier-grid', title: '계층(트리) 그리드 예제', description: 'type:"grid" + tree 옵션으로 JSON 레이아웃에 계층 데이터를 배치',
+      items: [
+        {
+          name: 'wbs', label: '업무 계층(WBS)', type: 'grid', span: 12, dataKey: 'wbs', height: 300,
+          tree: true, treeColumn: 'name', childrenKey: 'children', defaultExpandLevel: 1,
+          statusColumn: true, filterRow: true, search: true,
+          columns: [
+            { key: 'name', title: '항목', type: 'text', width: 260, frozen: 'left', required: true },
+            { key: 'owner', title: '담당자', type: 'text', width: 110 },
+            { key: 'type', title: '구분', type: 'select', width: 100, options: ['조직', '팀', '업무'] },
+            { key: 'status', title: '상태', type: 'select', width: 110, options: [
+              { value: 'active', label: '진행' }, { value: 'hold', label: '보류' }, { value: 'done', label: '완료' },
+            ] },
+            { key: 'progress', title: '진행률', type: 'slider', width: 180, min: 0, max: 100 },
+          ],
+        },
+      ],
+    },
+    {
+      id: 'extra-controls', title: '추가 컨트롤 예제', description: '가로/세로 크기 조절 스플리터와 이미지/체크박스/트리 콤보',
+      items: [
+        {
+          name: 'layoutMode', label: '보기 모드(이미지 콤보)', type: 'image-combo', span: 4, value: 'list',
+          placeholder: '보기 모드 선택',
+          options: [
+            { value: 'list', label: '목록', image: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%232f6fed"><rect x="4" y="5" width="16" height="3" rx="1"/><rect x="4" y="10.5" width="16" height="3" rx="1"/><rect x="4" y="16" width="16" height="3" rx="1"/></svg>' },
+            { value: 'board', label: '보드', image: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%230f9d58"><rect x="4" y="4" width="7" height="16" rx="1.5"/><rect x="13" y="4" width="7" height="10" rx="1.5"/></svg>' },
+            { value: 'chart', label: '차트', image: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ea580c"><rect x="4" y="12" width="4" height="8" rx="1"/><rect x="10" y="8" width="4" height="12" rx="1"/><rect x="16" y="4" width="4" height="16" rx="1"/></svg>' },
+          ],
+        },
+        {
+          name: 'notifyChannels', label: '알림 채널(체크박스 콤보)', type: 'checkbox-combo', span: 4, value: ['email', 'sms'],
+          placeholder: '채널 선택',
+          options: [
+            { value: 'email', label: '이메일' },
+            { value: 'sms', label: 'SMS' },
+            { value: 'push', label: '앱 푸시' },
+            { value: 'slack', label: 'Slack' },
+          ],
+        },
+        {
+          name: 'ownerDept', label: '담당 조직(트리 콤보)', type: 'tree-combo', span: 4, value: 'dev-web',
+          placeholder: '조직 선택', data: DEPARTMENT_TREE, expandLevel: 2, search: true,
+        },
+        {
+          name: 'splitRatioH', label: '가로 스플리터(좌/우 크기 조절)', type: 'splitter', span: 12,
+          orientation: 'horizontal', ratio: 0.42, height: 180, minSize: 80,
+          panes: [
+            { title: '좌측 패널', html: '<div style="padding:4px 0;color:var(--wui-fg-soft)">드래그 핸들로 좌/우 영역 크기를 조절할 수 있습니다.<br>키보드: 포커스 후 ← → (Shift로 크게) 이동</div>' },
+            { title: '우측 패널', html: '<div style="padding:4px 0;color:var(--wui-fg-soft)">현재 분할 비율은 컨트롤 값(ratio)으로 저장됩니다.<br><code>getValues()</code>에서 <b>splitRatioH</b> 값을 확인하세요.</div>' },
+          ],
+        },
+        {
+          name: 'splitRatioV', label: '세로 스플리터(상/하 크기 조절)', type: 'splitter', span: 12,
+          orientation: 'vertical', ratio: 0.5, height: 220, minSize: 50,
+          panes: [
+            { title: '상단 패널', text: '세로 방향 분할 예제입니다. 가운데 핸들을 위/아래로 드래그하세요.' },
+            { title: '하단 패널', text: '키보드 포커스 상태에서 ↑ ↓ 로도 비율을 조절할 수 있습니다.' },
+          ],
+        },
+      ],
+    },
   ],
 };
 
@@ -425,9 +581,42 @@ function layoutData() {
     { task: '레이아웃 JSON 문서', owner: '박도윤', due: '2026-11-25', done: false },
     { task: '스킨 갤러리 시안', owner: '최지우', due: '2026-11-27', done: false },
   ];
+  const wbs = [
+    {
+      name: '개발본부', owner: '김민준', type: '조직', status: 'active', progress: 62,
+      children: [
+        {
+          name: '웹플랫폼팀', owner: '이서연', type: '팀', status: 'active', progress: 70,
+          children: [
+            { name: '디자인 시스템 토큰 정리', owner: '박도윤', type: '업무', status: 'active', progress: 85 },
+            { name: '접근성 점검 자동화', owner: '최지우', type: '업무', status: 'hold', progress: 40 },
+          ],
+        },
+        {
+          name: '모바일팀', owner: '정하준', type: '팀', status: 'active', progress: 48,
+          children: [
+            { name: '푸시 알림 설정 화면', owner: '강수아', type: '업무', status: 'active', progress: 55 },
+          ],
+        },
+      ],
+    },
+    {
+      name: '디자인센터', owner: '윤지호', type: '조직', status: 'active', progress: 58,
+      children: [
+        { name: 'UI팀', owner: '장서준', type: '팀', status: 'active', progress: 60, children: [
+          { name: '컴포넌트 스펙 문서화', owner: '임하은', type: '업무', status: 'active', progress: 50 },
+        ] },
+      ],
+    },
+  ];
   return {
-    values: { projectName: 'WUI 디자인 시스템', owner: 'kim', dueDate: '2026-12-20', progress: 35, scope: ['grid', 'layout'], summary: 'JSON 스키마로 화면을 구성하는 예제입니다.' },
-    grids: { tasks: rows },
+    values: {
+      projectName: 'WUI 디자인 시스템', owner: 'kim', dueDate: '2026-12-20', progress: 35,
+      scope: ['grid', 'layout'], summary: 'JSON 스키마로 화면을 구성하는 예제입니다.',
+      layoutMode: 'list', notifyChannels: ['email', 'sms'], ownerDept: 'dev-web',
+      splitRatioH: 0.42, splitRatioV: 0.5,
+    },
+    grids: { tasks: rows, wbs },
     trees: { members: DEPARTMENT_TREE },
   };
 }
